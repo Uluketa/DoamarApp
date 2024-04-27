@@ -1,9 +1,9 @@
 import 'src/styles/global.css';
 
-import { useEffect } from "react";
-import { useColorScheme } from "react-native";
+import { useEffect, useState } from "react";
+import { colorScheme } from 'nativewind';
 import { useFonts, HindSiliguri_400Regular, HindSiliguri_500Medium, HindSiliguri_700Bold } from "@expo-google-fonts/hind-siliguri";
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { DefaultTheme, DarkTheme, ThemeProvider } from "@react-navigation/native";
 import 'react-native-gesture-handler';
 
 import RootStack from 'src/routes/index';
@@ -28,10 +28,10 @@ export default function App() {
 }
 
 function RootLayoutNav() {
-    const colorScheme = useColorScheme();
-    
+    const [colorTheme, setColorTheme] = useState(colorScheme.get());
+
     return (
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
             <RootStack />
         </ThemeProvider>
     );
