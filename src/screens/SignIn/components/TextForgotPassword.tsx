@@ -1,20 +1,18 @@
-import { forwardRef } from 'react';
+
+import { useNavigation } from '@react-navigation/native';
+import React from 'react';
 import { Text, TouchableOpacity, TouchableOpacityProps } from 'react-native';
-import { colors } from '~/styles/colors';
 
 interface TextForgotPasswordProps extends TouchableOpacityProps {
   onPress: () => void;
 }
 
-export const TextForgotPassword = forwardRef<TouchableOpacity, TextForgotPasswordProps>(({ onPress }, ref) => {
+const TextForgotPassword: React.FC<TextForgotPasswordProps> = ({ onPress }, ref) => {
   return (
-    <TouchableOpacity ref={ref} className={styles.button} onPress={onPress} >
-      <Text className={styles.buttonText}>Esqueceu a senha?</Text>
+    <TouchableOpacity ref={ref} className="items-end w-full mb-5 p-2" onPress={onPress} >
+      <Text className="text-gray-500 text-base text-center" style={{ textDecorationLine: 'underline' }}>Esqueceu a senha?</Text>
     </TouchableOpacity>
   );
-});
-
-const styles = {
-  button: 'items-end w-full px-5',
-  buttonText: 'text-black text-lg font- text-center',
 };
+
+export default TextForgotPassword;
