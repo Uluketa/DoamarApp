@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StatusBar } from 'react-native';
 import BtnText from '~/components/Button';
 import LabeledTextInput from '~/components/LabeledTextInput';
 import { AntDesign } from '@expo/vector-icons'; 
@@ -20,9 +20,9 @@ export default function ForgotPassword() {
             <View className='w-96 bg-white rounded-2xl shadow-lg p-5'>
                 {!emailEntered ? (
                     <View className='p-2'>
-                        <Text className='font-semibold text-xl'>Digite o seu e-mail para continuar </Text>
+                        <Text className='font-semibold text-xl'>Digite o seu e-mail para continuar: </Text>
 
-                        <LabeledTextInput label="" onChangeTxt={setEmail} value={email} />
+                        <LabeledTextInput label="" onChangeTxt={setEmail} value={email} placeholder='example@email.com' required={false} />
 
                         <View className='mt-5'>
                             <BtnText bgColor={colors.palette[3]} onPress={handleContinue} title='Continuar' />
@@ -30,14 +30,12 @@ export default function ForgotPassword() {
                     </View>
                 ) : (
                     <View className='p-4 items-center justify-center'>
-                        <AntDesign name="checkcircle" size={75} color={colors.palette[2]} className='mb-8' />
+                        <AntDesign name="checkcircle" size={75} color={colors.palette[3]} className='mb-8' />
                         <Text className='font-semibold text-xl'>Mensagem de confirmação </Text>
 
                         <Text className='text-center mt-2'>Um e-mail de redefinição de senha foi enviado para {email}.</Text>
                     </View>
                 )}
-
-
             </View>
         </View>
     );

@@ -8,6 +8,8 @@ import 'react-native-gesture-handler';
 
 import RootStack from 'src/routes/index';
 import { Loading } from "src/components/global/loading";
+import { StatusBar } from 'react-native';
+import { colors } from '~/styles/colors';
 
 export default function App() {
   const [loaded, error] = useFonts({
@@ -28,11 +30,12 @@ export default function App() {
 }
 
 function RootLayoutNav() {
-    const [colorTheme, setColorTheme] = useState(colorScheme.get());
+  const [colorTheme, setColorTheme] = useState(colorScheme.get());
 
-    return (
-        <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <RootStack />
-        </ThemeProvider>
-    );
+  return (
+    <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <StatusBar backgroundColor={colors.palette[1]} />
+      <RootStack />
+    </ThemeProvider>
+  );
 }

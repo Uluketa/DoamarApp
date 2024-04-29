@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TextInput, ColorSchemeName, TouchableOpacity, Image, Keyboard, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { colors } from '~/styles/colors';
+
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '~/routes';
 
 import TextForgotPassword from './components/TextForgotPassword';
 import LabeledTextInput from '~/components/LabeledTextInput';
 import ButtonEntrar from '~/components/Button';
-
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '~/routes';
 
 type Props = { navigation: StackNavigationProp<RootStackParamList, 'SignIn'> };
 
@@ -34,8 +33,8 @@ export default function SignIn({ navigation }: Props) {
                 className='w-full items-center justify-center px-8'
                 style={{ height: '65%' }}
             >
-                <LabeledTextInput label="Login:" value={login} onChangeTxt={setLogin}/>
-                <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword}/>
+                <LabeledTextInput label="Login:" value={login} onChangeTxt={setLogin} placeholder='' required={false} />
+                <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' required={false}/>
                 <TextForgotPassword onPress={() => navigation.navigate('ForgotPassword')} />
 
                 <ButtonEntrar title='Entrar' onPress={() => navigation.navigate('HomeClient')} bgColor={colors.palette[1]} />
@@ -44,7 +43,7 @@ export default function SignIn({ navigation }: Props) {
             <View
                 style={{ height: '10%' }}
             >
-                <TouchableOpacity className="items-center p-5" >
+                <TouchableOpacity className="items-center p-5" onPress={() => navigation.navigate("SignUp")}>
                     <Text className="text-gray-500 text-base text-center">Ainda não tem uma conta? <Text style={{ textDecorationLine: 'underline' }}>Cadastre-se</Text></Text>
                 </TouchableOpacity>
             </View>
