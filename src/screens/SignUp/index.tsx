@@ -24,6 +24,12 @@ export default function SignUp({ navigation }: Props) {
     const [password, setPassword] = useState<string>('');
     const [typeUser, setTypeUser] = useState<UserType>('I');
 
+    const [address, setAddress] = useState<string>('');
+    const [addressCep, setAddressCep] = useState<string>('');
+    const [addressNum, setAddressNum] = useState<string>(0);
+    const [addressCompl, setAddressCompl] = useState<string>('');
+    const [addressRefer, setAddressRefer] = useState<string>('');
+
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
     useEffect(() => {
@@ -57,16 +63,34 @@ export default function SignUp({ navigation }: Props) {
                             <TypeUserSelect setTypeUser={setTypeUser} typeUser={typeUser} />
                         </ScrollView>
                     ) : (
-                        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                            <LabeledTextInput label="Login:" value={login} onChangeTxt={setLogin} placeholder='' required />
-                            <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' required />
-                        </ScrollView>
+                        (screen == 2) ? (
+                            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                                <LabeledTextInput label="CEP:" value={addressCep} onChangeTxt={setAddressCep} placeholder='Ex: 00000-000' required />
+                                <LabeledTextInput label="Endereço:" value={address} onChangeTxt={setAddress} placeholder='Ex: Rua Camucas do Sul' required />
+
+                                <View className='flex-row'>
+                                    <View className='w-1/3 pr-1'>
+                                        <LabeledTextInput label="Nº:" value={addressNum} onChangeTxt={setAddressNum} placeholder='Ex: 1000' required />
+                                    </View>
+                                    <View className='w-2/3'>
+                                        <LabeledTextInput label="Complemento:" value={addressCompl} onChangeTxt={setAddressCompl} placeholder='' required={false} />
+                                    </View>
+                                </View>
+
+                                <LabeledTextInput label="Referência:" value={addressRefer} onChangeTxt={setAddressRefer} placeholder='' required={false} />
+                            </ScrollView>
+                        ) : (
+                            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                                <LabeledTextInput label="Login:" value={login} onChangeTxt={setLogin} placeholder='' required />
+                                <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' required />
+                            </ScrollView>
+                        )
                     )}
 
                     {(screen == 1) ? (
                         <View className='w-full grid-cols-3 flex-row justify-between mt-3 items-center'>
                             <View style={{ width: 24 }} />
-                            <Text className='text-center text-gray-400'>{screen} / 2</Text>
+                            <Text className='text-center text-gray-400'>{screen} / 3</Text>
                             <AntDesign
                                 name="arrowright"
                                 size={24}
@@ -76,22 +100,42 @@ export default function SignUp({ navigation }: Props) {
                             />
                         </View>
                     ) : (
-                        <View className='w-full grid-cols-3 flex-row justify-between mt-3 items-center'>
-                            <AntDesign
-                                name="arrowleft"
-                                size={24}
-                                color={colors.palette[1]}
-                                onPress={() => setScreen(screen - 1)}
-                                className='p-2'
-                            />
-                            <Text className='text-center text-gray-400'>{screen} / 2</Text>
-                            <View style={{ width: 24 }} />
-                        </View>
+                        (screen == 2) ? (
+                            <View className='w-full grid-cols-3 flex-row justify-between mt-3 items-center'>
+                                <AntDesign
+                                    name="arrowleft"
+                                    size={24}
+                                    color={colors.palette[1]}
+                                    onPress={() => setScreen(screen - 1)}
+                                    className='p-2'
+                                />
+                                <Text className='text-center text-gray-400'>{screen} / 3</Text>
+                                <AntDesign
+                                    name="arrowright"
+                                    size={24}
+                                    color={colors.palette[1]}
+                                    onPress={() => setScreen(screen + 1)}
+                                    className='p-2'
+                                />
+                            </View>
+                        ) : (
+                            <View className='w-full grid-cols-3 flex-row justify-between mt-3 items-center'>
+                                <AntDesign
+                                    name="arrowleft"
+                                    size={24}
+                                    color={colors.palette[1]}
+                                    onPress={() => setScreen(screen - 1)}
+                                    className='p-2'
+                                />
+                                <Text className='text-center text-gray-400'>{screen} / 3</Text>
+                                <View style={{ width: 24 }} />
+                            </View>
+                        )
                     )}
 
                 </View>
 
-                {(screen == 2) && (
+                {(screen == 3) && (
                     <View className='w-96 px-14 mt-4'>
                         <Text className='text-center text-sm text-gray-400 mb-4'>Li e estou de acordo com os <Text style={{ textDecorationLine: 'underline' }}>Termos de Uso</Text>.</Text>
                         <ButtonCadastrar bgColor={colors.palette[1]} onPress={() => navigation.navigate("SignIn")} title='Cadastrar-se' />

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { colors } from '~/styles/colors';
+import { styles } from './styles';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '~/routes';
@@ -8,14 +9,31 @@ import { RootStackParamList } from '~/routes';
 import TextForgotPassword from './components/TextForgotPassword';
 import LabeledTextInput from '~/components/LabeledTextInput';
 import ButtonEntrar from '~/components/Button';
+import { login } from '~/services/api';
 
 type Props = { navigation: StackNavigationProp<RootStackParamList, 'SignIn'> };
 
 export default function SignIn({ navigation }: Props) {
     const [auth, setAuth] = useState(false);
-    const [login, setLogin] = useState('');
+    const [vlogin, setvLogin] = useState('');
     const [password, setPassword] = useState('');
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+    const handleLogin = async () => {
+        const api = await login(vlogin, password);
+
+        if (api.success) {
+            if (api.typeUser === "I") {
+                navigation.navigate('HomeCompany');
+            } else if (api.typeUser === "C") {
+                navigation.navigate('HomeClient');
+            } else {
+                console.log('Login falhou');
+            }
+        } else {
+            console.log('Login falhou');
+        }
+    };
 
     return (
         <View className='flex-1 items-center justify-center'>
@@ -33,16 +51,14 @@ export default function SignIn({ navigation }: Props) {
                 className='w-full items-center justify-center px-8'
                 style={{ height: '65%' }}
             >
-                <LabeledTextInput label="Login:" value={login} onChangeTxt={setLogin} placeholder='' required={false} />
+                <LabeledTextInput label="Login:" value={vlogin} onChangeTxt={setvLogin} placeholder='' required={false} />
                 <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' required={false}/>
                 <TextForgotPassword onPress={() => navigation.navigate('ForgotPassword')} />
 
-                <ButtonEntrar title='Entrar' onPress={() => navigation.navigate('HomeClient')} bgColor={colors.palette[1]} />
+                <ButtonEntrar title='Entrar' onPress={handleLogin} bgColor={colors.palette[1]} />
             </View>
 
-            <View
-                style={{ height: '10%' }}
-            >
+            <View style={{ height: '10%' }} >
                 <TouchableOpacity className="items-center p-5" onPress={() => navigation.navigate("SignUp")}>
                     <Text className="text-gray-500 text-base text-center">Ainda não tem uma conta? <Text style={{ textDecorationLine: 'underline' }}>Cadastre-se</Text></Text>
                 </TouchableOpacity>
@@ -50,25 +66,3 @@ export default function SignIn({ navigation }: Props) {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    imgKeyVisible: {
-        width: 50,
-        height: 50
-    },
-    imgKeyNotVisible: {
-        width: 100,
-        height: 100
-    },
-    containerKeyVisible: {
-        alignItems: 'flex-end',
-        paddingRight: 20
-    },
-    containerKeyNotVisible: {
-        alignItems: 'center'
-    },
-    containerImg: {
-        backgroundColor: colors.palette[1],
-        height: '25%'
-    }
-});
