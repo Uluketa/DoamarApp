@@ -7,9 +7,9 @@ interface TextForgotPasswordProps extends TouchableOpacityProps {
   onPress: () => void;
 }
 
-const TextForgotPassword: React.FC<TextForgotPasswordProps> = ({ onPress }, ref) => {
+const TextForgotPassword: React.FC<TextForgotPasswordProps> = ({ onPress }) => {
   return (
-    <TouchableOpacity ref={ref} className="items-end w-full mb-5 p-2" onPress={onPress} >
+    <TouchableOpacity className="items-end w-full mb-5 p-2" onPress={onPress} >
       <Text className="text-gray-500 text-base text-center" style={{ textDecorationLine: 'underline' }}>Esqueceu a senha?</Text>
     </TouchableOpacity>
   );

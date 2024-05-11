@@ -14,24 +14,34 @@ import { login } from '~/services/api';
 type Props = { navigation: StackNavigationProp<RootStackParamList, 'SignIn'> };
 
 export default function SignIn({ navigation }: Props) {
-    const [auth, setAuth] = useState(false);
+    const [modalIsVisible, setModalIsVisible] = useState(false);
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
     const [vlogin, setvLogin] = useState('');
     const [password, setPassword] = useState('');
-    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    
+    const [verror, setvError] = useState(false);
+    const [verrorMsg, setvErrorMsg] = useState<string>();
 
     const handleLogin = async () => {
         const api = await login(vlogin, password);
 
+        console.log(api)
         if (api.success) {
             if (api.typeUser === "I") {
-                navigation.navigate('HomeCompany');
+                if (api.receiveDonationQuest) {
+                    navigation.navigate('HomeCompany');
+                } else {
+                    navigation.navigate('ReceiveDonationQuest');
+                }
             } else if (api.typeUser === "C") {
                 navigation.navigate('HomeClient');
             } else {
-                console.log('Login falhou');
+                setvError(true);
             }
         } else {
-            console.log('Login falhou');
+            setvError(true);
+            setvErrorMsg("Ops, ocorreu um erro. Tente novamente mais tarde");
         }
     };
 
@@ -51,8 +61,8 @@ export default function SignIn({ navigation }: Props) {
                 className='w-full items-center justify-center px-8'
                 style={{ height: '65%' }}
             >
-                <LabeledTextInput label="Login:" value={vlogin} onChangeTxt={setvLogin} placeholder='' required={false} />
-                <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' required={false}/>
+                <LabeledTextInput label="Login:" value={vlogin} onChangeTxt={setvLogin} placeholder='' />
+                <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' password/>
                 <TextForgotPassword onPress={() => navigation.navigate('ForgotPassword')} />
 
                 <ButtonEntrar title='Entrar' onPress={handleLogin} bgColor={colors.palette[1]} />

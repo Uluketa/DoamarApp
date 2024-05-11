@@ -50,7 +50,7 @@ export default function SignUp({ navigation }: Props) {
     return (
         <View className='flex-1 items-center justify-center'>
             <View className='justify-center items-center' style={{ height: '90%' }}>
-                <View className='w-96 py-5 px-8 bg-white shadow-lg rounded-2xl' style={{ height: (isKeyboardVisible) ? '80%' : 'auto' }}>
+                <View className='w-96 py-5 px-8 bg-white shadow-lg rounded-2xl' style={{ maxHeight: (isKeyboardVisible) ? '80%' : 'auto' }}>
                     {(screen == 1) ? (
                         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                             <LabeledTextInput label="Nome:" value={name} onChangeTxt={setName} placeholder='' required />
@@ -73,16 +73,16 @@ export default function SignUp({ navigation }: Props) {
                                         <LabeledTextInput label="Nº:" value={addressNum} onChangeTxt={setAddressNum} placeholder='Ex: 1000' required />
                                     </View>
                                     <View className='w-2/3'>
-                                        <LabeledTextInput label="Complemento:" value={addressCompl} onChangeTxt={setAddressCompl} placeholder='' required={false} />
+                                        <LabeledTextInput label="Complemento:" value={addressCompl} onChangeTxt={setAddressCompl} placeholder='' />
                                     </View>
                                 </View>
 
-                                <LabeledTextInput label="Referência:" value={addressRefer} onChangeTxt={setAddressRefer} placeholder='' required={false} />
+                                <LabeledTextInput label="Referência:" value={addressRefer} onChangeTxt={setAddressRefer} placeholder='' />
                             </ScrollView>
                         ) : (
                             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                                 <LabeledTextInput label="Login:" value={login} onChangeTxt={setLogin} placeholder='' required />
-                                <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' required />
+                                <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' required password />
                             </ScrollView>
                         )
                     )}

@@ -5,11 +5,12 @@ interface LabeledTextInputProps {
   label: string;
   value: string;
   placeholder: string;
-  required: boolean;
+  required?: boolean;
+  password?: boolean;
   onChangeTxt: (text: string) => void;
 }
 
-const LabeledTextInput: React.FC<LabeledTextInputProps> = ({ label, onChangeTxt, value, placeholder, required }) => {
+const LabeledTextInput: React.FC<LabeledTextInputProps> = ({ label, onChangeTxt, value, placeholder, required, password }) => {
   return (
     <View className='mb-3 w-full'>
       <Text className='mb-2 font-bold text-lg'>{label} <Text style={{ color: 'red' }}>{required ? "*" : ""}</Text></Text>
@@ -18,6 +19,7 @@ const LabeledTextInput: React.FC<LabeledTextInputProps> = ({ label, onChangeTxt,
         onChangeText={onChangeTxt}
         placeholder={placeholder}
         value={value}
+        secureTextEntry={password} 
       />
     </View>
   );

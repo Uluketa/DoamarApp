@@ -1,18 +1,21 @@
 import loginData from '../api/login.json';
 
 interface UserData {
+  id: string;
   login: string;
   password: string;
   typeUser: string;
   hash: string;
-  id: string;
+  receiveDonationQuest: boolean;
+  error: boolean;
+  errormsg: string;
 }
 
-export async function login(login: string, password: string): Promise<{ success: boolean, typeUser?: string, id?: string }> {
+export async function login(login: string, password: string): Promise<{ success: boolean, typeUser?: string, id?: string, receiveDonationQuest?: boolean}> {
   try {
-    const { login: storedLogin, password: storedPassword, typeUser, id } = loginData as UserData;
+    const { login: storedLogin, password: storedPassword, typeUser, id, receiveDonationQuest } = loginData as UserData;
     if (login === storedLogin && password === storedPassword) {
-      return { success: true, typeUser, id };
+      return { success: true, typeUser, receiveDonationQuest };
     } else {
       return { success: false };
     }
