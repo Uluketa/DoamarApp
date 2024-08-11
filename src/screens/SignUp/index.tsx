@@ -26,7 +26,7 @@ export default function SignUp({ navigation }: Props) {
 
     const [address, setAddress] = useState<string>('');
     const [addressCep, setAddressCep] = useState<string>('');
-    const [addressNum, setAddressNum] = useState<string>(0);
+    const [addressNum, setAddressNum] = useState<number>(0);
     const [addressCompl, setAddressCompl] = useState<string>('');
     const [addressRefer, setAddressRefer] = useState<string>('');
 

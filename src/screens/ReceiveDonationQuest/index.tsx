@@ -20,7 +20,7 @@ export default function ReceiveDonationQuest({ navigation }: Props) {
     return (
         <View className='flex-1 items-center'>
             <View
-                className='w-full justify-center items-center w-full h-4/5 rounded-b-3xl'
+                className='w-full justify-center items-center h-4/5 rounded-b-3xl'
                 style={{ backgroundColor: colors.palette[1] }}
             >
                 <Image
@@ -29,7 +29,9 @@ export default function ReceiveDonationQuest({ navigation }: Props) {
                     className='mb-20'
                 />
 
-                <Text className="text-gray-300 text-3xl mb-24 text-center" style={{ lineHeight: 45}}>Deseja realizar doações para a comunidade através do aplicativo?</Text>
+                <Text className="text-gray-300 text-3xl mb-24 text-center" style={{ lineHeight: 45}}>
+                    Deseja realizar doações para a comunidade através do aplicativo?
+                </Text>
 
                 <View className='w-60'>
                     <ButtonAvancar bgColor={colors.palette[3]} onPress={() => navigation.navigate("HomeCompany")} title='Cadastrar Itens' />

@@ -14,7 +14,6 @@ import { login } from '~/services/api';
 type Props = { navigation: StackNavigationProp<RootStackParamList, 'SignIn'> };
 
 export default function SignIn({ navigation }: Props) {
-    const [modalIsVisible, setModalIsVisible] = useState(false);
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
     const [vlogin, setvLogin] = useState('');
@@ -57,10 +56,7 @@ export default function SignIn({ navigation }: Props) {
                 />
             </View>
 
-            <View
-                className='w-full items-center justify-center px-8'
-                style={{ height: '65%' }}
-            >
+            <View className='w-full items-center justify-center px-8' style={{ height: '65%' }}>
                 <LabeledTextInput label="Login:" value={vlogin} onChangeTxt={setvLogin} placeholder='' />
                 <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' password/>
                 <TextForgotPassword onPress={() => navigation.navigate('ForgotPassword')} />
@@ -70,7 +66,9 @@ export default function SignIn({ navigation }: Props) {
 
             <View style={{ height: '10%' }} >
                 <TouchableOpacity className="items-center p-5" onPress={() => navigation.navigate("SignUp")}>
-                    <Text className="text-gray-500 text-base text-center">Ainda não tem uma conta? <Text style={{ textDecorationLine: 'underline' }}>Cadastre-se</Text></Text>
+                    <Text className="text-gray-500 text-base text-center">Ainda não tem uma conta? 
+                        <Text style={{ textDecorationLine: 'underline' }}>Cadastre-se</Text>
+                    </Text>
                 </TouchableOpacity>
             </View>
         </View>
