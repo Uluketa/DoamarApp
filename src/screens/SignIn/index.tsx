@@ -67,7 +67,7 @@ export default function SignIn({ navigation }: Props) {
             <View style={{ height: '10%' }} >
                 <TouchableOpacity className="items-center p-5" onPress={() => navigation.navigate("SignUp")}>
                     <Text className="text-gray-500 text-base text-center">Ainda não tem uma conta? 
-                        <Text style={{ textDecorationLine: 'underline' }}>Cadastre-se</Text>
+                        <Text style={{ textDecorationLine: 'underline' }}> Cadastre-se</Text>
                     </Text>
                 </TouchableOpacity>
             </View>

@@ -1,4 +1,4 @@
-import loginData from '../api/login.json';
+import loginData from '../../api/login.json';
 
 interface UserData {
   id: string;
