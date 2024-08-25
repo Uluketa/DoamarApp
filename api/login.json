@@ -1,7 +1,7 @@
 {
-  "login": "Lucas",
-  "password": "123",
-  "typeUser": "I",
+  "login": "",
+  "password": "",
+  "typeUser": "C",
   "hash": "2a5fd6c4e3b2a1",
   "id": "1234",
   "errormsg": "success",

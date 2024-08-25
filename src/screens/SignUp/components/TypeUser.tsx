@@ -18,7 +18,7 @@ const TypeUser: React.FC<TypeUserProps> = ({ typeUser, setTypeUser }) => {
                     <View className='absolute w-20 rounded-lg p-8 h-full bg-slate-300' />
                 )}
                 <AntDesign
-                    name="home"
+                    name="user"
                     size={24}
                     color={(typeUser === "I") ? colors.palette[1] : "rgb(209 213 219)"}
                 />
@@ -32,7 +32,7 @@ const TypeUser: React.FC<TypeUserProps> = ({ typeUser, setTypeUser }) => {
                     <View className='absolute w-20 rounded-lg p-8 h-full bg-slate-300' />
                 )}
                 <AntDesign
-                    name="user"
+                    name="home"
                     size={24}
                     color={(typeUser === "C") ? colors.palette[1] : "rgb(209 213 219)"}
                 />

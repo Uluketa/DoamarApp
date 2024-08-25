@@ -4,10 +4,7 @@ import { colors } from '~/styles/colors';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '~/routes';
-
-import LabeledTextInput from '~/components/LabeledTextInput';
-import ButtonAvancar from '~/components/Button';
-import { login } from '~/services/api';
+import { BtnText as ButtonAvancar } from '~/components/Button';
 
 type Props = { navigation: StackNavigationProp<RootStackParamList, 'ReceiveDonationQuest'> };
 
@@ -29,7 +26,7 @@ export default function ReceiveDonationQuest({ navigation }: Props) {
                     className='mb-20'
                 />
 
-                <Text className="text-gray-300 text-3xl mb-24 text-center" style={{ lineHeight: 45}}>
+                <Text className="text-gray-300 text-3xl mb-24 text-center" style={{ lineHeight: 45 }}>
                     Deseja realizar doações para a comunidade através do aplicativo?
                 </Text>
 

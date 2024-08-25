@@ -6,8 +6,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '~/routes';
 import { AntDesign } from '@expo/vector-icons';
 
-import LabeledTextInput from '~/components/LabeledTextInput';
-import ButtonCadastrar from '~/components/Button';
+import { LabeledTextInput } from '~/components/LabeledTextInput';
+import { BtnText as ButtonCadastrar } from '~/components/Button';
 import TypeUserSelect from './components/TypeUser';
 
 type Props = { navigation: StackNavigationProp<RootStackParamList, 'SignUp'> };
@@ -53,10 +53,10 @@ export default function SignUp({ navigation }: Props) {
                 <View className='w-96 py-5 px-8 bg-white shadow-lg rounded-2xl' style={{ maxHeight: (isKeyboardVisible) ? '80%' : 'auto' }}>
                     {(screen == 1) ? (
                         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                            <LabeledTextInput label="Nome:" value={name} onChangeTxt={setName} placeholder='' required />
-                            <LabeledTextInput label="E-mail:" value={email} onChangeTxt={setEmail} placeholder='example@email.com' required />
-                            <LabeledTextInput label="Celular:" value={cel} onChangeTxt={setCel} placeholder='11 98765-4321' required />
-                            <LabeledTextInput label="CPF / CNPJ:" value={cpfCnpj} onChangeTxt={setCpfCnpj} placeholder='' required />
+                            <LabeledTextInput label="Nome:" value={name} onChangeText={setName} required />
+                            <LabeledTextInput label="E-mail:" value={email} onChangeText={setEmail} placeholder='example@email.com' required />
+                            <LabeledTextInput label="Celular:" value={cel} onChangeText={setCel} placeholder='11 98765-4321' required />
+                            <LabeledTextInput label="CPF / CNPJ:" value={cpfCnpj} onChangeText={setCpfCnpj} required />
 
                             <Text className='mb-2 font-bold text-lg'>Tipo de Usuário: <Text style={{ color: 'red' }}>*</Text></Text>
 
@@ -65,24 +65,25 @@ export default function SignUp({ navigation }: Props) {
                     ) : (
                         (screen == 2) ? (
                             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                                <LabeledTextInput label="CEP:" value={addressCep} onChangeTxt={setAddressCep} placeholder='Ex: 00000-000' required />
-                                <LabeledTextInput label="Endereço:" value={address} onChangeTxt={setAddress} placeholder='Ex: Rua Camucas do Sul' required />
+                                <LabeledTextInput label="CEP:" value={addressCep} onChangeText={setAddressCep} placeholder='Ex: 00000-000' required />
+                                <LabeledTextInput label="Endereço:" value={address} onChangeText={setAddress} placeholder='Ex: Rua Camucas do Sul' required />
 
                                 <View className='flex-row'>
                                     <View className='w-1/3 pr-1'>
-                                        <LabeledTextInput label="Nº:" value={addressNum} onChangeTxt={setAddressNum} placeholder='Ex: 1000' required />
+                                        <LabeledTextInput label="Nº:" value={addressNum} onChangeText={setAddressNum} placeholder='Ex: 1000' required />
                                     </View>
+
                                     <View className='w-2/3'>
-                                        <LabeledTextInput label="Complemento:" value={addressCompl} onChangeTxt={setAddressCompl} placeholder='' />
+                                        <LabeledTextInput label="Complemento:" value={addressCompl} onChangeText={setAddressCompl} />
                                     </View>
                                 </View>
 
-                                <LabeledTextInput label="Referência:" value={addressRefer} onChangeTxt={setAddressRefer} placeholder='' />
+                                <LabeledTextInput label="Referência:" value={addressRefer} onChangeText={setAddressRefer} />
                             </ScrollView>
                         ) : (
                             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                                <LabeledTextInput label="Login:" value={login} onChangeTxt={setLogin} placeholder='' required />
-                                <LabeledTextInput label="Senha:" value={password} onChangeTxt={setPassword} placeholder='' required password />
+                                <LabeledTextInput label="Login:" value={login} onChangeText={setLogin} required />
+                                <LabeledTextInput label="Senha:" value={password} onChangeText={setPassword} required secureTextEntry />
                             </ScrollView>
                         )
                     )}
@@ -137,7 +138,7 @@ export default function SignUp({ navigation }: Props) {
 
                 {(screen == 3) && (
                     <View className='w-96 px-14 mt-4'>
-                        <Text className='text-center text-sm text-gray-400 mb-4'>Li e estou de acordo com os <Text style={{ textDecorationLine: 'underline' }}>Termos de Uso</Text>.</Text>
+                        <Text className='text-center text-sm text-gray-400 mb-4'>Li e estou de acordo com os <Text className='underline'>Termos de Uso</Text>.</Text>
                         <ButtonCadastrar bgColor={colors.palette[1]} onPress={() => navigation.navigate("SignIn")} title='Cadastrar-se' />
                     </View>
                 )}

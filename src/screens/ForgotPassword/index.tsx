@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { View, Text, StatusBar } from 'react-native';
-import BtnText from '~/components/Button';
-import LabeledTextInput from '~/components/LabeledTextInput';
-import { AntDesign } from '@expo/vector-icons'; 
+import { BtnText } from '~/components/Button';
+import { LabeledTextInput } from '~/components/LabeledTextInput';
+import { AntDesign } from '@expo/vector-icons';
 import { colors } from '~/styles/colors';
 
 export default function ForgotPassword() {
@@ -22,7 +22,7 @@ export default function ForgotPassword() {
                     <View className='p-2'>
                         <Text className='font-semibold text-xl'>Digite o seu e-mail para continuar: </Text>
 
-                        <LabeledTextInput label="" onChangeTxt={setEmail} value={email} placeholder='example@email.com' required={false} />
+                        <LabeledTextInput label="" onChangeText={setEmail} value={email} placeholder='example@email.com' required={false} />
 
                         <View className='mt-5'>
                             <BtnText bgColor={colors.palette[3]} onPress={handleContinue} title='Continuar' />

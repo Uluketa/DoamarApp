@@ -1,8 +1,6 @@
-import React from 'react';
 import { Image } from 'react-native';
 
-
-const Logo: React.FC = () => {
+export const Logo = () => {
     return (
         <Image
             className='mr-5'
@@ -11,5 +9,3 @@ const Logo: React.FC = () => {
         />
     );
 };
-
-export default Logo;

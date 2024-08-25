@@ -7,8 +7,7 @@ export const styles = StyleSheet.create({
         height: 50
     },
     imgKeyNotVisible: {
-        width: 100,
-        height: 100
+        width: 100
     },
     containerKeyVisible: {
         alignItems: 'flex-end',
