@@ -6,6 +6,9 @@ import { useFonts, HindSiliguri_400Regular, HindSiliguri_500Medium, HindSiliguri
 import { DefaultTheme, DarkTheme, ThemeProvider } from "@react-navigation/native";
 import 'react-native-gesture-handler';
 
+import { Provider } from 'react-redux';
+import store from './src/store';
+
 import RootStack from 'src/routes/index';
 import { Loading } from "src/components/global/loading";
 import { StatusBar } from 'react-native';
@@ -33,9 +36,11 @@ function RootLayoutNav() {
   const [colorTheme, setColorTheme] = useState(colorScheme.get());
 
   return (
-    <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <StatusBar backgroundColor={colors.palette[1]} />
-      <RootStack />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <StatusBar backgroundColor={colors.palette[1]} />
+        <RootStack />
+      </ThemeProvider>
+    </Provider>
   );
 }

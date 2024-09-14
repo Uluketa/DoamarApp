@@ -1,28 +1,54 @@
-import loginData from '../../api/login.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-interface UserData {
-  id: string;
-  login: string;
-  password: string;
-  typeUser: string;
-  hash: string;
-  receiveDonationQuest: boolean;
+const URL = (__DEV__) ? "192.168.15.3:8080" : "NOT DEFINED";
+
+interface LoginData {
   error: boolean;
-  errormsg: string;
+  msg: string;
+  userId: number|null;
+  userType: string|null;
+  typeDonation: string|null;
 }
 
-export async function login(login: string, password: string): Promise<{ typeUser?: string, id?: string, receiveDonationQuest?: boolean, error: boolean, errormsg: string }> {
+export async function login(login: string, password: string): Promise<LoginData> {
   try {
-    const { login: storedLogin, password: storedPassword, typeUser, id, receiveDonationQuest, error, errormsg } = loginData as UserData;
+    const response = await axios.post(`http://${URL}/api/login`, {
+      login,
+      senha: password
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
 
-    if (login === storedLogin && password === storedPassword) {
-      return { typeUser, id, receiveDonationQuest, error: false, errormsg: '' };
+    const data = response.data;
+
+    return {
+      error: data.error,
+      msg: data.msg,
+      userId: data.userId,
+      userType: data.userType,
+      typeDonation: data.typeDonation
+    };
+
+  } catch (error: any) {
+
+    if (error.response) {
+      return {
+        error: true,
+        msg: error.response.data?.msg || "Erro ao processar a solicitação.",
+        userType: null,
+        typeDonation: null
+      };
+    } else {
+      return {
+        error: true,
+        msg: "Ocorreu um erro. Tente novamente mais tarde!",
+        userType: null,
+        typeDonation: null
+      };
     }
-
-    return { typeUser: '', id: '', receiveDonationQuest: false, error: true, errormsg: 'Login ou senha incorretos' };
-
-  } catch (error) {
-    console.error('Erro ao fazer login:', error);
-    return { typeUser: '', id: '', receiveDonationQuest: false, error: true, errormsg: 'Erro ao processar a solicitação' };
   }
 }

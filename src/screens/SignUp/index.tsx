@@ -22,7 +22,7 @@ export default function SignUp({ navigation }: Props) {
     const [cel, setCel] = useState<string>('');
     const [login, setLogin] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [typeUser, setTypeUser] = useState<UserType>('I');
+    const [userType, setTypeUser] = useState<UserType>('I');
 
     const [address, setAddress] = useState<string>('');
     const [addressCep, setAddressCep] = useState<string>('');
@@ -56,11 +56,11 @@ export default function SignUp({ navigation }: Props) {
                             <LabeledTextInput label="Nome:" value={name} onChangeText={setName} required />
                             <LabeledTextInput label="E-mail:" value={email} onChangeText={setEmail} placeholder='example@email.com' required />
                             <LabeledTextInput label="Celular:" value={cel} onChangeText={setCel} placeholder='11 98765-4321' required />
-                            <LabeledTextInput label="CPF / CNPJ:" value={cpfCnpj} onChangeText={setCpfCnpj} required />
+                            <LabeledTextInput label={(userType == "C") ? "CPF:" : "CNPJ:"} value={cpfCnpj} onChangeText={setCpfCnpj} required />
 
                             <Text className='mb-2 font-bold text-lg'>Tipo de Usuário: <Text style={{ color: 'red' }}>*</Text></Text>
 
-                            <TypeUserSelect setTypeUser={setTypeUser} typeUser={typeUser} />
+                            <TypeUserSelect setTypeUser={setTypeUser} userType={userType} />
                         </ScrollView>
                     ) : (
                         (screen == 2) ? (

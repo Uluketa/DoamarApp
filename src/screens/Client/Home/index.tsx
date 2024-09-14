@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { View, Text, Alert, BackHandler } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
+import NavBar from '~/components/Navbar';
+import Header from '~/components/Client/Header';
 
-export default function HomeClient() {
-    const isFocused = useIsFocused(); // Verifica se a tela está focada
+export default function Home() {
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         const handleBackPress = () => {
@@ -28,7 +30,10 @@ export default function HomeClient() {
         };
     }, [isFocused]);
     return (
-        <View className='flex-1 bg-green-300 items-center mb-0 pb-0'>
+        <View className='flex-1 bg-green-300 items-center justify-center mb-0 pb-0'>
+            <Header />
+            <Text>Home</Text>
+            <NavBar />
         </View>
     );
 }

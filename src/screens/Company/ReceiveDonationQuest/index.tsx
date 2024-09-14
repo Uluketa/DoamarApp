@@ -3,17 +3,12 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { colors } from '~/styles/colors';
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '~/routes';
+import { RootStackParamList } from '~/types/navigation';
 import { BtnText as ButtonAvancar } from '~/components/Button';
 
 type Props = { navigation: StackNavigationProp<RootStackParamList, 'ReceiveDonationQuest'> };
 
 export default function ReceiveDonationQuest({ navigation }: Props) {
-    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
-    const [vlogin, setvLogin] = useState('');
-    const [password, setPassword] = useState('');
-
     return (
         <View className='flex-1 items-center'>
             <View
@@ -21,7 +16,7 @@ export default function ReceiveDonationQuest({ navigation }: Props) {
                 style={{ backgroundColor: colors.palette[1] }}
             >
                 <Image
-                    source={require("../../assets/logoLightGreenB.png")}
+                    source={require("~/assets/logoLightGreenB.png")}
                     style={{ width: 150, height: 150 }}
                     className='mb-20'
                 />
@@ -31,12 +26,12 @@ export default function ReceiveDonationQuest({ navigation }: Props) {
                 </Text>
 
                 <View className='w-60'>
-                    <ButtonAvancar bgColor={colors.palette[3]} onPress={() => navigation.navigate("HomeCompany")} title='Cadastrar Itens' />
+                    <ButtonAvancar bgColor={colors.palette[3]} onPress={() => navigation.navigate("CompanyHome")} title='Cadastrar Itens' />
                 </View>
             </View>
 
             <View className='items-center justify-center h-1/5 w-40' >
-                <ButtonAvancar bgColor='#a8a8a8' onPress={() => navigation.navigate("HomeCompany")} title='Pular' />
+                <ButtonAvancar bgColor='#a8a8a8' onPress={() => navigation.navigate("CompanyHome")} title='Pular' />
             </View>
         </View>
     );

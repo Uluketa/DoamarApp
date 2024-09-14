@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Keyboard } from 'react-native';
 
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '~/store/modules/rootReducer';
+import { LOGIN_REQUEST, LOGIN_SUCCESS } from '~/store/modules/user/actions';
+
 import { RootStackParamList } from '~/routes';
 import { login } from '~/services/api';
 
@@ -20,8 +25,8 @@ type Props = { navigation: StackNavigationProp<RootStackParamList, 'SignIn'> };
 export default function SignIn({ navigation }: Props) {
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
-    const [vlogin, setvLogin] = useState('');
-    const [password, setPassword] = useState('');
+    const [vlogin, setvLogin] = useState((__DEV__) ? 'cliente1' : '');
+    const [password, setPassword] = useState((__DEV__) ? '1234' : '');
 
     const [verror, setvError] = useState(false);
     const [verrorMsg, setvErrorMsg] = useState<string>();
@@ -31,6 +36,8 @@ export default function SignIn({ navigation }: Props) {
     const logoOpacity = useSharedValue(0);
     const logoWidth = useSharedValue(100);
     const logoMarginLeft = useSharedValue(0);
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         // Animações iniciais
@@ -78,30 +85,15 @@ export default function SignIn({ navigation }: Props) {
     });
 
     const handleLogin = async () => {
-        const api = await login(vlogin, password);
+        await dispatch({
+            type: LOGIN_REQUEST,
+            payload: {
+                login: vlogin,
+                password: password,
+            },
+        });
 
-        if (!api.error) {
-            if (api.typeUser === "I") {
-                if (api.receiveDonationQuest) {
-                    navigation.reset({ index: 0, routes: [{ name: 'HomeCompany' }] });
-
-                    navigation.navigate('HomeCompany');
-                } else {
-                    navigation.reset({ index: 0, routes: [{ name: 'ReceiveDonationQuest' }] });
-                    navigation.navigate('ReceiveDonationQuest');
-                }
-
-            } else if (api.typeUser === "C") {
-                navigation.reset({ index: 0, routes: [{ name: 'HomeClient' }] });
-                navigation.navigate('HomeClient');
-
-            }
-        } else {
-            setvErrorMsg(api.errormsg);
-            setvError(true);
-
-            setTimeout(() => setvError(false), 3000);
-        }
+        console.log('response')
     };
 
     return (
@@ -131,7 +123,7 @@ export default function SignIn({ navigation }: Props) {
                 <Text className="text-gray-500 text-base text-center mr-1 py-5">Ainda não tem uma conta?</Text>
 
                 <TouchableOpacity className="items-center py-5" onPress={() => navigation.navigate("SignUp")}>
-                    <Text className='underline'>Cadastre-se</Text>
+                    <Text className='underline ml-1'>Cadastre-se</Text>
                 </TouchableOpacity>
             </View>
         </View >
