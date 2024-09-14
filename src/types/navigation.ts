@@ -10,4 +10,5 @@ export type RootStackParamList = {
   ClientDonation: undefined;
   ClientSettings: undefined;
   ClientFavorites: undefined;
+  About: undefined;
 };

@@ -6,6 +6,8 @@ import Toast from 'react-native-toast-message';
 
 import SignIn from '../screens/SignIn';
 import SignUp from '../screens/SignUp';
+import ForgotPassword from '../screens/ForgotPassword';
+import ReceiveDonationQuest from '../screens/Company/ReceiveDonationQuest';
 
 // Client Screens
 import ClientHome from '../screens/Client/Home';
@@ -16,8 +18,7 @@ import ClientFavorites from '../screens/Client/Favorites';
 // Company Screens
 import CompanyHome from '../screens/Company/Home';
 
-import ForgotPassword from '../screens/ForgotPassword';
-import ReceiveDonationQuest from '../screens/Company/ReceiveDonationQuest';
+import About from '../screens/About';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
@@ -29,21 +30,12 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 export default function Routes() {
   const { userType } = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (userType) {
-      console.log(`Usuário logado como: ${userType}`);
-    } else {
-      console.log('Nenhum usuário logado');
-    }
-  }, [userType]);
 
   return (
     <NavigationContainer>
       <Toast />
 
-      <Stack.Navigator 
+      <Stack.Navigator
         initialRouteName={userType ? (userType === 'cliente' ? 'ClientHome' : 'CompanyHome') : 'SignIn'}
         screenOptions={{
           animationEnabled: false,
@@ -93,6 +85,13 @@ export default function Routes() {
             />
           </>
         )}
+
+        <Stack.Screen
+          name="About"
+          component={About}
+          options={{ gestureEnabled: false, title: "Sobre", headerRight: () => <Logo /> }} 
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
