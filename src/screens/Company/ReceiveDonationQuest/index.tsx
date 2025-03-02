@@ -1,14 +1,13 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import { colors } from '~/styles/colors';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '~/types/navigation';
 import { BtnText as ButtonAvancar } from '~/components/Button';
 
-type Props = { navigation: StackNavigationProp<RootStackParamList, 'ReceiveDonationQuest'> };
+type ReceiveDonationQuestProps = { navigation: StackNavigationProp<RootStackParamList, 'ReceiveDonationQuest'> };
 
-export default function ReceiveDonationQuest({ navigation }: Props) {
+export const ReceiveDonationQuest = ({ navigation }: ReceiveDonationQuestProps) => {
     return (
         <View className='flex-1 items-center'>
             <View

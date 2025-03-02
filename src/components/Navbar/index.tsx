@@ -18,27 +18,27 @@ interface NavButtonProps {
   isActive: boolean;
 }
 
-const NavButton: React.FC<NavButtonProps> = ({ icon, onPress, isActive }) => (
+const NavButton = ({ icon, onPress, isActive }: NavButtonProps) => (
   <TouchableOpacity className="flex-1 justify-center items-center" onPress={onPress}>
     {React.cloneElement(icon as React.ReactElement, { color: isActive ? colors.palette[1] : 'gray' })}
   </TouchableOpacity>
 );
 
-const NavBar: React.FC = () => {
+export const NavBar = () => {
   const { userType } = useSelector((state: RootState) => state.user);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute();
 
   const getButtonsByUserType = () => {
     switch (userType) {
-      case 'cliente':
+      case 'client':
         return [
           { title: 'ClientHome', icon: <MaterialIcons name="home" size={30} />, onPress: () => navigation.navigate('ClientHome') },
           { title: 'ClientFavorites', icon: <FontAwesome name="heart" size={24} />, onPress: () => navigation.navigate('ClientFavorites') },
           { title: 'ClientDonation', icon: <FontAwesome5 name="hand-holding-heart" size={24} />, onPress: () => navigation.navigate('ClientDonation') },
           { title: 'ClientSettings', icon: <MaterialIcons name="settings" size={30} />, onPress: () => navigation.navigate('ClientSettings') },
         ];
-      case 'instituicao':
+      case 'institution':
         return [
           { title: 'Dashboard', icon: <MaterialIcons name="dashboard" size={24} />, onPress: () => navigation.navigate('Dashboard') },
           { title: 'Stock', icon: <MaterialIcons name="inventory" size={24} />, onPress: () => navigation.navigate('Stock') },
@@ -80,5 +80,3 @@ const NavBar: React.FC = () => {
     </View>
   );
 };
-
-export default NavBar;

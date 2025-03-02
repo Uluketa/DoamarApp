@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { View, Text, ViewProps } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-type PROPS = ViewProps & {
+type ModalErrorProps = ViewProps & {
     visible: boolean
 }
-export const ModalError = ({ visible, children }: PROPS) => {
+
+export const ModalError = ({ visible, children }: ModalErrorProps) => {
     const translateY = useSharedValue(-100);
     const opacity = useSharedValue(0);
 

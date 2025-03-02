@@ -3,12 +3,10 @@ import { View, Text, TouchableOpacity, Keyboard } from 'react-native';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '~/store/modules/rootReducer';
-import { LOGIN_REQUEST, LOGIN_SUCCESS } from '~/store/modules/user/actions';
+import { useDispatch } from 'react-redux';
+import { LOGIN_REQUEST, setUser } from '~/store/modules/user/actions';
 
-import { RootStackParamList } from '~/routes';
-import { login } from '~/services/api';
+import { RootStackParamList } from '~/types/navigation';
 
 import { colors } from '~/styles/colors';
 import { styles } from './styles';
@@ -16,20 +14,22 @@ import { styles } from './styles';
 import { TextForgotPassword } from './components/TextForgotPassword';
 import { LabeledTextInput } from '~/components/LabeledTextInput';
 import { BtnText as ButtonEntrar } from '~/components/Button';
-import { ModalError } from '~/components/ModalError';
 
 import Animated, { useSharedValue, withTiming, withSequence, withRepeat, withSpring, useAnimatedStyle } from 'react-native-reanimated';
+import { ModalError } from '~/components/ModalError';
+import { authLogin } from '~/services/api';
 
-type Props = { navigation: StackNavigationProp<RootStackParamList, 'SignIn'> };
+type SignInProps = { navigation: StackNavigationProp<RootStackParamList, 'SignIn'> };
 
-export default function SignIn({ navigation }: Props) {
+export const SignIn = ({ navigation }: SignInProps) => {
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
-    const [vlogin, setvLogin] = useState((__DEV__) ? 'cliente1' : '');
+    const [username, setUsername] = useState((__DEV__) ? 'cliente1' : '');
     const [password, setPassword] = useState((__DEV__) ? '1234' : '');
+    const [isFetching, setIsFetching] = useState<boolean>(false);
 
-    const [verror, setvError] = useState(false);
-    const [verrorMsg, setvErrorMsg] = useState<string>();
+    const [modalErrorIsVisible, setModalErrorIsVisible] = useState<boolean>(false);
+    const [modalErrorText, setModalErrorText] = useState<string>('');
 
     // Valores compartilhados para animações
     const logoScale = useSharedValue(0.5);
@@ -85,20 +85,23 @@ export default function SignIn({ navigation }: Props) {
     });
 
     const handleLogin = async () => {
-        await dispatch({
-            type: LOGIN_REQUEST,
-            payload: {
-                login: vlogin,
-                password: password,
-            },
-        });
+        setIsFetching(true);
 
-        console.log('response')
+        try {
+            const responseUser = await authLogin({ username, password });
+            dispatch(setUser(responseUser));
+
+        } catch (error) {
+            // modalErrorIsVisible(true)
+
+        } finally {
+            setIsFetching(false);
+        }
     };
 
     return (
         <View className='flex-1 items-center justify-center'>
-            <ModalError visible={verror}><Text>{verrorMsg}</Text></ModalError>
+            {/* <ModalError visible={verror}><Text>{verrorMsg}</Text></ModalError> */}
 
             <View
                 className='w-full justify-center'
@@ -112,7 +115,7 @@ export default function SignIn({ navigation }: Props) {
             </View>
 
             <View className='w-full items-center justify-center px-8' style={{ height: '65%' }}>
-                <LabeledTextInput label="Login:" value={vlogin} onChangeText={setvLogin} />
+                <LabeledTextInput label="Login:" value={username} onChangeText={setUsername} />
                 <LabeledTextInput label="Senha:" value={password} onChangeText={setPassword} secureTextEntry />
                 <TextForgotPassword onPress={() => navigation.navigate('ForgotPassword')} />
 

@@ -1,9 +1,9 @@
 import { SafeAreaView } from 'react-native';
 
-type PROPS = {
+type ContainerProps = {
   children: React.ReactNode;
 };
 
-export const Container = ({ children }: PROPS) => {
+export const Container = ({ children }: ContainerProps) => {
   return <SafeAreaView className="flex flex-1 p-6">{children}</SafeAreaView>;
 };

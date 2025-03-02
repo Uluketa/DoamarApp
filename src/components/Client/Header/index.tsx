@@ -1,15 +1,13 @@
-import React from 'react';
-import { View, TextInput, Image, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { RootStackParamList } from '~/types/navigation';
-import { colors } from '~/styles/colors';
-import { persistor } from '~/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { Alert, Image, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { persistor } from '~/store';
 import { RESET_STATE } from '~/store/modules/user/actions';
+import { colors } from '~/styles/colors';
 
-const Header: React.FC = () => {
+export const Header = () => {
     const dispatch = useDispatch();
 
     const confirmLogout = () => {
@@ -52,5 +50,3 @@ const Header: React.FC = () => {
         </View>
     );
 };
-
-export default Header;

@@ -3,11 +3,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '~/types/navigation';
 import Toast from 'react-native-toast-message';
+import React from 'react';
 
-import SignIn from '../screens/SignIn';
-import SignUp from '../screens/SignUp';
-import ForgotPassword from '../screens/ForgotPassword';
-import ReceiveDonationQuest from '../screens/Company/ReceiveDonationQuest';
+import { SignIn } from '../screens/SignIn';
+import { SignUp } from '../screens/SignUp';
+import { ForgotPassword } from '../screens/ForgotPassword';
+import { ReceiveDonationQuest } from '../screens/Company/ReceiveDonationQuest';
 
 // Client Screens
 import ClientHome from '../screens/Client/Home';
@@ -36,7 +37,7 @@ export default function Routes() {
       <Toast />
 
       <Stack.Navigator
-        initialRouteName={userType ? (userType === 'cliente' ? 'ClientHome' : 'CompanyHome') : 'SignIn'}
+        initialRouteName={userType ? (userType === 'client' ? 'ClientHome' : 'CompanyHome') : 'SignIn'}
         screenOptions={{
           animationEnabled: false,
           headerTintColor: '#f0f0f0',
@@ -68,7 +69,7 @@ export default function Routes() {
               }}
             />
           </>
-        ) : (userType == 'cliente') ? (
+        ) : (userType == 'client') ? (
           <>
             <Stack.Screen name="ClientHome" component={ClientHome} options={{ headerShown: false, gestureEnabled: false }} />
             <Stack.Screen name="ClientDonation" component={ClientDonation} options={{ headerShown: false, gestureEnabled: false }} />
@@ -89,7 +90,7 @@ export default function Routes() {
         <Stack.Screen
           name="About"
           component={About}
-          options={{ gestureEnabled: false, title: "Sobre", headerRight: () => <Logo /> }} 
+          options={{ gestureEnabled: false, title: "Sobre", headerRight: () => <Logo /> }}
         />
 
       </Stack.Navigator>

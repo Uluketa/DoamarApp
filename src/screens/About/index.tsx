@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, ImageBackground } from 'react-native';
-import NavBar from '~/components/Navbar';
+import { NavBar } from '~/components/Navbar';
 
 export default function About() {
 

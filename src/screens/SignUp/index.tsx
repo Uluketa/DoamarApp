@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Keyboard, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Keyboard, ScrollView } from 'react-native';
 import { colors } from '~/styles/colors';
 
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '~/routes';
+import { RootStackParamList } from '~/types/navigation';
 import { AntDesign } from '@expo/vector-icons';
 
 import { LabeledTextInput } from '~/components/LabeledTextInput';
 import { BtnText as ButtonCadastrar } from '~/components/Button';
-import TypeUserSelect from './components/TypeUser';
+import { TypeUser } from './components/TypeUser';
 
-type Props = { navigation: StackNavigationProp<RootStackParamList, 'SignUp'> };
+type SignUpProps = { navigation: StackNavigationProp<RootStackParamList, 'SignUp'> };
 type UserType = "C" | "I";
 
-export default function SignUp({ navigation }: Props) {
-    const [screen, setScreen] = useState(1);
+export const SignUp = ({ navigation }: SignUpProps) => {
+    const [screen, setScreen] = useState<number>(1);
 
     const [name, setName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -60,7 +60,7 @@ export default function SignUp({ navigation }: Props) {
 
                             <Text className='mb-2 font-bold text-lg'>Tipo de Usuário: <Text style={{ color: 'red' }}>*</Text></Text>
 
-                            <TypeUserSelect setTypeUser={setTypeUser} userType={userType} />
+                            <TypeUser setTypeUser={setTypeUser} userType={userType} />
                         </ScrollView>
                     ) : (
                         (screen == 2) ? (
@@ -70,7 +70,7 @@ export default function SignUp({ navigation }: Props) {
 
                                 <View className='flex-row'>
                                     <View className='w-1/3 pr-1'>
-                                        <LabeledTextInput label="Nº:" value={addressNum} onChangeText={setAddressNum} placeholder='Ex: 1000' required />
+                                        <LabeledTextInput label="Nº:" value={String(addressNum)} onChangeText={(value) => setAddressNum(Number(value))} placeholder='Ex: 1000' required />
                                     </View>
 
                                     <View className='w-2/3'>
@@ -146,15 +146,3 @@ export default function SignUp({ navigation }: Props) {
         </View >
     );
 }
-
-const styles = StyleSheet.create({
-    imgLogo: {
-        width: 50,
-        height: 50
-    },
-    containerImgLogo: {
-        backgroundColor: colors.palette[1],
-        justifyContent: 'space-between',
-        paddingHorizontal: 20
-    }
-});

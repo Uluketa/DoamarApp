@@ -5,14 +5,13 @@ import { RootStackParamList } from '~/types/navigation';
 import { version } from '../../../../package.json';
 
 import SettingsButton from './components/SettingsButton';
-import Header from '~/components/Client/Header';
-import NavBar from '~/components/Navbar';
+import {Header} from '~/components/Client/Header';
+import {NavBar} from '~/components/Navbar';
 
 export default function Settings() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
     const navigateTo = (screen: string) => {
-        ;
     };
 
     return (

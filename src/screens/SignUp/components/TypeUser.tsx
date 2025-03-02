@@ -10,7 +10,7 @@ interface TypeUserProps {
     setTypeUser: (text: UserType) => void;
 }
 
-const TypeUser: React.FC<TypeUserProps> = ({ userType, setTypeUser }) => {
+export const TypeUser = ({ userType, setTypeUser }: TypeUserProps) => {
     return (
         <View className='border-2 border-gray-300 rounded-lg p-3 text-base grid-cols-3 flex-row'>
             <TouchableOpacity className='p-2 w-1/2 items-center' onPress={() => setTypeUser("I")}>
@@ -41,5 +41,3 @@ const TypeUser: React.FC<TypeUserProps> = ({ userType, setTypeUser }) => {
         </View>
     );
 };
-
-export default TypeUser;

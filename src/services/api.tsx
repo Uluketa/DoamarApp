@@ -1,53 +1,50 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { InitialUserState, UserStateType } from '~/store/modules/user/reducer';
 
-const URL = (__DEV__) ? "192.168.15.3:8080" : "NOT DEFINED";
+const URL = (__DEV__) ? "192.168.15.17:8000" : "NOT DEFINED";
+const API = axios.create({
+  baseURL: `http://${URL}/api`,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
 
-interface LoginData {
-  error: boolean;
+type ResponsePattern = {
+  ok: "S" | "N";
   msg: string;
-  userId: number|null;
-  userType: string|null;
-  typeDonation: string|null;
 }
 
-export async function login(login: string, password: string): Promise<LoginData> {
+type AuthLoginReturnType = ResponsePattern & UserStateType;
+
+type AuthLoginProps = {
+  username: string;
+  password: string;
+}
+
+export async function authLogin({ username, password }: AuthLoginProps): Promise<AuthLoginReturnType> {
   try {
-    const response = await axios.post(`http://${URL}/api/login`, {
-      login,
-      senha: password
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
+    const { data } = await API.post('/authLogin', {
+      username,
+      password
     });
 
-    const data = response.data;
-
-    return {
-      error: data.error,
-      msg: data.msg,
-      userId: data.userId,
-      userType: data.userType,
-      typeDonation: data.typeDonation
-    };
+    return data;
 
   } catch (error: any) {
-
+    console.log(error)
     if (error.response) {
       return {
-        error: true,
+        ok: "N",
         msg: error.response.data?.msg || "Erro ao processar a solicitação.",
-        userType: null,
-        typeDonation: null
+        ...InitialUserState
       };
+
     } else {
       return {
-        error: true,
+        ok: "N",
         msg: "Ocorreu um erro. Tente novamente mais tarde!",
-        userType: null,
-        typeDonation: null
+        ...InitialUserState
       };
     }
   }

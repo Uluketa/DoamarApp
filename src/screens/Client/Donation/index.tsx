@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import NavBar from '~/components/Navbar';
+import { NavBar } from '~/components/Navbar';
 
 export default function Donation() {
     return (

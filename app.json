@@ -12,6 +12,7 @@
     "plugins": [
       "expo-font"
     ],
+    "newArchEnabled": true,
     "orientation": "portrait",
     "icon": "./src/assets/global/doamarIcon.png",
     "userInterfaceStyle": "light",

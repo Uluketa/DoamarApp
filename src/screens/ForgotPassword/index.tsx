@@ -5,9 +5,9 @@ import { LabeledTextInput } from '~/components/LabeledTextInput';
 import { AntDesign } from '@expo/vector-icons';
 import { colors } from '~/styles/colors';
 
-export default function ForgotPassword() {
-    const [email, setEmail] = useState('');
-    const [emailEntered, setEmailEntered] = useState(false);
+export const ForgotPassword = () => {
+    const [email, setEmail] = useState<string>('');
+    const [emailEntered, setEmailEntered] = useState<boolean>(false);
 
     const handleContinue = () => {
         if (email.trim() !== '') {
