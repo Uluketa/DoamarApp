@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, Keyboard } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useDispatch } from 'react-redux';
-import { LOGIN_REQUEST, setUser } from '~/store/modules/user/actions';
+import { setUser } from '~/store/modules/user/actions';
 
 import { RootStackParamList } from '~/types/navigation';
 
@@ -18,6 +18,7 @@ import { BtnText as ButtonEntrar } from '~/components/Button';
 import Animated, { useSharedValue, withTiming, withSequence, withRepeat, withSpring, useAnimatedStyle } from 'react-native-reanimated';
 import { ModalError } from '~/components/ModalError';
 import { authLogin } from '~/services/api';
+import Toast from 'react-native-toast-message';
 
 type SignInProps = { navigation: StackNavigationProp<RootStackParamList, 'SignIn'> };
 
@@ -27,9 +28,6 @@ export const SignIn = ({ navigation }: SignInProps) => {
     const [username, setUsername] = useState((__DEV__) ? 'cliente1' : '');
     const [password, setPassword] = useState((__DEV__) ? '1234' : '');
     const [isFetching, setIsFetching] = useState<boolean>(false);
-
-    const [modalErrorIsVisible, setModalErrorIsVisible] = useState<boolean>(false);
-    const [modalErrorText, setModalErrorText] = useState<string>('');
 
     // Valores compartilhados para animações
     const logoScale = useSharedValue(0.5);
@@ -89,10 +87,30 @@ export const SignIn = ({ navigation }: SignInProps) => {
 
         try {
             const responseUser = await authLogin({ username, password });
-            dispatch(setUser(responseUser));
 
-        } catch (error) {
-            // modalErrorIsVisible(true)
+            if (responseUser.ok === "N") {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Ocorreu um erro!',
+                    text2: responseUser.msg || 'Verifique os dados e tente novamente.'
+                });
+
+            } else {
+                dispatch(setUser(responseUser));
+
+                Toast.show({
+                    type: 'success',
+                    text1: 'Sucesso!',
+                    text2: responseUser.msg || 'Login realizado com sucesso.'
+                });
+            }
+
+        } catch (error: any) {
+            Toast.show({
+                type: 'warning',
+                text1: 'Ocorreu um erro!',
+                text2: error.msg || 'Tente novamente mais tarde.'
+            });
 
         } finally {
             setIsFetching(false);

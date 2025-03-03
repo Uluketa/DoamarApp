@@ -4,7 +4,7 @@ import React from 'react';
 import { Alert, Image, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { persistor } from '~/store';
-import { RESET_STATE } from '~/store/modules/user/actions';
+import { clearUser } from '~/store/modules/user/actions';
 import { colors } from '~/styles/colors';
 
 export const Header = () => {
@@ -23,7 +23,7 @@ export const Header = () => {
 
     const handleLogout = async () => {
         try {
-            await dispatch({ type: RESET_STATE });
+            dispatch(clearUser());
 
             await persistor.purge();
             await AsyncStorage.clear();
