@@ -5,19 +5,16 @@ import { RootStackParamList } from '~/types/navigation';
 import { version } from '../../../../package.json';
 
 import SettingsButton from './components/SettingsButton';
-import {Header} from '~/components/Client/Header';
-import {NavBar} from '~/components/Navbar';
+import { LayoutClient } from '~/components/Client/Layout';
 
 export default function Settings() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-    const navigateTo = (screen: string) => {
-    };
-
     return (
-        <View className="flex-1 pt-20">
-            <Header />
-            <View className="flex-1 px-5 pt-5 pb-[25%] justify-between">
+        <LayoutClient
+            screenActiveScreen="ClientSettings"
+        >
+            <View className="flex-1 px-7 pt-10 pb-[25%] justify-between">
                 <View>
                     <Text className="text-2xl font-bold mb-5">Configurações</Text>
 
@@ -31,8 +28,7 @@ export default function Settings() {
                     <Text className="text-center text-gray-400">Versão {version}</Text>
                 </View>
             </View>
+        </LayoutClient>
 
-            <NavBar />
-        </View>
     );
 };

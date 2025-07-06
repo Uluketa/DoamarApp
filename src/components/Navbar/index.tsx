@@ -11,7 +11,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { colors } from '~/styles/colors';
 
 // Definindo os tipos de botões disponíveis na NavBar
-interface NavButtonProps {
+export interface NavButtonProps {
   title: string;
   icon: React.ReactNode;
   onPress: () => void;
@@ -24,7 +24,11 @@ const NavButton = ({ icon, onPress, isActive }: NavButtonProps) => (
   </TouchableOpacity>
 );
 
-export const NavBar = () => {
+interface NavBarProps {
+  activeScreen: string;
+}
+
+export const NavBar = ({ activeScreen }: NavBarProps) => {
   const { userType } = useSelector((state: RootState) => state.user);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute();
@@ -74,7 +78,7 @@ export const NavBar = () => {
           title={button.title}
           icon={button.icon}
           onPress={button.onPress}
-          isActive={route.name === button.title}
+          isActive={activeScreen === button.title}
         />
       ))}
     </View>

@@ -1,27 +1,38 @@
-import NetInfo from "@react-native-community/netinfo";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const TOKEN = "1g0273nbj1h4398dsn329uis2113x4";
-export const URL = "127.0.0.1:8000";
+export const TOKEN = '1g0273nbj1h4398dsn329uis2113x4';
+export const URL = '127.0.0.1:8000';
 
 export const conectado = async () => {
-    const response = await NetInfo.fetch();
-    
-    return response.isConnected;
-}
+  const response = await NetInfo.fetch();
+
+  return response.isConnected;
+};
 
 export const timestamp = () => {
-    const data = new Date();
+  const data = new Date();
 
-    const dia = data.getDate();
-    const mes = data.getMonth();
-    const ano = data.getFullYear();
+  const dia = data.getDate();
+  const mes = data.getMonth();
+  const ano = data.getFullYear();
 
-    const hora = data.getHours();
-    const minutos = data.getMinutes();
-    const segundos = data.getSeconds();
+  const hora = data.getHours();
+  const minutos = data.getMinutes();
+  const segundos = data.getSeconds();
 
-    const dataFormatada = `${ano}-${mes}-${dia} ${hora}:${minutos}:${segundos}`;
+  const dataFormatada = `${ano}-${mes}-${dia} ${hora}:${minutos}:${segundos}`;
 
-    return dataFormatada;
+  return dataFormatada;
+};
+
+export function formatCNPJ(cnpj: string): string {
+  if (!cnpj) return '';
+
+  return cnpj
+    .replace(/\D/g, '') // Remove todos os não números
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+    .replace(/(\d{4})(\d)/, '$1-$2');
 }

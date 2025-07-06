@@ -21,6 +21,7 @@ import ClientFavorites from '../screens/Client/Favorites';
 import CompanyHome from '../screens/Company/Home';
 
 import About from '../screens/About';
+import { CompanyProfile } from '../screens/CompanyProfile';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
@@ -92,6 +93,12 @@ export default function Routes() {
             name="About"
             component={About}
             options={{ gestureEnabled: false, title: "Sobre", headerRight: () => <Logo /> }}
+          />
+
+          <Stack.Screen
+            name="CompanyProfile"
+            component={CompanyProfile}
+            options={{ gestureEnabled: false, headerRight: () => <Logo /> }}
           />
 
         </Stack.Navigator>

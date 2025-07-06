@@ -1,11 +1,15 @@
 import React from 'react';
 import { View, Text, Image, ImageBackground } from 'react-native';
-import { NavBar } from '~/components/Navbar';
+import { LayoutClient } from '~/components/Client/Layout';
 
 export default function About() {
 
     return (
-        <View className="flex-1 items-center">
+        <LayoutClient
+            screenClassNames='items-center'
+            screenActiveScreen="ClientSettings"
+            screenHasHeader={false}
+        >
             <Image
                 className="absolute t-0 w-[100%] h-[200px] opacity-[0.3]"
                 source={require('~/assets/rostos.jpg')}
@@ -36,8 +40,6 @@ export default function About() {
                     </Text>
                 </View>
             </View>
-
-            <NavBar />
-        </View>
+        </LayoutClient>
     );
 }

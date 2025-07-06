@@ -11,4 +11,5 @@ export type RootStackParamList = {
   ClientSettings: undefined;
   ClientFavorites: undefined;
   About: undefined;
+  CompanyProfile: { companyId: number, companyName: string };
 };
