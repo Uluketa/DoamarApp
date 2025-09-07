@@ -137,9 +137,9 @@ export default function Home() {
         }
 
         return (
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                {starIcons}
-                <Text style={{ marginLeft: 8, color: starColor, fontWeight: 'bold', fontSize: 13 }}>{levelText}</Text>
+            <View className='flex-col text-center items-center'>
+                <View className='flex-row items-center'>{starIcons}</View>
+                <Text className='text-bold text-sm' style={{ color: starColor }}>{levelText}</Text>
             </View>
         );
     };
@@ -148,29 +148,27 @@ export default function Home() {
         <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
             {/* Perfil */}
             <View
-                className='flex-row items-center m-4 rounded-xl justify-between p-4 '
+                className='flex-col items-center rounded-xl justify-between'
             >
-                <View>
-                    {renderRating()}
-                    <Text className='text-3xl font-semibold my-2' style={userData?.classification?.rating === 10 ? { color: userColorRating } : {}}>{userData.client?.name}</Text>
-                    <Text className='text-md text-gray-500'>
-                        {userData.client?.accountType === 'B' ?
-                            'Doador & Recebedor' : userData.client?.accountType === 'D' ?
-                                'Doador' : 'Recebedor'}
-                    </Text>
-                </View>
+                <Image
+                    source={require("src/assets/global/cover.png")}
+                    className='w-full h-[70] absolute'
+                />
 
-                <View className='flex flex-row items-center'>
-                    <Image
-                        source={{ uri: `http://${URL}${userData.client?.pathProfileImage ? userData.client.pathProfileImage : PATH_CLIENT_PHOTO}` }}
-                        className='rounded-full'
-                        style={{
-                            borderColor: (userData?.classification?.rating === 10) ? userColorRating : colors.palette[1],
-                            borderWidth: (userData?.classification?.rating === 10) ? 3 : 2,
-                            width: 80,
-                            height: 80
-                        }}
-                    />
+                <Image
+                    source={{ uri: `http://${URL}${userData.client?.pathProfileImage ? userData.client.pathProfileImage : PATH_CLIENT_PHOTO}` }}
+                    className='rounded-full mt-[30]'
+                    style={{
+                        borderColor: (userData?.classification?.rating === 10) ? userColorRating : colors.palette[1],
+                        borderWidth: (userData?.classification?.rating === 10) ? 3 : 2,
+                        width: 100,
+                        height: 100
+                    }}
+                />
+
+                <View>
+                    <Text className='text-3xl font-semibold mt-2' style={userData?.classification?.rating === 10 ? { color: userColorRating } : {}}>{userData.client?.name}</Text>
+                    {renderRating()}
                 </View>
             </View>
 
