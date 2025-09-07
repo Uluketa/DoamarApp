@@ -106,7 +106,7 @@ export async function getInstitution(id: number) {
 
 export async function getOrdersByInstitution(id: number, token: string) {
   try {
-    const { data } = await API.get(`/orders?institution_id=${id}`, {
+    const { data } = await API.get(`/institutions/${id}/orders/`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -202,5 +202,32 @@ export async function saveSignUpData(props: prop.SignUpProps) {
       ok: 'N',
       msg: error.response?.data?.msg || 'Erro ao salvar cadastro.'
     };
+  }
+}
+
+export async function indexInstitutions(token: string) {
+  try {
+    const { data } = await API.get(`/institutions`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return data;
+
+  } catch (error: any) {
+    if (error.response) {
+      return {
+        ok: "N",
+        msg: error.response.data?.msg || "Erro ao processar a solicitação.",
+        ...InitialUserState
+      };
+
+    } else {
+      return {
+        ok: "N",
+        msg: "Ocorreu um erro. Tente novamente mais tarde!",
+        ...InitialUserState
+      };
+    }
   }
 }

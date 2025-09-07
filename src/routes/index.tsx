@@ -21,6 +21,7 @@ import { Logo } from '~/components/Logo';
 import toastConfig from '~/styles/toast';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PrivacyPolicy } from '~/components/screens/PrivacyPolicy';
+import ListInstitutions from '~/components/screens/ListInstitutions';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -81,6 +82,12 @@ export default function Routes() {
             name="About"
             component={About}
             options={{ gestureEnabled: false, title: "Sobre", headerRight: () => <Logo /> }}
+          />
+
+          <Stack.Screen
+            name="ListInstitutions"
+            component={ListInstitutions}
+            options={{ gestureEnabled: false, title: "Instituições", headerRight: () => <Logo /> }}
           />
 
           <Stack.Screen

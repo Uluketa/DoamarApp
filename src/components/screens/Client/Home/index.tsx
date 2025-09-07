@@ -78,6 +78,10 @@ export default function Home() {
         navigation.navigate('InstitutionProfile', { institution });
     }
 
+    const handleListInstitutions = () => {
+        navigation.navigate('ListInstitutions');
+    }
+
     const renderRating = () => {
         const rating = userData?.classification?.rating;
 
@@ -174,7 +178,9 @@ export default function Home() {
             <View className='pl-4 pb-6'>
                 <View className='flex flex-row justify-between items-center mr-4'>
                     <Text className='text-2xl font-bold mb-2'>Instituições</Text>
-                    <Text className='font-bold underline' style={{ color: colors.palette[1] }}>Ver mais</Text>
+                    <Pressable onPress={handleListInstitutions} className='p-2'>
+                        <Text className='font-bold underline' style={{ color: colors.palette[1] }}>Ver mais</Text>
+                    </Pressable>
                 </View>
                 {isLoading ? (
                     <View className='flex-row justify-center items-center h-[150] my-2'>
@@ -286,7 +292,7 @@ export default function Home() {
             </View>
 
             {/* Doações Realizadas */}
-            <View className='pl-4 py-6'>
+            <View className='pl-4 pb-6'>
                 <Text className='text-2xl font-bold mb-2'>Doações Realizadas</Text>
 
                 {isLoading ? (

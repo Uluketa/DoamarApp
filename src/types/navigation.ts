@@ -12,6 +12,7 @@ export type RootStackParamList = {
   Help: undefined;
   About: undefined;
   InstitutionProfile: { institution: Institution }
+  ListInstitutions: undefined;
 
   Layout: undefined;
 };
