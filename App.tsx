@@ -10,9 +10,10 @@ import { Provider } from 'react-redux';
 import store from './src/store';
 
 import RootStack from 'src/routes/index';
-import { Loading } from "src/components/global/loading";
+import { Loading } from "~/components/ui/Loading";
 import { StatusBar } from 'react-native';
 import { colors } from '~/styles/colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
   const [loaded, error] = useFonts({
@@ -38,8 +39,10 @@ function RootLayoutNav() {
   return (
     <Provider store={store}>
       <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <StatusBar backgroundColor={colors.palette[1]} />
-        <RootStack />
+        <SafeAreaView className='flex-1' style={{ backgroundColor: colors.palette[1] }}>
+          <StatusBar backgroundColor={colors.palette[1]} />
+          <RootStack />
+        </SafeAreaView>
       </ThemeProvider>
     </Provider>
   );

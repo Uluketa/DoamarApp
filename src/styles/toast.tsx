@@ -8,8 +8,8 @@ const toastConfig = {
       {...props}
       style={{
         borderLeftColor: 'transparent',
-        backgroundColor: colors.palette[5],
-        borderColor: colors.palette[1],
+        backgroundColor: '#fff',
+        borderColor: '#f0f0f0',
         borderWidth: 3,
         borderRadius: 10,
         shadowColor: '#000',
@@ -28,14 +28,14 @@ const toastConfig = {
       text1Style={{
         fontSize: 16,
         fontWeight: '600',
-        color: colors.palette[0],
+        color: '#111',
       }}
       text2Style={{
         fontSize: 14,
-        color: colors.palette[0],
+        color: '#333',
       }}
       renderLeadingIcon={() => (
-        <Ionicons name="checkmark-circle" size={24} color={colors.palette[0]} style={{ marginRight: 10 }} />
+        <Ionicons name="checkmark-circle" size={24} color={colors.palette[5]} style={{ marginRight: 10 }} />
       )}
     />
   ),
@@ -45,8 +45,8 @@ const toastConfig = {
       {...props}
       style={{
         borderLeftColor: 'transparent',
-        backgroundColor: '#FF3B30',
-        borderColor: '#D32F2F',
+        backgroundColor: '#fff',
+        borderColor: '#f0f0f0',
         borderWidth: 3,
         borderRadius: 10,
         shadowColor: '#000',
@@ -65,14 +65,14 @@ const toastConfig = {
       text1Style={{
         fontSize: 16,
         fontWeight: '600',
-        color: '#fff',
+        color: '#111',
       }}
       text2Style={{
         fontSize: 14,
-        color: '#fff',
+        color: '#333',
       }}
       renderLeadingIcon={() => (
-        <Ionicons name="close-circle" size={24} color="#fff" style={{ marginRight: 10 }} />
+        <Ionicons name="close-circle" size={24} color="#FF3B30" style={{ marginRight: 10 }} />
       )}
     />
   ),
@@ -82,8 +82,8 @@ const toastConfig = {
       {...props}
       style={{
         borderLeftColor: 'transparent',
-        backgroundColor: '#FFA500',
-        borderColor: '#FF8C00',
+        backgroundColor: '#fff',
+        borderColor: '#f0f0f0',
         borderWidth: 3,
         borderRadius: 10,
         shadowColor: '#000',
@@ -102,14 +102,14 @@ const toastConfig = {
       text1Style={{
         fontSize: 16,
         fontWeight: '600',
-        color: '#fff',
+        color: '#111',
       }}
       text2Style={{
         fontSize: 14,
-        color: '#fff',
+        color: '#333',
       }}
       renderLeadingIcon={() => (
-        <Ionicons name="alert-circle" size={24} color="#fff" style={{ marginRight: 10 }} />
+        <Ionicons name="alert-circle" size={24} color="#FFA500" style={{ marginRight: 10 }} />
       )}
     />
   ),

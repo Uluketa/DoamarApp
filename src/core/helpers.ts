@@ -1,8 +1,12 @@
 import NetInfo from '@react-native-community/netinfo';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const TOKEN = '1g0273nbj1h4398dsn329uis2113x4';
+export const EMAIL = 'doamarapp@gmail.com';
 export const URL = '127.0.0.1:8000';
+
+export const PATH_INSTITUTION_PHOTO = '/profile/institution.png';
+export const PATH_INSTITUTION_COVER = '/profile/institution_background.png'
+export const PATH_CLIENT_PHOTO = '/profile/client.png';
 
 export const conectado = async () => {
   const response = await NetInfo.fetch();

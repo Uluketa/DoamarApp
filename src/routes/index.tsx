@@ -1,45 +1,37 @@
-import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { RootStackParamList } from '~/types/navigation';
-import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
-import { Ionicons } from "@expo/vector-icons"
+import { RootStackParamList } from '~/types/Navigation';
+import Toast from 'react-native-toast-message';
 import React from 'react';
 
-import { SignIn } from '../screens/SignIn';
-import { SignUp } from '../screens/SignUp';
-import { ForgotPassword } from '../screens/ForgotPassword';
-import { ReceiveDonationQuest } from '../screens/Company/ReceiveDonationQuest';
+import { SignIn } from '~/components/screens/SignIn';
+import { SignUp } from '~/components/screens/SignUp';
+import { ForgotPassword } from '~/components/screens/ForgotPassword';
+import { ReceiveDonationQuest } from '~/components/screens/Institution/ReceiveDonationQuest';
 
-// Client Screens
-import ClientHome from '../screens/Client/Home';
-import ClientDonation from '../screens/Client/Donation';
-import ClientSettings from '../screens/Client/Settings';
-import ClientFavorites from '../screens/Client/Favorites';
+import { About } from '~/components/screens/About';
+import { InstitutionProfile } from '~/components/screens/InstitutionProfile';
+import { Layout } from '~/components/ui/Layout';
 
-// Company Screens
-import CompanyHome from '../screens/Company/Home';
-
-import About from '../screens/About';
-import { CompanyProfile } from '../screens/CompanyProfile';
-
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
 import { colors } from '~/styles/colors';
 import { Logo } from '~/components/Logo';
 import toastConfig from '~/styles/toast';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { PrivacyPolicy } from '~/components/screens/PrivacyPolicy';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function Routes() {
-  const { userType, userId } = useSelector((state: RootState) => state.user);
+  const { userData } = useSelector((state: RootState) => state.user);
 
   return (
-    <>
+    <SafeAreaView className='flex-1'>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName={userType ? (userType === 'client' ? 'ClientHome' : 'CompanyHome') : 'SignIn'}
+          initialRouteName={userData.id ? "Layout" : 'SignIn'}
           screenOptions={{
             animationEnabled: false,
             headerTintColor: '#f0f0f0',
@@ -51,7 +43,7 @@ export default function Routes() {
             },
           }}
         >
-          {!userId ? (
+          {!userData.id ? (
             <>
               <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
               <Stack.Screen
@@ -71,23 +63,19 @@ export default function Routes() {
                 }}
               />
             </>
-          ) : (userType == 'client') ? (
-            <>
-              <Stack.Screen name="ClientHome" component={ClientHome} options={{ headerShown: false, gestureEnabled: false }} />
-              <Stack.Screen name="ClientDonation" component={ClientDonation} options={{ headerShown: false, gestureEnabled: false }} />
-              <Stack.Screen name="ClientSettings" component={ClientSettings} options={{ headerShown: false, gestureEnabled: false }} />
-              <Stack.Screen name="ClientFavorites" component={ClientFavorites} options={{ headerShown: false, gestureEnabled: false }} />
-            </>
           ) : (
-            <>
-              <Stack.Screen name="CompanyHome" component={CompanyHome} options={{ gestureEnabled: false }} />
-              <Stack.Screen
-                name="ReceiveDonationQuest"
-                component={ReceiveDonationQuest}
-                options={{ headerShown: false, gestureEnabled: true }}
-              />
-            </>
+            <Stack.Screen
+              name="Layout"
+              component={Layout}
+              options={{ headerShown: false, gestureEnabled: false }}
+            />
           )}
+
+          <Stack.Screen
+            name="Privacy"
+            component={PrivacyPolicy}
+            options={{ gestureEnabled: false, title: "Política de Privacidade", headerRight: () => <Logo /> }}
+          />
 
           <Stack.Screen
             name="About"
@@ -96,8 +84,8 @@ export default function Routes() {
           />
 
           <Stack.Screen
-            name="CompanyProfile"
-            component={CompanyProfile}
+            name="InstitutionProfile"
+            component={InstitutionProfile}
             options={{ gestureEnabled: false, headerRight: () => <Logo /> }}
           />
 
@@ -105,6 +93,6 @@ export default function Routes() {
       </NavigationContainer>
 
       <Toast config={toastConfig} />
-    </>
+    </SafeAreaView>
   );
 }

@@ -1,17 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { User } from '~/types/entities/User';
 
 export type UserStateType = {
-  userId: number;
-  userType: 'client' | 'institution';
   accountType: 'R' | 'D' | 'B';  //Recipient (R) || Donor (D) || Both (B)
   token: string;
+  userData: User;
 }
 
 export const InitialUserState: UserStateType = {
-  userType: 'client',
   accountType: 'R',
-  userId: 0,
   token: '',
+  userData: {
+    id: 0,
+    username: '',
+    password: '',
+    type: 'client',
+    hash: '',
+    active: 'S'
+  },
 };
 
 const userSlice = createSlice({
@@ -20,15 +26,14 @@ const userSlice = createSlice({
   reducers: {
     setUser(state, action: PayloadAction<UserStateType>) {
       state.accountType = action.payload.accountType;
-      state.userType = action.payload.userType;
-      state.userId = action.payload.userId;
       state.token = action.payload.token;
+      state.userData = action.payload.userData;
     },
-    clearUser() {
+    clearAll() {
       return InitialUserState;
-    }
+    },
   }
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearAll } = userSlice.actions;
 export default userSlice.reducer;
