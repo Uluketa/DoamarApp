@@ -1,5 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '~/types/Navigation';
 import Toast from 'react-native-toast-message';
 import React from 'react';
@@ -12,17 +12,19 @@ import { ReceiveDonationQuest } from '~/components/screens/Institution/ReceiveDo
 import { About } from '~/components/screens/About';
 import { InstitutionProfile } from '~/components/screens/InstitutionProfile';
 import { Layout } from '~/components/ui/Layout';
+import { ClientCart } from '~/components/screens/Client/Cart'
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 
 import { colors } from '~/styles/colors';
 import { Logo } from '~/components/Logo';
+import { CartHeader } from '~/components/CartHeader';
+
 import toastConfig from '~/styles/toast';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PrivacyPolicy } from '~/components/screens/PrivacyPolicy';
 import ListInstitutions from '~/components/screens/ListInstitutions';
-import { Cart } from '~/components/Cart';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -35,7 +37,7 @@ export default function Routes() {
         <Stack.Navigator
           initialRouteName={userData.id ? "Layout" : 'SignIn'}
           screenOptions={{
-            animationEnabled: false,
+            animationEnabled: true,
             headerTintColor: '#f0f0f0',
             headerTitleStyle: {
               color: '#f0f0f0',
@@ -43,6 +45,7 @@ export default function Routes() {
             headerStyle: {
               backgroundColor: colors.palette[1],
             },
+            cardStyleInterpolator: CardStyleInterpolators.forNoAnimation
           }}
         >
           {!userData.id ? (
@@ -86,6 +89,12 @@ export default function Routes() {
           />
 
           <Stack.Screen
+            name="ClientCart"
+            component={ClientCart}
+            options={{ gestureEnabled: false, title: "Carrinho", headerRight: () => <Logo /> }}
+          />
+
+          <Stack.Screen
             name="ListInstitutions"
             component={ListInstitutions}
             options={{ gestureEnabled: false, title: "Instituições", headerRight: () => <Logo /> }}
@@ -94,7 +103,7 @@ export default function Routes() {
           <Stack.Screen
             name="InstitutionProfile"
             component={InstitutionProfile}
-            options={{ gestureEnabled: false, headerRight: () => <Cart classlist='mr-5' /> }}
+            options={{ gestureEnabled: false, headerRight: () => <CartHeader classlist='mr-5' /> }}
           />
 
         </Stack.Navigator>

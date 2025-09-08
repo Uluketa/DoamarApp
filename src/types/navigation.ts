@@ -14,6 +14,7 @@ export type RootStackParamList = {
   InstitutionProfile: { institution: Institution }
   ListInstitutions: undefined;
 
+  ClientCart: undefined;
   Layout: undefined;
 };
 

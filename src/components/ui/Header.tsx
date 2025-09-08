@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { colors } from '~/styles/colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Cart } from '../Cart';
+import { CartHeader } from '../CartHeader';
 
 export const Header = () => {
     return (
@@ -25,7 +25,7 @@ export const Header = () => {
                     placeholderTextColor="#777"
                 />
             </View>
-            <Cart classlist='mr-2' />
+            <CartHeader classlist='mr-2' />
         </View>
     );
 };

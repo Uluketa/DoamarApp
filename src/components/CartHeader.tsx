@@ -1,20 +1,26 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { Pressable, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '~/store';
+import { RootStackParamList } from '~/types/Navigation';
 
 type CartProps = {
     classlist?: string;
 }
 
-export const Cart = ({ classlist = '' }: CartProps) => {
+export const CartHeader = ({ classlist = '' }: CartProps) => {
     const { items } = useSelector((state: RootState) => state.cart);
 
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
     const displayQuantity = totalQuantity > 9 ? '9+' : totalQuantity;
 
+    type NavigationProps = StackNavigationProp<RootStackParamList, 'Layout'>;
+    const navigation = useNavigation<NavigationProps>();
+
     const handleOpenCart = () => {
-        console.log('Abrir o carrinho')
+        navigation.navigate("ClientCart");
     }
 
     return (

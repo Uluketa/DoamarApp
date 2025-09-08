@@ -1,14 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Institution } from "~/types/entities/Institution";
 import { Order } from "~/types/entities/Order";
 
 export type CartItem = Order & { quantity: number };
 
 export type CartStateType = {
   items: CartItem[];
+  institution: Institution | null;
 };
 
 export const InitialCartState: CartStateType = {
-  items: []
+  items: [],
+  institution: null
 };
 
 const cartSlice = createSlice({

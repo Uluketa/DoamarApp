@@ -5,8 +5,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "~/styles/colors";
 import { Order } from "~/types/entities/Order";
 
-export function OrderCard({ item, onQuantityChange }: { item: Order, onQuantityChange: (item: Order, quantity: number) => void }) {
-    const [quantity, setQuantity] = useState(0);
+type OrderCardType = {
+    item: Order,
+    initialQuantity: number,
+    onQuantityChange: (item: Order, quantity: number) => void
+}
+
+export function OrderCard({ item, onQuantityChange, initialQuantity }: OrderCardType) {
+    const [quantity, setQuantity] = useState(initialQuantity);
 
     const updateQuantity = (newQty: number) => {
         setQuantity(newQty);
@@ -14,46 +20,19 @@ export function OrderCard({ item, onQuantityChange }: { item: Order, onQuantityC
     };
 
     return (
-        <View>
-            <View className="rounded-xl mr-2 overflow-hidden my-1 relative">
-                <Image
-                    source={{ uri: item.image_url }}
-                    style={{ width: 130, height: 140 }}
-                />
+        <View className="mr-2 rounded-lg w-[120] items-center" style={{ backgroundColor: '#dedede' }}>
+            <Image
+                source={{ uri: item.image_url }}
+                style={{ width: 70, height: 100, resizeMode: "contain" }}
+            />
 
-                {/* Gradiente */}
-                <LinearGradient
-                    colors={["transparent", colors.black]}
-                    style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: 100,
-                    }}
-                />
-
-                {/* Texto Centralizado */}
-                <View
-                    style={{
-                        position: "absolute",
-                        bottom: 10,
-                        left: 0,
-                        right: 0,
-                        height: 100,
-                        justifyContent: "flex-end",
-                        alignItems: "center",
-                    }}
-                >
-                    <Text className="text-center text-md text-white">{item.name}</Text>
-                </View>
-            </View>
+            {/* Texto Centralizado */}
+            <Text className="text-center text-md" style={{ color: '#555'}}>{item.name}</Text>
 
             {/* Botões de Adicionar/Remover */}
-            <View className="pr-2">
+   
                 <View
-                    className="flex flex-row items-center justify-between rounded-lg p-2"
-                    style={{ borderColor: '#555', borderWidth: 1 }}
+                    className="flex flex-row items-center justify-between rounded-lg p-2 w-full"
                 >
                     <TouchableOpacity onPress={() => updateQuantity(Math.max(0, quantity - 1))}>
                         <Ionicons name="remove-circle" size={24} color={'#555'} />
@@ -67,7 +46,6 @@ export function OrderCard({ item, onQuantityChange }: { item: Order, onQuantityC
                         <Ionicons name="add-circle" size={24} color={'#555'} />
                     </TouchableOpacity>
                 </View>
-            </View>
         </View>
     );
 }
