@@ -22,6 +22,7 @@ import toastConfig from '~/styles/toast';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PrivacyPolicy } from '~/components/screens/PrivacyPolicy';
 import ListInstitutions from '~/components/screens/ListInstitutions';
+import { Cart } from '~/components/Cart';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -93,7 +94,7 @@ export default function Routes() {
           <Stack.Screen
             name="InstitutionProfile"
             component={InstitutionProfile}
-            options={{ gestureEnabled: false, headerRight: () => <Logo /> }}
+            options={{ gestureEnabled: false, headerRight: () => <Cart classlist='mr-5' /> }}
           />
 
         </Stack.Navigator>

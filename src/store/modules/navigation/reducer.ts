@@ -9,7 +9,7 @@ export const InitialNavigationState: NavigationStateType = {
   screen: 'Home',
 };
 
-const userSlice = createSlice({
+const navigationSlice = createSlice({
   name: 'navigation',
   initialState: InitialNavigationState,
   reducers: {
@@ -22,5 +22,5 @@ const userSlice = createSlice({
   }
 });
 
-export const { setNavigationScreen, clearAll } = userSlice.actions;
-export default userSlice.reducer;
+export const { setNavigationScreen, clearAll } = navigationSlice.actions;
+export default navigationSlice.reducer;

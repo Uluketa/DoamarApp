@@ -14,41 +14,33 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { formatCNPJ, PATH_INSTITUTION_COVER, PATH_INSTITUTION_PHOTO } from '~/core/helpers';
 import { Order } from '~/types/entities/Order';
 import { OrderCard } from './components/OrderCard';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '~/store';
+import { Cart } from '~/components/Cart';
+import { setCartItems } from '~/store/modules/cart/actions';
 
 // Tipagem das props da tela
 type Props = StackScreenProps<RootStackParamList, 'InstitutionProfile'>;
-type CartType = {
-  order: Order;
-  quantity: number;
-}
 
 export function InstitutionProfile({ route, navigation }: Props) {
   const [institutionData, setInstitutionData] = useState<Institution>(route.params['institution']);
   const [ordersData, setOrdersData] = useState<Array<Order>>([]);
-  const [cart, setCart] = useState<Array<CartType>>([]);
 
+  const { items } = useSelector((state: RootState) => state.cart);
   const { token } = useSelector((state: RootState) => state.user);
   const [location, setLocation] = useState({
     latitude: -23.55052, // São Paulo
     longitude: -46.633308,
   });
 
+  const dispatch = useDispatch();
+
   const handleQuantityChange = (order: Order, qty: number) => {
-    setCart(prev => {
-      if (qty === 0) {
-        return prev.filter(item => item.order.id !== order.id);
-      }
-
-      if (prev.some(item => item.order.id === order.id)) {
-        return prev.map(item =>
-          item.order.id === order.id ? { ...item, quantity: qty } : item
-        );
-      }
-
-      return [...prev, { order, quantity: qty }];
-    });
+    dispatch(setCartItems({
+      items: (items ?? []).filter(item => item.id !== order.id).concat(
+        qty > 0 ? [{ ...order, quantity: qty }] : []
+      )
+    }));
   };
 
   const fetchInstituionOrders = async () => {
@@ -83,7 +75,7 @@ export function InstitutionProfile({ route, navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: institutionData.name,
-      headerRight: () => <Logo />,
+      headerRight: () => <Cart classlist='mr-5' />,
     });
 
     fetchInstituionOrders();
@@ -213,27 +205,37 @@ export function InstitutionProfile({ route, navigation }: Props) {
         </View>
       </ScrollView>
 
-      {cart.length > 0 && (
-        <View
-          className='w-[100%] rounded-t-lg p-7 border-t border-gray-200'
-          style={{ backgroundColor: colors.white }}
-        >
-          <Text className='text-2xl font-bold mb-2'>Resumo</Text>
-          <View className='w-[100%] justify-between items-center flex flex-row'>
-            <View className='mb-2'>
-              {cart.map(item => (
-                <Text key={item.order.id} style={{ color: colors.palette[3], fontSize: 16 }}>
-                  {item.quantity} x {item.order.name}
-                </Text>
-              ))}
-            </View>
-
-            <TouchableOpacity
-              className='p-3 rounded-md w-24 items-center'
-              style={{ backgroundColor: colors.palette[3] }}
-            ><Text className='text-white'>Finalizar</Text></TouchableOpacity>
-          </View>
+      {items.length > 0 && (
+        <View className='absolute bg-blue-600 px-5 py-4 rounded-lg items-center flex-row gap-2 bottom-4 right-4'>
+          <Ionicons name="cart" size={18} color='white' />
+          <Text className='text-white text-xl'>Ver Carrinho</Text>
         </View>
+
+        // <View
+        //   className='w-[100%] rounded-t-lg p-7 border-t border-gray-200'
+        //   style={{ backgroundColor: colors.white }}
+        // >
+        //   <Text className='text-2xl font-bold mb-2'>Carrinho</Text>
+        //   <View className='w-[100%] justify-between flex flex-col'>
+        //     <View className='my-3'>
+        //       {cart.slice(0, 3).map(item => (
+        //           <Text className="text-gray-700 text-base">
+        //             {item.quantity} × {item.order.name}
+        //           </Text>
+        //       ))}
+        //     </View>
+
+        //     <View className='flex-row w-full justify-end'>
+        //       <TouchableOpacity
+        //         className='px-5 py-3 rounded-md items-center flex-row gap-2'
+        //         style={{ backgroundColor: colors.palette[3] }}
+        //       >
+        //         <Ionicons name="cart" size={18} color='white' />
+        //         <Text className='text-white'>Finalizar</Text>
+        //       </TouchableOpacity>
+        //     </View>
+        //   </View>
+        // </View>
       )}
     </View>
   );
