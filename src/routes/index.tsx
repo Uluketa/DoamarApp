@@ -12,7 +12,7 @@ import { ReceiveDonationQuest } from '~/components/screens/Institution/ReceiveDo
 import { About } from '~/components/screens/About';
 import { InstitutionProfile } from '~/components/screens/InstitutionProfile';
 import { Layout } from '~/components/ui/Layout';
-import { ClientCart } from '~/components/screens/Client/Cart'
+import { ClientCart } from '~/components/screens/Client/Cart';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -22,7 +22,6 @@ import { Logo } from '~/components/Logo';
 import { CartHeader } from '~/components/CartHeader';
 
 import toastConfig from '~/styles/toast';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { PrivacyPolicy } from '~/components/screens/PrivacyPolicy';
 import ListInstitutions from '~/components/screens/ListInstitutions';
 
@@ -32,7 +31,7 @@ export default function Routes() {
   const { userData } = useSelector((state: RootState) => state.user);
 
   return (
-    <SafeAreaView className='flex-1'>
+    <>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName={userData.id ? "Layout" : 'SignIn'}
@@ -45,7 +44,8 @@ export default function Routes() {
             headerStyle: {
               backgroundColor: colors.palette[1],
             },
-            cardStyleInterpolator: CardStyleInterpolators.forNoAnimation
+            headerStatusBarHeight: 0,
+            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
           }}
         >
           {!userData.id ? (
@@ -72,7 +72,7 @@ export default function Routes() {
             <Stack.Screen
               name="Layout"
               component={Layout}
-              options={{ headerShown: false, gestureEnabled: false }}
+              options={{ headerShown: false, gestureEnabled: false, title: "Voltar" }}
             />
           )}
 
@@ -97,7 +97,7 @@ export default function Routes() {
           <Stack.Screen
             name="ListInstitutions"
             component={ListInstitutions}
-            options={{ gestureEnabled: false, title: "Instituições", headerRight: () => <Logo /> }}
+            options={{ gestureEnabled: false, title: "Instituições", headerRight: () => <Logo />, headerStatusBarHeight: 0 }}
           />
 
           <Stack.Screen
@@ -105,11 +105,10 @@ export default function Routes() {
             component={InstitutionProfile}
             options={{ gestureEnabled: false, headerRight: () => <CartHeader classlist='mr-5' /> }}
           />
-
         </Stack.Navigator>
       </NavigationContainer>
 
       <Toast config={toastConfig} />
-    </SafeAreaView>
+    </>
   );
 }

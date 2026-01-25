@@ -1,4 +1,4 @@
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ContainerProps = {
   children: React.ReactNode;

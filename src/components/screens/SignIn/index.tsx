@@ -29,57 +29,41 @@ export const SignIn = ({ navigation }: SignInProps) => {
     const [isFetching, setIsFetching] = useState<boolean>(false);
 
     // Valores compartilhados para animações
-    const logoScale = useSharedValue(0.5);
+    const logoScale = useSharedValue(0.8);
     const logoOpacity = useSharedValue(0);
     const logoWidth = useSharedValue(100);
-    const logoMarginLeft = useSharedValue(0);
-
+    const logoTranslateX = useSharedValue(0);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        // Animações iniciais
-        logoOpacity.value = withTiming(1, { duration: 2000 });
-        logoScale.value = withSequence(
-            withTiming(1, { duration: 1000 }),
-            withRepeat(
-                withSpring(1.1, {
-                    damping: 50,
-                    stiffness: 50,
-                    mass: 2
-                }),
-                4,
-                true
-            )
-        );
+        logoOpacity.value = withTiming(1, { duration: 800 });
+        logoScale.value = withTiming(1, { duration: 800 });
 
-        // Listeners para teclado
-        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-            setKeyboardVisible(true);
-            logoWidth.value = withTiming(70, { duration: 300 });
-            logoMarginLeft.value = withTiming(1, { duration: 300 });
+        const show = Keyboard.addListener('keyboardDidShow', () => {
+            logoWidth.value = withTiming(70, { duration: 250 });
+            logoTranslateX.value = withTiming(120, { duration: 250 });
         });
 
-        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-            setKeyboardVisible(false);
-            logoWidth.value = withTiming(100, { duration: 300 });
-            logoMarginLeft.value = withTiming(0, { duration: 300 });
+        const hide = Keyboard.addListener('keyboardDidHide', () => {
+            logoWidth.value = withTiming(100, { duration: 250 });
+            logoTranslateX.value = withTiming(0, { duration: 250 });
         });
 
         return () => {
-            keyboardDidShowListener.remove();
-            keyboardDidHideListener.remove();
+            show.remove();
+            hide.remove();
         };
-    }, [logoOpacity, logoScale, logoWidth, logoMarginLeft]);
+    }, []);
 
     // Estilos animados
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            opacity: logoOpacity.value,
-            transform: [{ scale: logoScale.value }],
-            width: logoWidth.value,
-            marginLeft: isKeyboardVisible ? 'auto' : logoMarginLeft.value,
-        };
-    });
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: logoOpacity.value,
+        width: logoWidth.value,
+        transform: [
+            { scale: logoScale.value },
+            { translateX: logoTranslateX.value }
+        ],
+    }));
 
     const handleLogin = async () => {
         setIsFetching(true);
@@ -121,11 +105,9 @@ export const SignIn = ({ navigation }: SignInProps) => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             className='flex-1 items-center'
         >
-            {/* <ModalError visible={verror}><Text>{verrorMsg}</Text></ModalError> */}
-
             <View
                 className='w-full justify-center'
-                style={[styles.containerImg, (isKeyboardVisible) ? styles.containerKeyVisible : styles.containerKeyNotVisible]}
+                style={[styles.containerImg, styles.containerKeyNotVisible]}
             >
                 <Animated.Image
                     source={require("~/assets/logoLightGreenB.png")}
@@ -134,18 +116,20 @@ export const SignIn = ({ navigation }: SignInProps) => {
                 />
             </View>
 
-            <View className='w-full items-center justify-center px-8' style={{ height: isKeyboardVisible ? '40%' : '65%' }}>
-                <LabeledTextInput label="Login:" value={username} onChangeText={setUsername} />
-                <LabeledTextInput label="Senha:" value={password} onChangeText={setPassword} secureTextEntry />
-                <TextForgotPassword onPress={() => navigation.navigate('ForgotPassword')} />
-                <ButtonEntrar title='Entrar' onPress={handleLogin} bgColor={colors.palette[1]} loading={isFetching} />
-            </View>
+            <View className='w-full h-[75%] justify-between'>
+                <View className='w-full items-center justify-center p-8'>
+                    <LabeledTextInput label="Login:" value={username} onChangeText={setUsername} />
+                    <LabeledTextInput label="Senha:" value={password} onChangeText={setPassword} secureTextEntry />
+                    <TextForgotPassword onPress={() => navigation.navigate('ForgotPassword')} />
+                    <ButtonEntrar title='Entrar' onPress={handleLogin} bgColor={colors.palette[1]} loading={isFetching} />
+                </View>
 
-            <View className='flex flex-row' style={{ height: '10%' }} >
-                <Text className="text-gray-500 text-base text-center mr-1 py-5">Ainda não tem uma conta?</Text>
-                <TouchableOpacity className="items-center py-5" onPress={() => navigation.navigate("SignUp")}>
-                    <Text className='underline ml-1'>Cadastre-se</Text>
-                </TouchableOpacity>
+                <View className='flex flex-row justify-center items-center'>
+                    <Text className="text-gray-500 text-base text-center mr-1 py-5">Ainda não tem uma conta?</Text>
+                    <TouchableOpacity className="items-center py-5" onPress={() => navigation.navigate("SignUp")}>
+                        <Text className='underline ml-1'>Cadastre-se</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </KeyboardAvoidingView>
     );

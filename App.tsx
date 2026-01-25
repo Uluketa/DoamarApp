@@ -1,9 +1,14 @@
 import 'src/styles/global.css';
 
-import { useEffect, useState } from "react";
-import { colorScheme } from 'nativewind';
-import { useFonts, HindSiliguri_400Regular, HindSiliguri_500Medium, HindSiliguri_700Bold } from "@expo-google-fonts/hind-siliguri";
-import { DefaultTheme, DarkTheme, ThemeProvider } from "@react-navigation/native";
+import { useEffect } from "react";
+import { Platform, StatusBar, View } from 'react-native';
+import {
+  useFonts,
+  HindSiliguri_400Regular,
+  HindSiliguri_500Medium,
+  HindSiliguri_700Bold
+} from "@expo-google-fonts/hind-siliguri";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import 'react-native-gesture-handler';
 
 import { Provider } from 'react-redux';
@@ -11,10 +16,15 @@ import store from './src/store';
 
 import RootStack from 'src/routes/index';
 import { Loading } from "~/components/ui/Loading";
-import { StatusBar } from 'react-native';
 import { colors } from '~/styles/colors';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import * as NavigationBar from 'expo-navigation-bar';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
+// ======================
+// APP ROOT
+// ======================
 export default function App() {
   const [loaded, error] = useFonts({
     HindSiliguri_400Regular,
@@ -30,19 +40,47 @@ export default function App() {
     return <Loading />;
   }
 
-  return <RootLayoutNav />;
+  // 🔥 SafeAreaProvider TEM que estar AQUI
+  return (
+    <SafeAreaProvider>
+      <RootLayoutNav />
+    </SafeAreaProvider>
+  );
 }
 
+
+// ======================
+// LAYOUT
+// ======================
 function RootLayoutNav() {
-  const [colorTheme, setColorTheme] = useState(colorScheme.get());
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setBackgroundColorAsync(colors.background);
+      NavigationBar.setButtonStyleAsync('dark');
+    }
+  }, []);
 
   return (
     <Provider store={store}>
-      <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <SafeAreaView className='flex-1' style={{ backgroundColor: colors.palette[1] }}>
-          <StatusBar backgroundColor={colors.palette[1]} />
+      <ThemeProvider value={DefaultTheme}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: colors.palette[1],
+            paddingTop: insets.top,
+            paddingBottom: 0
+          }}
+        >
+          <StatusBar
+            barStyle="dark-content"
+            translucent={Platform.OS === 'android'}
+            backgroundColor="transparent"
+          />
+
           <RootStack />
-        </SafeAreaView>
+        </View>
       </ThemeProvider>
     </Provider>
   );

@@ -82,7 +82,7 @@ export const NavBar = ({ activeScreen, setActiveScreen, userType }: NavBarProps)
   const screens = userType === 'institution' ? institutionScreens : clientScreens;
 
   return (
-    <View className='flex-row h-20 bg-white border-t border-gray-200'>
+    <View className='flex-row pb-12 pt-6 bg-white border-t border-gray-200'>
       {screens.map((button, index) => (
         <NavButton
           key={index}
