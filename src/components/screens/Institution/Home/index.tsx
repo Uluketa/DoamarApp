@@ -3,14 +3,14 @@ import { View, Text } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { BtnText } from '~/components/Button';
 import { persistor } from '~/store';
-import { clearAll } from '~/store/modules/user/actions';
+import { clearUser } from '~/store/modules/user/actions';
 
 export default function Home() {
     const dispatch = useDispatch();
 
     const handleClean = async () => {
         try {
-            dispatch(clearAll());
+            dispatch(clearUser());
 
             await persistor.purge();
             await AsyncStorage.clear();

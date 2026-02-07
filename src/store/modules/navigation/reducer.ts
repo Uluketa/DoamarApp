@@ -13,14 +13,17 @@ const navigationSlice = createSlice({
   name: 'navigation',
   initialState: InitialNavigationState,
   reducers: {
+    // Define tela ativa
     setNavigationScreen(state, action: PayloadAction<NavigationStateType>) {
       state.screen = action.payload.screen;
     },
-    clearAll() {
+
+    // Reseta para Home
+    resetNavigation() {
       return InitialNavigationState;
     },
   }
 });
 
-export const { setNavigationScreen, clearAll } = navigationSlice.actions;
+export const { setNavigationScreen, resetNavigation } = navigationSlice.actions;
 export default navigationSlice.reducer;

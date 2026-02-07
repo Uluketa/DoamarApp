@@ -3,11 +3,13 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, BackHandler, FlatList, Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, BackHandler, FlatList, Image, Pressable, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { clientHome, listSocialIssues, URL } from '~/api';
+import { clientHome, listSocialIssues, IMAGE_BASE_URL } from '~/api';
+import { useTheme } from '~/contexts/ThemeContext';
 import { PATH_CLIENT_PHOTO, PATH_INSTITUTION_COVER } from '~/core/helpers';
 import { RootState } from '~/store';
+import { setHomeData, setHomeLoading } from '~/store/modules/home/actions';
 import { colors } from '~/styles/colors';
 import { RootStackParamList } from '~/types/Navigation';
 import { Institution } from '~/types/entities/Institution';
@@ -15,18 +17,18 @@ import { SocialIssue } from '~/types/entities/SocialIssue';
 
 export default function Home() {
     const dispatch = useDispatch();
-    const [institutionsData, setInstitutionsData] = useState<Array<Institution>>([]);
-    const [socialIssuesData, setSocialIssuesData] = useState<Array<SocialIssue>>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
     const isFocused = useIsFocused();
-
     const { token, userData } = useSelector((state: RootState) => state.user);
+    const { institutions: institutionsData, socialIssues: socialIssuesData, isLoading } = useSelector((state: RootState) => state.home);
     const [userColorRating, setUserColorRating] = useState<string>('#2196F3');
 
     type NavigationProps = StackNavigationProp<RootStackParamList, 'InstitutionProfile'>;
     const navigation = useNavigation<NavigationProps>();
+    const { theme, toggleTheme } = useTheme();
 
+    // Handle back button (usa subscription: addEventListener retorna { remove() })
     useEffect(() => {
         const handleBackPress = () => {
             if (isFocused) {
@@ -43,299 +45,327 @@ export default function Home() {
             return false;
         };
 
-        BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+        const subscription = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
 
-        return () => {
-            BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-        };
+        return () => subscription.remove();
     }, [isFocused]);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
     const fetchData = async () => {
+        if (!userData.id || !token) return;
+        dispatch(setHomeLoading(true));
         try {
-            const clientHomeResponse = await clientHome(userData.id, token);
-            const clientHomeData = clientHomeResponse.data;
+            const [clientHomeResponse, socialIssuesResponse] = await Promise.all([
+                clientHome(userData.id, token),
+                listSocialIssues(),
+            ]);
 
-            if (!userData) dispatch({ type: 'user/setUserData', payload: clientHomeData.user });
-            setInstitutionsData(clientHomeData.institutions);
+            const institutions = (clientHomeResponse.ok === 'S' && clientHomeResponse.data?.institutions)
+                ? clientHomeResponse.data.institutions
+                : [];
+            const socialIssues = (socialIssuesResponse.ok === 'S' && socialIssuesResponse.data)
+                ? socialIssuesResponse.data
+                : [];
 
-            const socialIssuesResponse = await listSocialIssues();
-            const socialIssuesData = socialIssuesResponse.data;
-
-            setSocialIssuesData(socialIssuesData);
-
+            dispatch(setHomeData({ institutions, socialIssues }));
         } catch (error) {
-            console.log(error);
+            console.error('Erro ao buscar dados da home:', error);
+        } finally {
+            dispatch(setHomeLoading(false));
+            setIsRefreshing(false);
         }
+    };
 
-        setIsLoading(false);
+    // Só busca da API quando ainda não tem dados em cache (ao voltar na Home usa o cache)
+    useEffect(() => {
+        if (userData.id && token && institutionsData.length === 0 && socialIssuesData.length === 0) {
+            dispatch(setHomeLoading(true));
+            fetchData();
+        }
+    }, [userData.id, token]);
+
+    const handleRefresh = () => {
+        setIsRefreshing(true);
+        fetchData();
     };
 
     const handleInstitutionProfile = (institution: Institution) => {
         navigation.navigate('InstitutionProfile', { institution });
-    }
+    };
 
     const handleListInstitutions = () => {
         navigation.navigate('ListInstitutions');
-    }
+    };
 
+    //  Renderizar classificação do usuário
     const renderRating = () => {
         const rating = userData?.classification?.rating;
 
         if (rating === undefined || rating === null || rating === 0) {
             return (
-                <Text style={{ color: 'gray', fontSize: 12 }}>Sem histórico de doações</Text>
+                <Text className="text-sm text-gray-500">Comece a doar para ganhar pontos</Text>
             );
         }
 
         let levelText = 'Iniciante';
-        let starSize = 15;
-        let nameStyle = {};
-        let stars = 0;
-        let starColor = '#2196F3';
+        let starColor = '#3b82f6';
+        let stars = 1;
 
-        if (rating >= 1 && rating <= 3) {
+        if (rating >= 1 && rating <= 2) {
             levelText = 'Nível Iniciante';
-            stars = Math.ceil(rating / 2);
-
-        } else if (rating >= 4 && rating <= 6) {
-            starColor = '#ffa200ff';
+            stars = 1;
+            starColor = '#3b82f6';
+        } else if (rating >= 3 && rating <= 4) {
             levelText = 'Nível Vizinho';
-            stars = Math.ceil(rating / 2);
-
-        } else if (rating >= 7 && rating <= 9) {
-            starColor = colors.palette[3];
+            stars = 2;
+            starColor = '#f59e0b';
+        } else if (rating >= 5 && rating <= 7) {
             levelText = 'Nível Amigo';
-            stars = Math.ceil(rating / 2);
-
-        } else if (rating === 10) {
-            starColor = '#8e24aa';
+            stars = 3;
+            starColor = '#10b981';
+        } else if (rating >= 8 && rating <= 9) {
+            levelText = 'Nível Herói';
+            stars = 4;
+            starColor = '#8b5cf6';
+        } else if (rating >= 10) {
             levelText = 'Nível Doamar';
-            starSize = 22;
-            nameStyle = { color: '#8e24aa' };
             stars = 5;
+            starColor = '#ec4899';
         }
 
-        // Gera estrelas cheias
-        const starIcons = [];
-        for (let i = 0; i < 5; i++) {
-            starIcons.push(
-                <Ionicons
-                    key={i}
-                    name="star"
-                    size={starSize}
-                    color={i < stars ? starColor : 'gray'}
-                />
-            );
-        }
+        const starIcons = Array(5).fill(0).map((_, i) => (
+            <Ionicons
+                key={i}
+                name={i < stars ? "star" : "star-outline"}
+                size={18}
+                color={i < stars ? starColor : '#d1d5db'}
+            />
+        ));
 
         if (userColorRating !== starColor) {
             setUserColorRating(starColor);
         }
 
         return (
-            <View className='flex-col text-center items-center'>
-                <View className='flex-row items-center'>{starIcons}</View>
-                <Text className='text-bold text-sm' style={{ color: starColor }}>{levelText}</Text>
+            <View className='items-center gap-2'>
+                <View className='flex-row gap-1'>
+                    {starIcons}
+                </View>
+                <Text className='font-bold text-sm' style={{ color: starColor }}>
+                    {levelText}
+                </Text>
             </View>
         );
     };
 
     return (
-        <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
-            {/* Perfil */}
-
-            <View className="items-center pb-4">
+        <ScrollView
+            className='flex-1'
+            style={{ 
+                backgroundColor: colors.background
+            }}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+                <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={handleRefresh}
+                    colors={[colors.border]}
+                />
+            }
+        >
+            {/* Header com Perfil */}
+            <View className="bg-gradient-to-b items-center pb-8" style={{
+                backgroundColor: colors.palette[1] + '15'
+            }}>
                 <Image
                     source={require("src/assets/global/cover.png")}
-                    className="w-full h-28 absolute"
+                    className="w-full h-20 absolute top-0"
                 />
 
-                <Image
-                    source={{ uri: `http://${URL}${userData.client?.pathProfileImage ? userData.client.pathProfileImage : PATH_CLIENT_PHOTO}` }}
-                    style={{
-                        width: 100,
-                        height: 100,
-                        borderRadius: 50,
-                        borderWidth: 2,
-                        borderColor: userColorRating,
-                        marginTop: 40,
-                        backgroundColor: '#fff',
-                    }}
-                />
-
-                <Text className="text-2xl font-semibold mt-2">
-                    {userData.client?.name}
-                </Text>
-
-                {renderRating()}
-            </View>
-
-
-            {/* Instituições */}
-            <View className="pb-6">
-                <View className="flex-row justify-between items-center px-4">
-                    <Text className="text-2xl font-bold mb-2">Instituições</Text>
-                    <Pressable onPress={handleListInstitutions}>
-                        <Text className="font-bold underline" style={{ color: colors.palette[1] }}>
-                            Ver mais
-                        </Text>
-                    </Pressable>
+                <View className="mt-8">
+                    <Image
+                        source={{
+                            uri: userData.client?.pathProfileImage
+                                ? `${IMAGE_BASE_URL}${userData.client.pathProfileImage}`
+                                : `${IMAGE_BASE_URL}${PATH_CLIENT_PHOTO}`
+                        }}
+                        style={{
+                            width: 100,
+                            height: 100,
+                            borderRadius: 50,
+                            borderWidth: 3,
+                            borderColor: userColorRating,
+                        }}
+                    />
                 </View>
 
-                <FlatList
-                    horizontal
-                    data={institutionsData}
-                    renderItem={({ item }) => (
-                        <View
-                            className="rounded-2xl overflow-hidden"
-                            style={{
-                                shadowColor: '#000',
-                                shadowOpacity: 0.15,
-                                shadowRadius: 6,
-                                elevation: 4,
-                            }}
-                        >
-                            <Pressable
+                <Text className="text-2xl font-bold mt-4" style={{ color: colors.text }}>
+                    Olá, {userData.client?.name?.split(' ')[0]}!
+                </Text>
+
+                <View className="mt-2">
+                    {renderRating()}
+                </View>
+            </View>
+
+            {/* Seção de Instituições */}
+            <View className="px-6 py-8">
+                <View className="flex-row justify-between items-center mb-4">
+                    <Text className="text-2xl font-bold" style={{ color: colors.text }}>Instituições</Text>
+                    <TouchableOpacity onPress={handleListInstitutions}>
+                        <Text className="font-bold text-blue-500">Ver todas</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {isLoading && institutionsData.length === 0 ? (
+                    <View className="h-56 justify-center items-center">
+                        <View className="items-center">
+                            <ActivityIndicator size="large" color={colors.palette[1]} />
+                            <Text className="text-gray-500 mt-4 font-medium">Carregando instituições...</Text>
+                            <Text className="text-gray-400 text-sm mt-1">Aguarde um momento</Text>
+                        </View>
+                    </View>
+                ) : institutionsData.length === 0 ? (
+                    <View className="h-40 justify-center items-center border border-gray-200 rounded-lg">
+                        <Text className="text-gray-500">Nenhuma instituição disponível</Text>
+                    </View>
+                ) : (
+                    <FlatList
+                        horizontal
+                        data={institutionsData}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
                                 onPress={() => handleInstitutionProfile(item)}
-                                className="z-10 absolute top-2 right-2 w-10 h-10 bg-white/60 rounded-lg flex items-center justify-center">
-                                <Ionicons name="arrow-forward" size={20} color="white" />
-                            </Pressable>
-
-                            <Image
-                                source={{ uri: `http://${URL}${item.pathBackgroundImage ? item.pathBackgroundImage : PATH_INSTITUTION_COVER}` }}
-                                style={{ width: 140, height: 150 }}
-                            />
-
-                            {/* Gradiente */}
-                            <LinearGradient
-                                colors={['transparent', colors.palette[0]]}
+                                className="rounded-2xl overflow-hidden mr-4 bg-white shadow-sm"
                                 style={{
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    height: 100,
-                                }}
-                            />
-
-                            {/* Texto Centralizado */}
-                            <View
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 10,
-                                    left: 0,
-                                    right: 0,
-                                    height: 100,
-                                    justifyContent: 'flex-end',
-                                    alignItems: 'center',
+                                    width: 160,
+                                    height: 200,
+                                    shadowColor: '#000',
+                                    shadowOpacity: 0.1,
+                                    shadowRadius: 4,
+                                    elevation: 3,
                                 }}
                             >
-                                <Text className="text-center text-md text-white">{item.name}</Text>
-                            </View>
-                        </View>
-                    )}
-                    contentContainerStyle={{
-                        paddingHorizontal: 16,
-                        gap: 8,
-                    }}
-                    showsHorizontalScrollIndicator={false}
-                />
+                                {/* Imagem de fundo */}
+                                <Image
+                                    source={{
+                                        uri: item.pathBackgroundImage
+                                            ? `${IMAGE_BASE_URL}${item.pathBackgroundImage}`
+                                            : `${IMAGE_BASE_URL}${PATH_INSTITUTION_COVER}`
+                                    }}
+                                    className="w-full h-full"
+                                />
+
+                                {/* Gradiente */}
+                                <LinearGradient
+                                    colors={['transparent', colors.palette[0]]}
+                                    style={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: 80,
+                                    }}
+                                />
+
+                                {/* Info */}
+                                <View className="absolute bottom-0 left-0 right-0 p-3">
+                                    <Text className="text-white font-bold text-sm line-clamp-2">
+                                        {item.name}
+                                    </Text>
+                                    {item.social_issue && (
+                                        <Text className="text-white/80 text-xs mt-1">
+                                            {item.social_issue.title}
+                                        </Text>
+                                    )}
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                        scrollEventThrottle={16}
+                        showsHorizontalScrollIndicator={false}
+                    />
+                )}
             </View>
 
+            {/* Seção de Temas Sociais */}
+            <View className="px-6 py-8 border-t" style={{ borderColor: colors.border }}>
+                <Text className="text-2xl font-bold mb-4" style={{ color: colors.text }}>Causas Sociais</Text>
 
-            {/* Imagem de Propaganda */}
-            <View className="relative overflow-hidden">
-                <Image
-                    className="opacity-40 w-full h-48"
-                    source={require("src/assets/rostos.jpg")}
-                />
-
-                <Image
-                    className="absolute w-24 h-24 items-center content-center"
-                    source={require("src/assets/logoDarkGreenA.png")}
-                    style={{
-                        top: '50%',
-                        left: '50%',
-                        transform: [{ translateX: -48 }, { translateY: -48 }],
-                    }}
-                />
-            </View>
-
-            {/* Questões Sociais */}
-            <View className='py-6'>
-                <Text className='text-2xl font-bold mb-2 px-4'>Questões Sociais</Text>
-
-                {isLoading ? (
-                    <View className='flex-row justify-center items-center h-[70] my-2'>
+                {isLoading && socialIssuesData.length === 0 ? (
+                    <View className="h-24 justify-center items-center">
                         <ActivityIndicator size="large" color={colors.palette[1]} />
                     </View>
+                ) : socialIssuesData.length === 0 ? (
+                    <Text className="text-gray-500 text-center">Nenhuma causa disponível</Text>
                 ) : (
                     <FlatList
                         horizontal
                         data={socialIssuesData}
-                        keyExtractor={(item) => item.title}
-                        renderItem={({ item }) => (
-                            <Pressable
-                                className="flex flex-row items-center justify-center rounded-xl"
-                                style={{
-                                    backgroundColor: colors.palette[0]
-                                }}
-                            >
-                                <View className='p-5 rounded-lg m-0'>
-                                    <Ionicons name={item.icon} size={30} color={colors.palette[4]} />
-                                </View>
-
-                                <Text className="text-center text-md pr-5" style={{ color: colors.palette[4] }}>{item.title}</Text>
-                            </Pressable>
-                        )}
-                        contentContainerStyle={{
-                            paddingHorizontal: 16,
-                            gap: 8,
-                        }}
-                        showsHorizontalScrollIndicator={false}
-                    />
-                )}
-            </View>
-
-            {/* Doações Realizadas */}
-            <View className='pb-6'>
-                <Text className='text-2xl font-bold mb-2 px-4'>Doações Realizadas</Text>
-
-                {isLoading ? (
-                    <View className='flex-row justify-center items-center h-[100] my-2'>
-                        <ActivityIndicator size="large" color={colors.palette[1]} />
-                    </View>
-                ) : (
-                    <FlatList
-                        horizontal
-                        data={userData.donations || []}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => (
                             <View
-                                className="rounded-xl overflow-hidden bg-white shadow-md p-4 justify-between"
-                                style={{ width: 200 }}
+                                className="rounded-xl items-center justify-center p-4 mr-3 border"
+                                style={{
+                                    minWidth: 140,
+                                    borderColor: colors.palette[1] + '30'
+                                }}
                             >
-                                <Text className="text-lg font-semibold mb-1">{item.order?.name || 'Pedido'}</Text>
-                                <Text className="text-sm text-gray-500 mb-2">
-                                    {item.order?.description || 'Sem descrição'}
-                                </Text>
-                                <Text className="text-sm font-bold">
-                                    Data: {item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}
+                                <Ionicons
+                                    name={item.icon as any}
+                                    size={32}
+                                    color={colors.palette[1]}
+                                />
+                                <Text className="mt-2 text-xs font-semibold text-center" style={{ color: colors.palette[1] }}>
+                                    {item.title}
                                 </Text>
                             </View>
                         )}
                         showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{
-                            paddingHorizontal: 16,
-                            gap: 8,
-                        }}
                     />
                 )}
             </View>
+
+            {/* Seção de Doações Recentes */}
+            <View className="px-6 py-8 border-t" style={{ borderColor: colors.border }}>
+                <Text className="text-2xl font-bold mb-4" style={{ color: colors.text }}>Suas Doações</Text>
+
+                {!userData.donations || userData.donations.length === 0 ? (
+                    <View className="bg-blue-50 rounded-lg p-6 items-center">
+                        <Ionicons name="gift-outline" size={48} color={colors.palette[1]} />
+                        <Text className="mt-4 font-bold text-lg">Comece a Doar</Text>
+                        <Text className="text-sm text-gray-600 text-center mt-2">
+                            Explore instituições e realize sua primeira doação
+                        </Text>
+                    </View>
+                ) : (
+                    <FlatList
+                        horizontal
+                        data={userData.donations.slice(0, 5)}
+                        keyExtractor={(item, index) => `${item.id}-${index}`}
+                        renderItem={({ item }) => (
+                            <View className="rounded-lg border p-4 mr-3" style={{ minWidth: 200, borderColor: colors.border }}>
+                                <View className="flex-row items-start gap-3">
+                                    <Ionicons name="heart" size={24} color={colors.pink} />
+                                    <View className="flex-1">
+                                        <Text className="font-bold text-sm line-clamp-2" style={{ color: colors.pink }}>
+                                            {item.order?.name || 'Doação'}
+                                        </Text>
+                                        <Text className="text-xs text-gray-500 mt-1">
+                                            {item.order?.institution?.name || 'Instituição'}
+                                        </Text>
+                                        <Text className="text-xs text-gray-400 mt-2">
+                                            {item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : 'N/A'}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
+                        )}
+                        showsHorizontalScrollIndicator={false}
+                    />
+                )}
+            </View>
+
+            <View className="h-6" />
         </ScrollView>
     );
 }

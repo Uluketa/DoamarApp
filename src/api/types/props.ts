@@ -22,3 +22,36 @@ export type SignUpProps = {
     cnpj?: string;
     userType: "C" | "I";
 }
+
+export type UpdateClientProfileProps = {
+    name?: string;
+    email?: string;
+    cellphone?: string;
+    cpf?: string;
+    addressLine?: string;
+    addressNumber?: string;
+    addressCep?: string;
+    addressCity?: string;
+    addressState?: string;
+    addressNeighborhood?: string;
+    addressComplement?: string;
+    addressReference?: string;
+    accountType?: "D" | "R" | "B";
+}
+
+export type UpdateInstitutionProfileProps = {
+    name?: string;
+    email?: string;
+    cellphone?: string;
+    cnpj?: string;
+    addressLine?: string;
+    addressNumber?: string;
+    addressCep?: string;
+    addressCity?: string;
+    addressState?: string;
+    addressNeighborhood?: string;
+    addressComplement?: string;
+    addressReference?: string;
+    accountType?: "D" | "R" | "B";
+    social_issue_id?: number;
+}

@@ -1,258 +1,296 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { useLayoutEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '~/types/Navigation';
-
-import { Logo } from '~/components/Logo';
-import { colors } from '~/styles/colors';
-import { getOrdersByInstitution, URL } from '~/api';
-import { Institution } from '~/types/entities/Institution';
-
-import MapView, { Marker } from "react-native-maps";
-import { Ionicons } from '@expo/vector-icons';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { LinearGradient } from 'expo-linear-gradient';
-import { formatCNPJ, PATH_INSTITUTION_COVER, PATH_INSTITUTION_PHOTO } from '~/core/helpers';
-import { Order } from '~/types/entities/Order';
-import { OrderCard } from './components/OrderCard';
+import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '~/store';
-import { CartHeader } from '~/components/CartHeader';
-import { setCartItems } from '~/store/modules/cart/actions';
-import { clearAll } from '~/store/modules/cart/reducer';
 
-// Tipagem das props da tela
+import { RootStackParamList } from '~/types/Navigation';
+import { colors } from '~/styles/colors';
+import { Institution } from '~/types/entities/Institution';
+import { Order } from '~/types/entities/Order';
+import { RootState } from '~/store';
+
+import { getOrdersByInstitution, URL } from '~/api';
+import { formatCNPJ, PATH_INSTITUTION_COVER } from '~/core/helpers';
+import { OrderCard } from './components/OrderCard';
+import { CartHeader } from '~/components/CartHeader';
+import { setCartItems, clearCart } from '~/store/modules/cart/actions';
+import { useTheme } from '~/contexts/ThemeContext';
+
+const MAP_DARK_STYLE = [
+  { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#38414e' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#17263c' }] },
+];
+
 type Props = StackScreenProps<RootStackParamList, 'InstitutionProfile'>;
 
 export function InstitutionProfile({ route, navigation }: Props) {
-  const [institutionData, setInstitutionData] = useState<Institution>(route.params['institution']);
-  const [ordersData, setOrdersData] = useState<Array<Order>>([]);
+  const { institution } = route.params;
+  const [institutionData] = useState<Institution>(institution);
+  const [ordersData, setOrdersData] = useState<Order[]>([]);
+  const { theme } = useTheme();
 
-  const { items, institution } = useSelector((state: RootState) => state.cart);
+  const dispatch = useDispatch();
   const { token } = useSelector((state: RootState) => state.user);
-  const [location, setLocation] = useState({
-    latitude: -23.55052, // São Paulo
+  const { items, institution: cartInstitution } = useSelector(
+    (state: RootState) => state.cart
+  );
+
+  const [location] = useState({
+    latitude: -23.55052,
     longitude: -46.633308,
   });
 
-  const dispatch = useDispatch();
+  const [liked, setLiked] = useState(false);
+  const getQuantityForOrder = (orderId: number) =>
+    items.find(i => i.id === orderId)?.quantity ?? 0;
 
   const handleQuantityChange = (order: Order, qty: number) => {
-    const isDifferentInstitution =
-      institution && institution.id !== institutionData.id;
+    const differentInstitution =
+      cartInstitution && cartInstitution.id !== institutionData.id;
 
-    if (isDifferentInstitution) {
+    if (differentInstitution) {
       Alert.alert(
         'Carrinho de outra instituição',
-        'Você já tem itens de outra instituição no carrinho. Deseja limpar o carrinho para adicionar este item?',
+        'Deseja limpar o carrinho para adicionar este item?',
         [
-          {
-            text: 'Cancelar',
-            style: 'cancel',
-          },
+          { text: 'Cancelar', style: 'cancel' },
           {
             text: 'Limpar e adicionar',
             onPress: () => {
-              dispatch(clearAll());
-              dispatch(setCartItems({
-                institution: institutionData,
-                items: qty > 0 ? [{ ...order, quantity: qty }] : [],
-              }));
+              dispatch(clearCart());
+              dispatch(
+                setCartItems({
+                  institution: institutionData,
+                  items: qty > 0 ? [{ ...order, quantity: qty }] : [],
+                })
+              );
             },
           },
         ]
       );
-    } else {
-      dispatch(setCartItems({
+      return;
+    }
+
+    dispatch(
+      setCartItems({
         institution: institutionData,
-        items: (items ?? []).filter(item => item.id !== order.id).concat(
-          qty > 0 ? [{ ...order, quantity: qty }] : []
-        ),
-      }));
-    }
+        items: items
+          .filter(i => i.id !== order.id)
+          .concat(qty > 0 ? [{ ...order, quantity: qty }] : []),
+      })
+    );
   };
 
-  const fetchInstituionOrders = async () => {
-    const orders = await getOrdersByInstitution(institutionData.id, token);
-    if (orders.data) {
-      setOrdersData(orders.data);
-    }
-  };
-
-  const getCoordinates = async (cep: string, number: string) => {
-    try {
-      console.log(cep, number)
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&country=Brasil&postalcode=${cep}&street=${number}`,
-        {
-          headers: { "User-Agent": "MyApp/1.0 (limirruda2@gmail.com)" },
-        }
-      );
-      const data = await response.json();
-
-      if (data.length > 0) {
-        setLocation({
-          latitude: parseFloat(data[0].lat),
-          longitude: parseFloat(data[0].lon),
-        });
-      }
-    } catch (error) {
-      console.error("Erro ao buscar coordenadas:", error);
-    }
-  };
-
-  const getQuantityForOrder = (orderId: number) => {
-    const item = items.find(i => i.id === orderId);
-    return item?.quantity ?? 0;
+  const fetchOrders = async () => {
+    const response = await getOrdersByInstitution(institutionData.id, token);
+    if (response.data) setOrdersData(response.data);
   };
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: institutionData.name,
-      headerRight: () => <CartHeader classlist='mr-5' />,
+      title: '',
+      headerRight: () => <CartHeader classlist="mr-5" />,
     });
 
-    fetchInstituionOrders();
-    // getCoordinates(institutionData.addressCep, institutionData.addressNumber.toString());
-
-  }, [navigation, institutionData.name]);
+    fetchOrders();
+  }, []);
 
   return (
-    <View className='flex-1'>
-      <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
-        <Image
-          className="w-full h-[150] absolute"
-          source={{ uri: `http://${URL}${institutionData?.pathBackgroundImage ? institutionData.pathBackgroundImage : PATH_INSTITUTION_COVER}` }}
-        />
+    <View className="flex-1" style={{ backgroundColor: colors.background }}>
+      <ScrollView showsVerticalScrollIndicator={false}>
 
-        <View className='mt-[150] z-40'>
-          <View
-            className='flex flex-row items-center justify-between w-full px-4 py-2'
+        {/* HEADER PREMIUM */}
+        <View className="relative">
+          <Image
+            source={{
+              uri: `http://${URL}${institutionData.pathBackgroundImage ?? PATH_INSTITUTION_COVER}`,
+            }}
+            className="w-full h-[220]"
+          />
+
+          <LinearGradient
+            colors={[
+              'rgba(0,0,0,0.65)',
+              'rgba(0,0,0,0.45)',
+              'rgba(0,0,0,0.25)',
+            ]}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          />
+
+          <TouchableOpacity
+            onPress={() => setLiked(prev => !prev)}
+            activeOpacity={0.8}
+            style={{
+              position: 'absolute',
+              top: 20,
+              right: 20,
+              backgroundColor: 'rgba(0,0,0,0.45)',
+              padding: 10,
+              borderRadius: 999,
+              zIndex: 10,
+            }}
           >
-            <View>
-              <Text style={styles.title}>{institutionData.name}</Text>
-              <Text className='text-md text-gray-400'>{formatCNPJ(institutionData?.cnpj ?? '')}</Text>
-            </View>
+            <Ionicons
+              name={liked ? 'heart' : 'heart-outline'}
+              size={25}
+              color={liked ? '#ff4d6d' : '#fff'}
+            />
+          </TouchableOpacity>
 
-            {institutionData?.pathLogoImage && (
+          <View className="absolute bottom-6 left-4 right-4">
+            <Text className="text-2xl font-bold text-white">
+              {institutionData.name}
+            </Text>
+            <Text className="text-sm text-white/80 mt-1">
+              {formatCNPJ(institutionData.cnpj)}
+            </Text>
+          </View>
+
+          {institutionData.pathLogoImage && (
+            <View
+              style={{
+                position: 'absolute',
+                right: 16,
+                bottom: -24,
+                backgroundColor: colors.background,
+                padding: 14,
+                borderRadius: 16,
+                elevation: 6,
+              }}
+            >
               <Image
                 source={{ uri: `http://${URL}${institutionData.pathLogoImage}` }}
-                className='shadow-2xl'
-                style={{
-                  width: 100,
-                  height: 50,
-                  resizeMode: 'contain'
-                }}
+                style={{ width: 80, height: 40, resizeMode: 'contain' }}
               />
-            )}
-          </View>
-
-          {location ? (
-            <View className='relative'>
-              {/* Gradiente */}
-              <LinearGradient
-                colors={['#f0f0f0', 'transparent']}
-                className='z-50'
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 100,
-                }}
-              />
-
-              <MapView
-                style={{ width: "100%", height: 150 }}
-                region={{
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-              >
-                <Marker coordinate={location} title={institutionData.name} />
-              </MapView>
-            </View>
-          ) : (
-            <View
-              className='flex flex-col justify-center items-center'
-              style={{ width: "100%", height: 150, backgroundColor: colors.palette[1] }}
-            >
-              <Ionicons name="map" size={25} color="white" />
-              <Text className='text-xl font-bold text-white mt-4'>{institutionData?.addressLine} - {institutionData?.addressNumber}</Text>
             </View>
           )}
+        </View>
 
-          <View className='py-6'>
-            <Text className='text-2xl font-bold mb-2 pl-4'>Principal Causa Social</Text>
-
-            <View className="rounded-xl overflow-hidden relative">
-              <Image
-                source={{
-                  uri: `http://${URL}${institutionData.social_issue?.pathImage ?
-                    institutionData.social_issue?.pathImage :
-                    PATH_INSTITUTION_COVER}`
-                }}
-                style={{ height: 200 }}
-                className='w-[90%] mx-[5%] rounded-lg'
-              />
-
-              {/* Gradiente */}
-              <LinearGradient
-                colors={["transparent", colors.black]}
-                className='w-[90%] mx-[5%] absolute bottom-[0] h-[100]'
-              />
-
-              {/* Texto Centralizado */}
-              <View
-                style={{
-                  position: "absolute",
-                  bottom: 10,
-                  left: 0,
-                  right: 0,
-                  height: 100,
-                  justifyContent: "flex-end",
-                  alignItems: "center",
-                }}
-              >
-                <Text className="text-center text-lg text-white">{institutionData.social_issue?.title}</Text>
-              </View>
-            </View>
-            <View className='bg-black w-[90%] mx-[5%] rounded-b-lg p-4'>
-              <Text className="text-center text-sm text-white">{institutionData.social_issue?.description}</Text>
-            </View>
-          </View>
-
-          <View className='pl-4 py-6'>
-            <Text className='text-2xl font-bold mb-2'>Pedidos de doação</Text>
-            <FlatList
-              horizontal
-              data={ordersData}
-              keyExtractor={(item) => item.id.toString()}
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <OrderCard
-                  item={item}
-                  onQuantityChange={handleQuantityChange}
-                  initialQuantity={getQuantityForOrder(item.id)} />
-              )}
-            />
+        {/* MAP CARD */}
+        <View className="mt-6 px-4">
+          <View
+            style={{
+              borderRadius: 16,
+              overflow: 'hidden',
+              borderWidth: 1,
+              borderColor: colors.border,
+              backgroundColor: colors.background,
+            }}
+          >
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              style={{ width: '100%', height: 160 }}
+              region={{
+                latitude: location.latitude,
+                longitude: location.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+              customMapStyle={theme === 'dark' ? MAP_DARK_STYLE : []}
+            >
+              <Marker coordinate={location} title={institutionData.name} />
+            </MapView>
           </View>
         </View>
+
+        {/* CAUSA SOCIAL */}
+        <View className="mt-6 px-4">
+          <Text className="text-xl font-bold" style={{ color: colors.text }}>
+            Principal causa social
+          </Text>
+
+          <View className="mt-4 rounded-2xl overflow-hidden">
+            <Image
+              source={{
+                uri: `http://${URL}${institutionData.social_issue?.pathImage ?? PATH_INSTITUTION_COVER}`,
+              }}
+              style={{ height: 200 }}
+            />
+
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.85)']}
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 120,
+              }}
+            />
+
+            <View className="absolute bottom-4 left-4 right-4">
+              <Text className="text-lg font-semibold text-white">
+                {institutionData.social_issue?.title}
+              </Text>
+              <Text className="text-sm mt-2" style={{ color: '#9e9e9e' }}>
+                {institutionData.social_issue?.description}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* PEDIDOS */}
+        <View className="mt-6">
+          <View className="px-4 mb-4">
+            <Text className="text-xl font-bold" style={{ color: colors.text }}>
+              Pedidos de doação
+            </Text>
+            <Text className="text-sm mt-1" style={{ color: colors.text + 'CC' }}>
+              Escolha como ajudar esta instituição
+            </Text>
+          </View>
+
+          <FlatList
+            horizontal
+            data={ordersData}
+            keyExtractor={item => item.id.toString()}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[
+              { paddingHorizontal: 16 },
+              ordersData.length === 0 && { flex: 1 }
+            ]}
+            ListEmptyComponent={() => (
+              <View className="flex-1 justify-center items-center">
+                <Text
+                  className="text-center"
+                  style={{ color: colors.text + 'CC' }}
+                >
+                  Nenhum pedido disponível
+                </Text>
+              </View>
+            )}
+            renderItem={({ item }) => (
+              <OrderCard
+                item={item}
+                onQuantityChange={handleQuantityChange}
+                initialQuantity={getQuantityForOrder(item.id)}
+              />
+            )}
+          />
+        </View>
+
+        <View className="h-10" />
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.palette[0],
-  },
-  description: {
-    fontSize: 16,
-    color: colors.palette[3],
-    marginTop: 10,
-  },
-});

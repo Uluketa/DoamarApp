@@ -4,15 +4,25 @@ import { RootStackParamList } from '~/types/Navigation';
 import Toast from 'react-native-toast-message';
 import React from 'react';
 
+// Auth Screens
 import { SignIn } from '~/components/screens/SignIn';
 import { SignUp } from '~/components/screens/SignUp';
 import { ForgotPassword } from '~/components/screens/ForgotPassword';
+
+// Client Screens
+import { ClientCart } from '~/components/screens/Client/Cart';
+import { CartCheckout } from '~/components/screens/Client/CartCheckout';
+import EditProfile from '~/components/screens/Client/EditProfile';
+
+// Institution Screens
 import { ReceiveDonationQuest } from '~/components/screens/Institution/ReceiveDonationQuest';
 
+// Common Screens
 import { About } from '~/components/screens/About';
 import { InstitutionProfile } from '~/components/screens/InstitutionProfile';
 import { Layout } from '~/components/ui/Layout';
-import { ClientCart } from '~/components/screens/Client/Cart';
+import { PrivacyPolicy } from '~/components/screens/PrivacyPolicy';
+import ListInstitutions from '~/components/screens/ListInstitutions';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -22,8 +32,6 @@ import { Logo } from '~/components/Logo';
 import { CartHeader } from '~/components/CartHeader';
 
 import toastConfig from '~/styles/toast';
-import { PrivacyPolicy } from '~/components/screens/PrivacyPolicy';
-import ListInstitutions from '~/components/screens/ListInstitutions';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -42,7 +50,7 @@ export default function Routes() {
               color: '#f0f0f0',
             },
             headerStyle: {
-              backgroundColor: colors.palette[1],
+              backgroundColor: colors.header,
             },
             headerStatusBarHeight: 0,
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
@@ -50,7 +58,11 @@ export default function Routes() {
         >
           {!userData.id ? (
             <>
-              <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
+              <Stack.Screen 
+                name="SignIn" 
+                component={SignIn} 
+                options={{ headerShown: false }} 
+              />
               <Stack.Screen
                 name="SignUp"
                 component={SignUp}
@@ -72,43 +84,89 @@ export default function Routes() {
             <Stack.Screen
               name="Layout"
               component={Layout}
-              options={{ headerShown: false, gestureEnabled: false, title: "Voltar" }}
+              options={{ 
+                headerShown: false, 
+                gestureEnabled: false, 
+                title: "Voltar" 
+              }}
             />
           )}
 
+          {/* Common Screens */}
           <Stack.Screen
             name="Privacy"
             component={PrivacyPolicy}
-            options={{ gestureEnabled: false, title: "Política de Privacidade", headerRight: () => <Logo /> }}
+            options={{ 
+              gestureEnabled: false, 
+              title: "Política de Privacidade", 
+              headerRight: () => <Logo /> 
+            }}
           />
 
           <Stack.Screen
             name="About"
             component={About}
-            options={{ gestureEnabled: false, title: "Sobre", headerRight: () => <Logo /> }}
+            options={{ 
+              gestureEnabled: false, 
+              title: "Sobre", 
+              headerRight: () => <Logo /> 
+            }}
+          />
+
+          {/* Client Screens */}
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+            options={{ 
+              title: "Editar Perfil", 
+              headerRight: () => <Logo /> 
+            }}
           />
 
           <Stack.Screen
             name="ClientCart"
             component={ClientCart}
-            options={{ gestureEnabled: false, title: "Carrinho", headerRight: () => <Logo /> }}
+            options={{ 
+              gestureEnabled: false, 
+              title: "Carrinho", 
+              headerRight: () => <Logo /> 
+            }}
           />
 
           <Stack.Screen
+            name="CartCheckout"
+            component={CartCheckout}
+            options={{ 
+              title: "Confirmar Doações", 
+              headerRight: () => <Logo />,
+              gestureEnabled: false 
+            }}
+          />
+
+          {/* Institution Screens */}
+          <Stack.Screen
             name="ListInstitutions"
             component={ListInstitutions}
-            options={{ gestureEnabled: false, title: "Instituições", headerRight: () => <Logo />, headerStatusBarHeight: 0 }}
+            options={{ 
+              gestureEnabled: false, 
+              title: "Instituições", 
+              headerRight: () => <Logo />, 
+              headerStatusBarHeight: 0 
+            }}
           />
 
           <Stack.Screen
             name="InstitutionProfile"
             component={InstitutionProfile}
-            options={{ gestureEnabled: false, headerRight: () => <CartHeader classlist='mr-5' /> }}
+            options={{ 
+              gestureEnabled: false, 
+              headerRight: () => <CartHeader classlist='mr-5' /> 
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>
 
-      <Toast config={toastConfig} />
+      <Toast config={toastConfig} topOffset={70} />
     </>
   );
 }

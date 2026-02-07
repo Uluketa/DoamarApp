@@ -5,17 +5,24 @@ import {
   TouchableOpacity,
   Animated,
   PanResponder,
+  ActivityIndicator,
 } from "react-native";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Donation } from "~/types/entities/Donation";
+import { updateDonationStatus } from "~/api";
+import { useSelector } from "react-redux";
+import { RootState } from "~/store";
+import Toast from "react-native-toast-message";
 
 type Props = {
   donation: Donation | null;
   onClose: () => void;
+  onStatusUpdated?: () => void;
 };
 
-export function DonationDetailsModal({ donation, onClose }: Props) {
-  if (!donation) return null;
+export function DonationDetailsModal({ donation, onClose, onStatusUpdated }: Props) {
+  const { token } = useSelector((state: RootState) => state.user);
+  const [updating, setUpdating] = useState(false);
 
   const translateY = useRef(new Animated.Value(0)).current;
 
@@ -47,6 +54,34 @@ export function DonationDetailsModal({ donation, onClose }: Props) {
     })
   ).current;
 
+  const handleStatus = async (status: "approved" | "rejected") => {
+    if (!donation || !token || updating) return;
+    setUpdating(true);
+    const res = await updateDonationStatus(donation.id, status, token);
+    setUpdating(false);
+    if (res.ok === "S") {
+      Toast.show({
+        type: "success",
+        text1: status === "approved" ? "Doação aprovada" : "Doação rejeitada",
+        text2: status === "approved"
+          ? "A pontuação do doador foi atualizada."
+          : undefined,
+      });
+      onStatusUpdated?.();
+      onClose();
+    } else {
+      Toast.show({
+        type: "error",
+        text1: res.msg ?? "Erro ao atualizar status",
+      });
+    }
+  };
+
+  if (!donation) return null;
+
+  const status = donation.status ?? "pending";
+  const canApproveReject = status === "pending";
+
   return (
     <Modal transparent animationType="fade">
       <View className="flex-1 justify-end bg-black/40">
@@ -65,9 +100,13 @@ export function DonationDetailsModal({ donation, onClose }: Props) {
           <View className="bg-slate-50 rounded-2xl p-4 mb-4">
             <Detail
               label="Nome"
-              value={donation.user.client?.name || "Doação anônima"}
+              value={donation.user?.client?.name || "Doação anônima"}
             />
-            <Detail label="Item" value={donation.order.name} />
+            <Detail label="Item" value={donation.order?.name ?? "-"} />
+            <Detail
+              label="Quantidade"
+              value={String(donation.quantity ?? 1)}
+            />
             <Detail
               label="Data"
               value={
@@ -76,7 +115,38 @@ export function DonationDetailsModal({ donation, onClose }: Props) {
                   : "-"
               }
             />
+            <Detail
+              label="Status"
+              value={status === "pending" ? "Pendente" : status === "approved" ? "Aprovado" : "Rejeitado"}
+            />
           </View>
+
+          {canApproveReject && (
+            <View className="flex-row gap-3 mb-4">
+              <TouchableOpacity
+                onPress={() => handleStatus("rejected")}
+                disabled={updating}
+                className="flex-1 bg-red-500 py-3.5 rounded-2xl"
+              >
+                {updating ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <Text className="text-white text-center font-semibold">Rejeitar</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleStatus("approved")}
+                disabled={updating}
+                className="flex-1 bg-emerald-500 py-3.5 rounded-2xl"
+              >
+                {updating ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <Text className="text-white text-center font-semibold">Aprovar</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
 
           <TouchableOpacity
             onPress={onClose}

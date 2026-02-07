@@ -1,21 +1,33 @@
 import { Institution } from "./entities/Institution";
 
 export type RootStackParamList = {
-  Overview: undefined;
-  Details: { name: string };
+  // Auth Screens
   SignIn: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
+
+  // Main Layout
+  Layout: undefined;
+
+  // Client Screens
+  EditProfile: undefined;
+  ClientCart: undefined;
+  CartCheckout: undefined;
+
+  // Institution Screens
   ReceiveDonationQuest: undefined;
 
+  // Common Screens
   Privacy: undefined;
-  Help: undefined;
+  PrivacyPolicy: undefined;
   About: undefined;
-  InstitutionProfile: { institution: Institution }
+  Help: undefined;
+  InstitutionProfile: { institution: Institution };
   ListInstitutions: undefined;
 
-  ClientCart: undefined;
-  Layout: undefined;
+  // Legacy (kept for compatibility)
+  Overview: undefined;
+  Details: { name: string };
 };
 
 export type ClientScreenType =

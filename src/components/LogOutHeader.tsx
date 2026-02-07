@@ -9,6 +9,7 @@ import { RootStackParamList } from '~/types/Navigation';
 import * as userReducer from '~/store/modules/user/reducer';
 import * as navReducer from '~/store/modules/navigation/reducer';
 import * as cartReducer from '~/store/modules/cart/reducer';
+import * as homeReducer from '~/store/modules/home/reducer';
 
 import { persistor } from '~/store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,9 +30,10 @@ export const LogOutHeader = () => {
 
     const handleLogout = async () => {
         try {
-            dispatch(userReducer.clearAll());
-            dispatch(navReducer.clearAll());
-            dispatch(cartReducer.clearAll());
+            dispatch(userReducer.clearUser());
+            dispatch(navReducer.resetNavigation());
+            dispatch(cartReducer.clearCart());
+            dispatch(homeReducer.clearHome());
 
             await persistor.purge();
             await AsyncStorage.clear();

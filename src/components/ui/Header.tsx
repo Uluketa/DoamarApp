@@ -15,19 +15,20 @@ type headerProps = {
 
 export const Header = ({ userType }: headerProps) => {
     return (
-        <View style={{ backgroundColor: colors.palette[1] }} className="flex-row items-center justify-between px-3 py-4">
+        <View style={{ backgroundColor: colors.header }} className="flex-row items-center justify-between px-3 py-4">
             <Image
                 source={require('~/assets/logoLightGreenB.png')}
                 className="w-10 h-10 mx-2"
                 resizeMode="contain"
             />
 
-            <View className="flex-row flex-1 items-center bg-gray-200 rounded-lg px-4 mx-2 h-10">
-                <Ionicons name="search" size={20} color="#777" />
+            <View className="flex-row flex-1 items-center bg-gray-200 rounded-lg px-4 mx-2 h-10" style={{ backgroundColor: colors.border }}>
+                <Ionicons name="search" size={20} color='#777' />
                 <TextInput
-                    className="flex-1 h-12 text-base text-gray-700 ml-2"
+                    className="flex-1 h-12 text-gray-600 ml-2 text-bold"
                     placeholder="Pesquisar..."
                     placeholderTextColor="#777"
+                    style={{ fontFamily: 'Poppins-Regular', backgroundColor: 'transparent' }}
                 />
             </View>
 

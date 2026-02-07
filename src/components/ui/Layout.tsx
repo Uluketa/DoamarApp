@@ -1,4 +1,4 @@
-import React, { use, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 
 import { NavBar } from '~/components/ui/Navbar';
@@ -9,11 +9,13 @@ import { RootState } from '~/store/modules/rootReducer';
 import { setNavigationScreen } from '~/store/modules/navigation/actions';
 import { ClientScreenType, InstitutionScreenType } from '~/types/Navigation';
 
+// Client Screens
 import ClientHome from '~/components/screens/Client/Home';
 import ClientDonation from '~/components/screens/Client/Donation';
 import ClientFavorites from '~/components/screens/Client/Favorites';
 import ClientSettings from '~/components/screens/Client/Settings';
 
+// Institution Screens
 import InstitutionDashboard from '~/components/screens/Institution/Dashboard';
 import DonationItemsStock from '~/components/screens/Institution/DonationItemsStock';
 import ReceivedDonations from '~/components/screens/Institution/ReceivedDonations';

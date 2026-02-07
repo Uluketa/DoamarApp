@@ -1,20 +1,29 @@
-import React from 'react';
-import { View, Text, Linking } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Linking, Alert, ActivityIndicator } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '~/types/Navigation';
 import { version } from '../../../../../package.json';
 
 import SettingsButton from './components/SettingsButton';
-import { useDispatch } from 'react-redux';
-import { Alert } from 'react-native';
-import * as userReducer from '~/store/modules/user/reducer';
-import * as navReducer from '~/store/modules/navigation/reducer';
-import * as cartReducer from '~/store/modules/cart/reducer';
-import { persistor } from '~/store';
+import { useTheme } from '~/contexts/ThemeContext';
+import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persistor } from '~/store';
+import { RootState } from '~/store';
+import { clearUser } from '~/store/modules/user/actions';
+import { clearCart } from '~/store/modules/cart/actions';
+import { resetNavigation } from '~/store/modules/navigation/actions';
+import { clearHome } from '~/store/modules/home/actions';
+import { authLogout } from '~/api';
+import colors from '~/styles/colors';
 
 export default function Settings() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const dispatch = useDispatch();
+    const { token } = useSelector((state: RootState) => state.user);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const { theme, toggleTheme } = useTheme();
+
     const email = 'doamarapp@gmail.com';
     const title = 'Ajuda - Doamar App';
     const body = 'Olá, preciso de ajuda com...';
@@ -41,7 +50,47 @@ export default function Settings() {
             .catch(err => console.error('Erro ao abrir email', err));
     };
 
-    const dispatch = useDispatch();
+    const handleLogout = async () => {
+        try {
+            setIsLoggingOut(true);
+
+            // Tentar fazer logout no servidor (não é crítico se falhar)
+            if (token) {
+                await authLogout(token);
+            }
+
+            // Limpar Redux
+            dispatch(clearUser());
+            dispatch(clearCart());
+            dispatch(resetNavigation());
+            dispatch(clearHome());
+
+            // Limpar AsyncStorage e Redux Persist
+            await persistor.purge();
+            await AsyncStorage.clear();
+
+            // Redirecionar para login
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'SignIn' }]
+            });
+
+        } catch (error) {
+            console.error('Erro ao fazer logout:', error);
+            // Mesmo em caso de erro, vamos limpar dados locais
+            dispatch(clearUser());
+            dispatch(clearCart());
+            dispatch(resetNavigation());
+            dispatch(clearHome());
+            await AsyncStorage.clear();
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'SignIn' }]
+            });
+        } finally {
+            setIsLoggingOut(false);
+        }
+    };
 
     const confirmLogout = () => {
         Alert.alert(
@@ -54,29 +103,57 @@ export default function Settings() {
         );
     };
 
-    const handleLogout = async () => {
-        try {
-            dispatch(userReducer.clearAll());
-            dispatch(navReducer.clearAll());
-            dispatch(cartReducer.clearAll());
-
-            await persistor.purge();
-            await AsyncStorage.clear();
-        } catch (error) {
-            console.log('Erro ao limpar dados durante o logout:', error);
-        }
-    };
-
     return (
-        <View className="flex-1 px-7 py-10 justify-between">
+        <View className="flex-1 px-7 py-10 justify-between" style={{ backgroundColor: colors.background }}>
             <View>
-                <Text className="text-2xl font-bold mb-5">Configurações</Text>
+                <Text className="text-2xl font-bold mb-5" style={{ color: colors.text }}>Configurações</Text>
+                {/* Theme toggle */}
+                <SettingsButton
+                    iconName={theme === 'dark' ? 'sunny-outline' : 'moon-outline' as any}
+                    title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+                    color={colors.text}
+                    onPress={toggleTheme}
+                />
 
-                {/* <SettingsButton iconName="settings" title="Editar Perfil" onPress={() => navigation.navigate('EditProfileClient')} /> */}
-                <SettingsButton iconName="shield" title="Privacidade" onPress={() => navigation.navigate('Privacy')} />
-                <SettingsButton iconName="help-circle" title="Ajuda" onPress={sendEmail} />
-                <SettingsButton iconName="info" title="Sobre" onPress={() => navigation.navigate('About')} />
-                <SettingsButton bbtm={false} iconName="log-out" title="Sair do App" color="red" onPress={confirmLogout} />  
+                <SettingsButton 
+                    iconName="person-outline" 
+                    title="Editar Perfil" 
+                    color={colors.text}
+                    onPress={() => navigation.navigate('EditProfile')} 
+                />
+                <SettingsButton 
+                    iconName="shield-checkmark-outline" 
+                    title="Privacidade" 
+                    color={colors.text}
+                    onPress={() => navigation.navigate('PrivacyPolicy')} 
+                />
+                <SettingsButton 
+                    iconName="help-circle-outline" 
+                    title="Ajuda" 
+                    color={colors.text}
+                    onPress={sendEmail} 
+                />
+                <SettingsButton 
+                    iconName="information-circle-outline" 
+                    title="Sobre" 
+                    color={colors.text}
+                    onPress={() => navigation.navigate('About')} 
+                />
+                
+                {isLoggingOut ? (
+                    <View className="mt-4 flex-row items-center justify-center py-3 border border-red-200 rounded-lg">
+                        <ActivityIndicator color="red" size="small" />
+                        <Text className="ml-2 text-red-600 font-semibold">Desconectando...</Text>
+                    </View>
+                ) : (
+                    <SettingsButton 
+                        bbtm={false} 
+                        iconName="log-out-outline" 
+                        title="Sair do App" 
+                        color="red" 
+                        onPress={confirmLogout}
+                    />
+                )}
             </View>
 
             <View>
@@ -84,4 +161,4 @@ export default function Settings() {
             </View>
         </View>
     );
-};
+}

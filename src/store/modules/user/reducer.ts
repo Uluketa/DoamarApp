@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from '~/types/entities/User';
+import { Client } from '~/types/entities/Client';
 
 export type UserStateType = {
   accountType: 'R' | 'D' | 'B';  //Recipient (R) || Donor (D) || Both (B)
@@ -24,16 +25,42 @@ const userSlice = createSlice({
   name: 'user',
   initialState: InitialUserState,
   reducers: {
+    // Login: Define usuário e token
     setUser(state, action: PayloadAction<UserStateType>) {
       state.accountType = action.payload.accountType;
       state.token = action.payload.token;
       state.userData = action.payload.userData;
     },
-    clearAll() {
+
+    // Logout: Limpa todos os dados
+    clearUser() {
       return InitialUserState;
     },
+
+    // Atualizar perfil do cliente
+    updateUserData(state, action: PayloadAction<Partial<User>>) {
+      state.userData = {
+        ...state.userData,
+        ...action.payload
+      };
+    },
+
+    // Atualizar dados do cliente relacionado
+    updateClientData(state, action: PayloadAction<Partial<Client>>) {
+      if (state.userData.client) {
+        state.userData.client = {
+          ...state.userData.client,
+          ...action.payload
+        };
+      }
+    },
+
+    // Atualizando apenas o token
+    setToken(state, action: PayloadAction<string>) {
+      state.token = action.payload;
+    }
   }
 });
 
-export const { setUser, clearAll } = userSlice.actions;
+export const { setUser, clearUser, updateUserData, updateClientData, setToken } = userSlice.actions;
 export default userSlice.reducer;

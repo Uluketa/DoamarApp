@@ -9,21 +9,41 @@ import {
   Linking,
   Animated,
   PanResponder,
+  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 
 import { LabeledTextInput } from '~/components/LabeledTextInput';
-import { Order } from '~/types/entities/Order';
+import { ORDER_TYPES, ORDER_TYPE_ID } from '~/constants/orderTypes';
+
+export type OrderModalSavePayload = {
+  name: string;
+  description?: string;
+  has_limit: boolean;
+  limit?: number | null;
+  image_url?: string | null;
+  order_type_id: number;
+};
 
 type Props = {
   visible: boolean;
   onClose: () => void;
-  onSave: (order: Partial<Order>) => void;
+  onSave: (payload: OrderModalSavePayload) => void | Promise<unknown>;
+  institutionId?: number;
 };
 
-export default function OrderModal({ visible, onClose, onSave }: Props) {
+const ORDER_TYPE_ENTRIES = [
+  { id: ORDER_TYPE_ID.ALIMENTOS, name: ORDER_TYPES[ORDER_TYPE_ID.ALIMENTOS].name },
+  { id: ORDER_TYPE_ID.UTENSILIOS, name: ORDER_TYPES[ORDER_TYPE_ID.UTENSILIOS].name },
+  { id: ORDER_TYPE_ID.ROUPAS, name: ORDER_TYPES[ORDER_TYPE_ID.ROUPAS].name },
+  { id: ORDER_TYPE_ID.HIGIENE, name: ORDER_TYPES[ORDER_TYPE_ID.HIGIENE].name },
+  { id: ORDER_TYPE_ID.MATERIAL_ESCOLAR, name: ORDER_TYPES[ORDER_TYPE_ID.MATERIAL_ESCOLAR].name },
+];
+
+export default function OrderModal({ visible, onClose, onSave, institutionId }: Props) {
   const translateY = useRef(new Animated.Value(0)).current;
 
   const [name, setName] = useState('');
@@ -31,6 +51,19 @@ export default function OrderModal({ visible, onClose, onSave }: Props) {
   const [hasLimit, setHasLimit] = useState(false);
   const [limit, setLimit] = useState('');
   const [image, setImage] = useState<string | null>(null);
+  const [orderTypeId, setOrderTypeId] = useState(ORDER_TYPE_ID.ALIMENTOS);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      setName('');
+      setDescription('');
+      setHasLimit(false);
+      setLimit('');
+      setImage(null);
+      setOrderTypeId(ORDER_TYPE_ID.ALIMENTOS);
+    }
+  }, [visible]);
 
   const closeSheet = () => {
     Animated.timing(translateY, {
@@ -65,16 +98,34 @@ export default function OrderModal({ visible, onClose, onSave }: Props) {
     })
   ).current;
 
-  const handleSave = () => {
-    onSave({
-      name,
-      description,
+  const handleSave = async () => {
+    if (!name.trim()) {
+      Alert.alert('Atenção', 'Informe o nome do produto.');
+      return;
+    }
+    const payload: OrderModalSavePayload = {
+      name: name.trim(),
+      description: description.trim() || undefined,
       has_limit: hasLimit,
-      limit: hasLimit ? Number(limit) : null,
-      image_url: image ?? undefined,
-    });
-
-    closeSheet();
+      limit: hasLimit ? Number(limit) || null : null,
+      image_url: image?.startsWith('http') ? image : null,
+      order_type_id: orderTypeId,
+    };
+    if (institutionId != null) {
+      setSaving(true);
+      try {
+        const result = await onSave(payload);
+        const res = result as { ok?: string } | undefined;
+        if (res?.ok === 'S') {
+          closeSheet();
+        }
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      (onSave as (p: OrderModalSavePayload) => void)(payload);
+      closeSheet();
+    }
   };
 
   const pickImage = async () => {
@@ -155,6 +206,29 @@ export default function OrderModal({ visible, onClose, onSave }: Props) {
             placeholderTextColor="#888"
           />
 
+          <View className="my-4">
+            <Text className="mb-2 font-bold text-lg">Tipo do pedido</Text>
+            <View className="flex-row flex-wrap gap-2">
+              {ORDER_TYPE_ENTRIES.map(({ id, name: typeName }) => (
+                <TouchableOpacity
+                  key={id}
+                  onPress={() => setOrderTypeId(id)}
+                  className={`px-4 py-2 rounded-full ${
+                    orderTypeId === id ? 'bg-green-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <Text
+                    className={`font-semibold ${
+                      orderTypeId === id ? 'text-white' : 'text-gray-700'
+                    }`}
+                  >
+                    {typeName}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
           <View className="flex-row justify-between items-center my-4">
             <Text className="font-bold text-lg">
               Tem limite?
@@ -214,10 +288,15 @@ export default function OrderModal({ visible, onClose, onSave }: Props) {
           <TouchableOpacity
             className="bg-green-600 py-4 rounded-xl items-center mt-4"
             onPress={handleSave}
+            disabled={saving}
           >
-            <Text className="text-white font-bold text-lg">
-              Salvar pedido
-            </Text>
+            {saving ? (
+              <ActivityIndicator color="white" size="small" />
+            ) : (
+              <Text className="text-white font-bold text-lg">
+                Salvar pedido
+              </Text>
+            )}
           </TouchableOpacity>
         </Animated.View>
       </View>

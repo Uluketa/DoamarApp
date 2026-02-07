@@ -1,51 +1,99 @@
 import { useState } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "~/styles/colors";
 import { Order } from "~/types/entities/Order";
 
-type OrderCardType = {
-    item: Order,
-    initialQuantity: number,
-    onQuantityChange: (item: Order, quantity: number) => void
-}
+type OrderCardProps = {
+  item: Order;
+  initialQuantity: number;
+  onQuantityChange: (item: Order, quantity: number) => void;
+};
 
-export function OrderCard({ item, onQuantityChange, initialQuantity }: OrderCardType) {
-    const [quantity, setQuantity] = useState(initialQuantity);
+export function OrderCard({
+  item,
+  initialQuantity,
+  onQuantityChange,
+}: OrderCardProps) {
+  const [quantity, setQuantity] = useState(initialQuantity);
 
-    const updateQuantity = (newQty: number) => {
-        setQuantity(newQty);
-        onQuantityChange(item, newQty);
-    };
+  const updateQuantity = (newQty: number) => {
+    setQuantity(newQty);
+    onQuantityChange(item, newQty);
+  };
 
-    return (
-        <View className="mr-2 rounded-lg w-[120] items-center" style={{ backgroundColor: '#dedede' }}>
-            <Image
-                source={{ uri: item.image_url }}
-                style={{ width: 70, height: 100, resizeMode: "contain" }}
+  return (
+    <View
+      className="mr-4 rounded-2xl overflow-hidden"
+      style={{
+        width: 150,
+        backgroundColor: colors.background,
+        borderWidth: 1,
+        borderColor: colors.border,
+        elevation: 4,
+      }}
+    >
+      {/* IMAGE */}
+      <View
+        className="items-center justify-center py-4"
+        style={{ backgroundColor: colors.background }}
+      >
+        <Image
+          source={{ uri: item.image_url }}
+          style={{
+            width: 80,
+            height: 90,
+            resizeMode: "contain",
+          }}
+        />
+      </View>
+
+      {/* CONTENT */}
+      <View className="px-3 py-3">
+        <Text
+          numberOfLines={2}
+          className="text-sm font-semibold text-center"
+          style={{ color: colors.text }}
+        >
+          {item.name}
+        </Text>
+
+        {/* STEPPER */}
+        <View
+          className="flex-row items-center justify-between mt-4 rounded-full px-3 py-2"
+          style={{
+            backgroundColor: colors.background,
+            borderWidth: 1,
+            borderColor: colors.border,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => updateQuantity(Math.max(0, quantity - 1))}
+            disabled={quantity === 0}
+          >
+            <Ionicons
+              name="remove"
+              size={18}
+              color={quantity === 0 ? colors.border : colors.palette[1]}
             />
+          </TouchableOpacity>
 
-            {/* Texto Centralizado */}
-            <Text className="text-center text-md" style={{ color: '#555'}}>{item.name}</Text>
+          <Text
+            className="text-base font-bold"
+            style={{ color: colors.text }}
+          >
+            {quantity}
+          </Text>
 
-            {/* Botões de Adicionar/Remover */}
-   
-                <View
-                    className="flex flex-row items-center justify-between rounded-lg p-2 w-full"
-                >
-                    <TouchableOpacity onPress={() => updateQuantity(Math.max(0, quantity - 1))}>
-                        <Ionicons name="remove-circle" size={24} color={'#555'} />
-                    </TouchableOpacity>
-
-                    <Text className="text-lg" style={{ color: '#555' }}>
-                        {quantity}
-                    </Text>
-
-                    <TouchableOpacity onPress={() => updateQuantity(quantity + 1)}>
-                        <Ionicons name="add-circle" size={24} color={'#555'} />
-                    </TouchableOpacity>
-                </View>
+          <TouchableOpacity onPress={() => updateQuantity(quantity + 1)}>
+            <Ionicons
+              name="add"
+              size={18}
+              color={colors.palette[1]}
+            />
+          </TouchableOpacity>
         </View>
-    );
+      </View>
+    </View>
+  );
 }

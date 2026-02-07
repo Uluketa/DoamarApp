@@ -7,8 +7,17 @@ type DonationCardProps = {
   onPress: () => void;
 };
 
+const statusConfig: Record<string, { label: string; className: string }> = {
+  pending: { label: 'Pendente', className: 'bg-amber-100' },
+  approved: { label: 'Aprovado', className: 'bg-emerald-100' },
+  rejected: { label: 'Rejeitado', className: 'bg-red-100' },
+};
+
 export function DonationCard({ donation, onPress }: DonationCardProps) {
-  const orderTypeName = donation.order.order_type.name;
+  const orderType = donation.order?.order_type ?? donation.order?.orderType;
+  const orderTypeName = orderType?.name ?? '-';
+  const status = donation.status ?? 'pending';
+  const { label: statusLabel, className: statusClass } = statusConfig[status] ?? statusConfig.pending;
 
   return (
     <TouchableOpacity
@@ -20,17 +29,22 @@ export function DonationCard({ donation, onPress }: DonationCardProps) {
       <View className="flex-row justify-between items-start">
         <View className="flex-1">
           <Text className="text-base font-semibold text-slate-800">
-            {donation.user.client?.name ?? "Doação anônima"}
+            {donation.user?.client?.name ?? "Doação anônima"}
           </Text>
 
           <Text className="text-sm text-slate-500 mt-1">
-            {donation.order.name}
+            {donation.order?.name}
           </Text>
+          {donation.quantity != null && donation.quantity > 1 && (
+            <Text className="text-xs text-slate-400 mt-0.5">
+              Qtd: {donation.quantity}
+            </Text>
+          )}
         </View>
 
-        <View className="bg-emerald-100 px-3 py-1 rounded-full">
-          <Text className="text-xs text-emerald-700 font-semibold">
-            Recebido
+        <View className={`${statusClass} px-3 py-1 rounded-full`}>
+          <Text className={`text-xs font-semibold ${status === 'approved' ? 'text-emerald-700' : status === 'rejected' ? 'text-red-700' : 'text-amber-700'}`}>
+            {statusLabel}
           </Text>
         </View>
       </View>
