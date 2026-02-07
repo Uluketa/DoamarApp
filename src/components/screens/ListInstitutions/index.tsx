@@ -136,24 +136,24 @@ export default function ListInstitutions() {
                     className="flex-1 flex-row items-center rounded-xl px-3 h-full"
                     style={{
                         backgroundColor: colors.background || '#ffffff10',
-                        borderColor: colors.border,
+                        borderColor: colors.borderSecondary,
                         borderWidth: 1,
                     }}
                 >
-                    <Ionicons name="search" size={18} color={colors.border} />
+                    <Ionicons name="search" size={18} color={colors.borderSecondary} />
 
                     <TextInput
                         value={query}
                         onChangeText={setQuery}
                         placeholder="Buscar instituições..."
-                        placeholderTextColor={colors.border}
+                        placeholderTextColor={colors.borderSecondary}
                         className="flex-1 ml-2 h-10"
                         style={{ color: colors.text, fontFamily: 'Poppins-Regular' }}
                     />
 
                     {query.length > 0 && (
                         <TouchableOpacity onPress={() => setQuery('')}>
-                            <Ionicons name="close-circle" size={18} color={colors.border} />
+                            <Ionicons name="close-circle" size={18} color={colors.borderSecondary} />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -161,7 +161,7 @@ export default function ListInstitutions() {
                 <TouchableOpacity
                     onPress={() => setShowFilters((s) => !s)}
                     className="p-3 rounded-xl"
-                    style={{ backgroundColor: colors.palette[1] }}
+                    style={{ backgroundColor: colors.primary }}
                 >
                     <Ionicons name="filter" size={20} color="#fff" />
                 </TouchableOpacity>

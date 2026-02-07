@@ -90,7 +90,7 @@ function RootLayoutNav() {
         <View
           style={{
             flex: 1,
-            backgroundColor: colors.header,
+            backgroundColor: colors.primary,
             paddingTop: insets.top,
             paddingBottom: 0
           }}

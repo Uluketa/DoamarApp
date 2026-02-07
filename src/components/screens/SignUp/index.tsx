@@ -117,7 +117,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
+            style={{ flex: 1, backgroundColor: colors.background }}
         >
             <View className='flex-1 items-center justify-center'>
                 <View className='justify-center items-center'
@@ -125,7 +125,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                         height: isKeyboardVisible ? '75%' : '90%',
                         paddingBottom: isKeyboardVisible ? 80 : 0
                     }}>
-                    <View className='w-96 py-5 px-8 bg-white shadow-lg rounded-2xl'>
+                    <View className='w-96 py-5 px-8 shadow-lg rounded-2xl' style={{ backgroundColor: colors.card }}>
                         {(screen == 1) ? (
                             <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
                                 <LabeledTextInput label="Nome:" value={name} onChangeText={setName} required />
@@ -133,7 +133,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                                 <LabeledTextInput label="Celular:" value={cellphone} onChangeText={setCellphone} placeholder='11 98765-4321' required />
                                 <LabeledTextInput label={(userType == "C") ? "CPF:" : "CNPJ:"} value={cpfCnpj} onChangeText={setCpfCnpj} required />
 
-                                <Text className='mb-2 font-bold text-lg'>Tipo de Usuário: <Text style={{ color: 'red' }}>*</Text></Text>
+                                <Text className='mb-2 font-bold text-lg' style={{ color: colors.text }}>Tipo de Usuário: <Text style={{ color: 'red' }}>*</Text></Text>
 
                                 <TypeUser setTypeUser={setTypeUser} userType={userType} />
                             </ScrollView>
@@ -163,7 +163,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                                         </View>
 
                                         <View className='w-1/3'>
-                                            <LabeledTextInput label="Estado (UF):" value={addressState} onChangeText={setAddressState} required />
+                                            <LabeledTextInput label="UF:" value={addressState} onChangeText={setAddressState} required />
                                         </View>
                                     </View>
 
@@ -182,7 +182,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                                 <View style={{ width: 24 }} />
                                 <Text className='text-center text-gray-400'>{screen} / 4</Text>
                                 <AntDesign
-                                    name="arrowright"
+                                    name="arrow-right"
                                     size={24}
                                     color={colors.palette[1]}
                                     onPress={() => setScreen(screen + 1)}
@@ -193,7 +193,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                             (screen == 2) ? (
                                 <View className='w-full grid-cols-3 flex-row justify-between mt-3 items-center'>
                                     <AntDesign
-                                        name="arrowleft"
+                                        name="arrow-left"
                                         size={24}
                                         color={colors.palette[1]}
                                         onPress={() => setScreen(screen - 1)}
@@ -201,7 +201,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                                     />
                                     <Text className='text-center text-gray-400'>{screen} / 4</Text>
                                     <AntDesign
-                                        name="arrowright"
+                                        name="arrow-right"
                                         size={24}
                                         color={colors.palette[1]}
                                         onPress={() => setScreen(screen + 1)}
@@ -211,7 +211,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                             ) : (screen == 3) ? (
                                 <View className='w-full grid-cols-3 flex-row justify-between mt-3 items-center'>
                                     <AntDesign
-                                        name="arrowleft"
+                                        name="arrow-left"
                                         size={24}
                                         color={colors.palette[1]}
                                         onPress={() => setScreen(screen - 1)}
@@ -219,7 +219,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                                     />
                                     <Text className='text-center text-gray-400'>{screen} / 4</Text>
                                     <AntDesign
-                                        name="arrowright"
+                                        name="arrow-right"
                                         size={24}
                                         color={colors.palette[1]}
                                         onPress={() => setScreen(screen + 1)}
@@ -229,7 +229,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                             ) : (
                                 <View className='w-full grid-cols-3 flex-row justify-between mt-3 items-center'>
                                     <AntDesign
-                                        name="arrowleft"
+                                        name="arrow-left"
                                         size={24}
                                         color={colors.palette[1]}
                                         onPress={() => setScreen(screen - 1)}
@@ -245,7 +245,7 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                     {(screen == 4) && (
                         <View className='w-96 px-14 mt-4'>
                             <Text className='text-center text-sm text-gray-400 mb-4'>Li e estou de acordo com os <Text className='underline'>Termos de Uso</Text>.</Text>
-                            <ButtonCadastrar bgColor={colors.palette[1]} onPress={handleSignUp} title='Cadastrar-se' loading={isLoading} />
+                            <ButtonCadastrar bgColor={colors.primary} onPress={handleSignUp} title='Cadastrar-se' loading={isLoading} />
                         </View>
                     )}
                 </View>

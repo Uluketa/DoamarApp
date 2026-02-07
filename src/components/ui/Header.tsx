@@ -15,7 +15,7 @@ type headerProps = {
 
 export const Header = ({ userType }: headerProps) => {
     return (
-        <View style={{ backgroundColor: colors.header }} className="flex-row items-center justify-between px-3 py-4">
+        <View style={{ backgroundColor: colors.primary }} className="flex-row items-center justify-between px-3 py-4">
             <Image
                 source={require('~/assets/logoLightGreenB.png')}
                 className="w-10 h-10 mx-2"

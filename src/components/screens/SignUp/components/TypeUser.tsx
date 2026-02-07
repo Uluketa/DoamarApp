@@ -12,10 +12,10 @@ interface TypeUserProps {
 
 export const TypeUser = ({ userType, setTypeUser }: TypeUserProps) => {
     return (
-        <View className='border-2 border-gray-300 rounded-lg p-3 text-base grid-cols-3 flex-row'>
+        <View className='border-2 rounded-lg p-3 text-base grid-cols-3 flex-row' style={{ borderColor: colors.border }}>
             <TouchableOpacity className='p-2 w-1/2 items-center' onPress={() => setTypeUser("I")}>
                 {(userType === "I") && (
-                    <View className='absolute w-20 rounded-lg p-8 h-full bg-slate-300' />
+                    <View className='absolute w-20 rounded-lg p-8 h-full' style={{ backgroundColor: colors.background + 'FF' }} />
                 )}
                 <AntDesign
                     name="home"
@@ -25,11 +25,11 @@ export const TypeUser = ({ userType, setTypeUser }: TypeUserProps) => {
                 <Text style={{ color: (userType === "I") ? colors.palette[1] : "rgb(209 213 219)" }}>PJ</Text>
             </TouchableOpacity>
 
-            <View className='bg-gray-300' style={{ width: '1%' }} />
+            <View style={{ width: '1%', backgroundColor: colors.border }} />
 
             <TouchableOpacity className='p-2 w-1/2 items-center' onPress={() => setTypeUser("C")}>
                 {(userType === "C") && (
-                    <View className='absolute w-20 rounded-lg p-8 h-full bg-slate-300' />
+                    <View className='absolute w-20 rounded-lg p-8 h-full' style={{ backgroundColor: colors.background + 'FF' }} />
                 )}
                 <AntDesign
                     name="user"

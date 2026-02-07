@@ -160,7 +160,7 @@ export default function Home() {
     return (
         <ScrollView
             className='flex-1'
-            style={{ 
+            style={{
                 backgroundColor: colors.background
             }}
             showsVerticalScrollIndicator={false}
@@ -173,37 +173,39 @@ export default function Home() {
             }
         >
             {/* Header com Perfil */}
-            <View className="bg-gradient-to-b items-center pb-8" style={{
-                backgroundColor: colors.palette[1] + '15'
-            }}>
-                <Image
-                    source={require("src/assets/global/cover.png")}
-                    className="w-full h-20 absolute top-0"
-                />
-
-                <View className="mt-8">
+            <View className="px-6 pt-8">
+                <View className="bg-gradient-to-b items-center pb-8 rounded-2xl" style={{
+                    backgroundColor: colors.palette[1] + '15'
+                }}>
                     <Image
-                        source={{
-                            uri: userData.client?.pathProfileImage
-                                ? `${IMAGE_BASE_URL}${userData.client.pathProfileImage}`
-                                : `${IMAGE_BASE_URL}${PATH_CLIENT_PHOTO}`
-                        }}
-                        style={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: 50,
-                            borderWidth: 3,
-                            borderColor: userColorRating,
-                        }}
+                        source={require("src/assets/global/cover.png")}
+                        className="w-full h-20 absolute top-0 rounded-t-2xl"
                     />
-                </View>
 
-                <Text className="text-2xl font-bold mt-4" style={{ color: colors.text }}>
-                    Olá, {userData.client?.name?.split(' ')[0]}!
-                </Text>
+                    <View className="mt-8">
+                        <Image
+                            source={{
+                                uri: userData.client?.pathProfileImage
+                                    ? `${IMAGE_BASE_URL}${userData.client.pathProfileImage}`
+                                    : `${IMAGE_BASE_URL}${PATH_CLIENT_PHOTO}`
+                            }}
+                            style={{
+                                width: 100,
+                                height: 100,
+                                borderRadius: 50,
+                                borderWidth: 3,
+                                borderColor: userColorRating,
+                            }}
+                        />
+                    </View>
 
-                <View className="mt-2">
-                    {renderRating()}
+                    <Text className="text-2xl font-bold mt-4" style={{ color: colors.text }}>
+                        Olá, {userData.client?.name?.split(' ')[0]}!
+                    </Text>
+
+                    <View className="mt-2">
+                        {renderRating()}
+                    </View>
                 </View>
             </View>
 
@@ -258,7 +260,7 @@ export default function Home() {
 
                                 {/* Gradiente */}
                                 <LinearGradient
-                                    colors={['transparent', colors.palette[0]]}
+                                    colors={['transparent', 'rgba(0,0,0,0.7)']}
                                     style={{
                                         position: 'absolute',
                                         bottom: 0,

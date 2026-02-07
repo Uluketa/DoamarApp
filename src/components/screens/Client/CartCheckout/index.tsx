@@ -196,7 +196,7 @@ export const CartCheckout = () => {
           onPress={() => setConfirmModal(true)}
           disabled={!isValid || isSubmitting}
           className="py-4 rounded-lg flex-row items-center justify-center"
-          style={{ backgroundColor: isValid ? colors.header : colors.border }}
+          style={{ backgroundColor: isValid ? colors.primary : colors.border }}
         >
           {isSubmitting ? (
             <ActivityIndicator color="white" />

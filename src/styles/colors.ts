@@ -6,10 +6,12 @@ type Theme = {
     background: string;
     text: string;
     border: string;
+    card: string;
     white: string;
     black: string;
     pink: string;
-    header: string;
+    primary: string;
+    borderSecondary: string;
 };
 
 const light: Theme = {
@@ -27,7 +29,9 @@ const light: Theme = {
     white: '#FFFFFF',
     black: '#000000',
     pink: '#ec4899',
-    header: '#39503B'
+    primary: '#39503B',
+    borderSecondary: '#999999',
+    card: '#FFFFFF'
 };
 
 const dark: Theme = {
@@ -45,7 +49,9 @@ const dark: Theme = {
     white: '#0F1720',
     black: '#FFFFFF',
     pink: '#ec4899',
-    header: '#39503B'
+    primary: '#39503B',
+    borderSecondary: '#7c7c7c',
+    card: '#1f1f1f'
 };
 
 let current: 'light' | 'dark' = 'light';

@@ -16,6 +16,7 @@ import { resetNavigation } from '~/store/modules/navigation/actions';
 import { clearHome } from '~/store/modules/home/actions';
 import { authLogout } from '~/api';
 import colors from '~/styles/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Settings() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -34,7 +35,7 @@ export default function Settings() {
         const query: string[] = [];
         query.push(`subject=${encodeURIComponent(title)}`);
         query.push(`body=${encodeURIComponent(body)}`);
-        
+
         if (query.length > 0) {
             url += `?${query.join('&')}`;
         }
@@ -104,60 +105,67 @@ export default function Settings() {
     };
 
     return (
-        <View className="flex-1 px-7 py-10 justify-between" style={{ backgroundColor: colors.background }}>
-            <View>
-                <Text className="text-2xl font-bold mb-5" style={{ color: colors.text }}>Configurações</Text>
-                {/* Theme toggle */}
-                <SettingsButton
-                    iconName={theme === 'dark' ? 'sunny-outline' : 'moon-outline' as any}
-                    title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
-                    color={colors.text}
-                    onPress={toggleTheme}
-                />
-
-                <SettingsButton 
-                    iconName="person-outline" 
-                    title="Editar Perfil" 
-                    color={colors.text}
-                    onPress={() => navigation.navigate('EditProfile')} 
-                />
-                <SettingsButton 
-                    iconName="shield-checkmark-outline" 
-                    title="Privacidade" 
-                    color={colors.text}
-                    onPress={() => navigation.navigate('PrivacyPolicy')} 
-                />
-                <SettingsButton 
-                    iconName="help-circle-outline" 
-                    title="Ajuda" 
-                    color={colors.text}
-                    onPress={sendEmail} 
-                />
-                <SettingsButton 
-                    iconName="information-circle-outline" 
-                    title="Sobre" 
-                    color={colors.text}
-                    onPress={() => navigation.navigate('About')} 
-                />
-                
-                {isLoggingOut ? (
-                    <View className="mt-4 flex-row items-center justify-center py-3 border border-red-200 rounded-lg">
-                        <ActivityIndicator color="red" size="small" />
-                        <Text className="ml-2 text-red-600 font-semibold">Desconectando...</Text>
-                    </View>
-                ) : (
-                    <SettingsButton 
-                        bbtm={false} 
-                        iconName="log-out-outline" 
-                        title="Sair do App" 
-                        color="red" 
-                        onPress={confirmLogout}
-                    />
-                )}
+        <View className='flex-1 py-6' style={{ backgroundColor: colors.background }}>
+            <View className="flex-row items-center mx-6 mb-4">
+                <Ionicons name="settings" size={28} color={colors.palette[1]} />
+                <Text className="text-2xl font-bold ml-3" style={{ color: colors.text }}>
+                    Configurações
+                </Text>
             </View>
+            <View className="flex-1 px-7 pb-10 justify-between">
+                <View>
+                    {/* Theme toggle */}
+                    <SettingsButton
+                        iconName={theme === 'dark' ? 'sunny-outline' : 'moon-outline' as any}
+                        title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+                        color={colors.text}
+                        onPress={toggleTheme}
+                    />
 
-            <View>
-                <Text className="text-center text-gray-400">Versão {version}</Text>
+                    <SettingsButton
+                        iconName="person-outline"
+                        title="Editar Perfil"
+                        color={colors.text}
+                        onPress={() => navigation.navigate('EditProfile')}
+                    />
+                    <SettingsButton
+                        iconName="shield-checkmark-outline"
+                        title="Privacidade"
+                        color={colors.text}
+                        onPress={() => navigation.navigate('PrivacyPolicy')}
+                    />
+                    <SettingsButton
+                        iconName="help-circle-outline"
+                        title="Ajuda"
+                        color={colors.text}
+                        onPress={sendEmail}
+                    />
+                    <SettingsButton
+                        iconName="information-circle-outline"
+                        title="Sobre"
+                        color={colors.text}
+                        onPress={() => navigation.navigate('About')}
+                    />
+
+                    {isLoggingOut ? (
+                        <View className="mt-4 flex-row items-center justify-center py-3 border border-red-200 rounded-lg">
+                            <ActivityIndicator color="red" size="small" />
+                            <Text className="ml-2 text-red-600 font-semibold">Desconectando...</Text>
+                        </View>
+                    ) : (
+                        <SettingsButton
+                            bbtm={false}
+                            iconName="log-out-outline"
+                            title="Sair do App"
+                            color="red"
+                            onPress={confirmLogout}
+                        />
+                    )}
+                </View>
+
+                <View>
+                    <Text className="text-center text-gray-400">Versão {version}</Text>
+                </View>
             </View>
         </View>
     );

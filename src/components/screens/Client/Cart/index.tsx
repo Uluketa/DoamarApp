@@ -189,7 +189,7 @@ export const ClientCart = () => {
                 <TouchableOpacity
                     onPress={handleCheckout}
                     className=' py-4 rounded-lg flex-row items-center justify-center mb-3'
-                    style={{ backgroundColor: colors.header }}
+                    style={{ backgroundColor: colors.primary }}
                 >
                     <Ionicons name="checkmark-circle" size={20} color="white" />
                     <Text className='text-white font-bold ml-2 text-lg'>

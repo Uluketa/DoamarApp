@@ -50,7 +50,7 @@ export default function Routes() {
               color: '#f0f0f0',
             },
             headerStyle: {
-              backgroundColor: colors.header,
+              backgroundColor: colors.primary,
             },
             headerStatusBarHeight: 0,
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
@@ -94,7 +94,7 @@ export default function Routes() {
 
           {/* Common Screens */}
           <Stack.Screen
-            name="Privacy"
+            name="PrivacyPolicy"
             component={PrivacyPolicy}
             options={{ 
               gestureEnabled: false, 

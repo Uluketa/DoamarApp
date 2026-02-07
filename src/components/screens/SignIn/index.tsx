@@ -104,6 +104,7 @@ export const SignIn = ({ navigation }: SignInProps) => {
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             className='flex-1 items-center'
+            style={{ backgroundColor: colors.background }}
         >
             <View
                 className='w-full justify-center'
@@ -121,13 +122,13 @@ export const SignIn = ({ navigation }: SignInProps) => {
                     <LabeledTextInput label="Login:" value={username} onChangeText={setUsername} />
                     <LabeledTextInput label="Senha:" value={password} onChangeText={setPassword} secureTextEntry />
                     <TextForgotPassword onPress={() => navigation.navigate('ForgotPassword')} />
-                    <ButtonEntrar title='Entrar' onPress={handleLogin} bgColor={colors.palette[1]} loading={isFetching} />
+                    <ButtonEntrar title='Entrar' onPress={handleLogin} bgColor={colors.primary} loading={isFetching} />
                 </View>
 
                 <View className='flex flex-row justify-center items-center mb-6'>
-                    <Text className="text-gray-500 text-base text-center mr-1 py-5">Ainda não tem uma conta?</Text>
-                    <TouchableOpacity className="items-center py-5" onPress={() => navigation.navigate("SignUp")}>
-                        <Text className='underline ml-1'>Cadastre-se</Text>
+                    <Text className="text-base text-center mr-1 py-5" style={{ color: colors.text + '77' }}>Ainda não tem uma conta?</Text>
+                    <TouchableOpacity className="items-center py-5"  onPress={() => navigation.navigate("SignUp")}>
+                        <Text className='underline ml-1' style={{ color: colors.text }}>Cadastre-se</Text>
                     </TouchableOpacity>
                 </View>
             </View>

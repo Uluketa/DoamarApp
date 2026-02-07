@@ -1,81 +1,82 @@
 import { ScrollView, Text } from "react-native";
+import colors from "~/styles/colors";
 
 export function PrivacyPolicy() {
   return (
-    <ScrollView className="flex-1 bg-white p-4">
-      <Text className="text-2xl font-bold text-black mb-3">
+    <ScrollView className="flex-1 p-4" style={{ backgroundColor: colors.background}}>
+      <Text className="text-2xl font-bold text-black mb-3" style={{ color: colors.text }}>
         Política de Privacidade - Doamar APP
       </Text>
 
-      <Text className="text-base text-gray-700 mb-3 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-3 text-justify leading-7" style={{ color: colors.text }}>
         A sua privacidade é importante para nós. O Doamar APP respeita a sua
         privacidade e protege as informações pessoais que você compartilha
         conosco.
       </Text>
 
-      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2">
+      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2" style={{ color: colors.text }}>
         Coleta de informações
       </Text>
-      <Text className="text-base text-gray-700 mb-3 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-3 text-justify leading-7" style={{ color: colors.text }}>
         Solicitamos apenas os dados necessários para fornecer nossos serviços,
         como informações de contato e informações básicas para gerenciamento de
         doações. Coletamos essas informações de forma justa e com seu consentimento.
       </Text>
 
-      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2">
+      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2" style={{ color: colors.text }}>
         Uso das informações
       </Text>
-      <Text className="text-base text-gray-700 mb-3 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-3 text-justify leading-7" style={{ color: colors.text }}>
         As informações coletadas são usadas exclusivamente para permitir a
         comunicação com você, organizar doações e melhorar nossos serviços. Não
         realizamos transações financeiras ou processamos pagamentos.
       </Text>
 
-      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2">
+      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2" style={{ color: colors.text }}>
         Compartilhamento de dados
       </Text>
-      <Text className="text-base text-gray-700 mb-3 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-3 text-justify leading-7" style={{ color: colors.text }}>
         Não compartilhamos informações pessoais com terceiros, exceto quando
         exigido por lei ou para proteger nossos direitos.
       </Text>
 
-      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2">
+      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2" style={{ color: colors.text }}>
         Segurança
       </Text>
-      <Text className="text-base text-gray-700 mb-3 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-3 text-justify leading-7" style={{ color: colors.text }}>
         Protegemos suas informações usando métodos comercialmente aceitáveis
         para evitar perda, acesso não autorizado ou uso indevido.
       </Text>
 
-      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2">
+      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2" style={{ color: colors.text }}>
         Links externos
       </Text>
-      <Text className="text-base text-gray-700 mb-3 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-3 text-justify leading-7" style={{ color: colors.text }}>
         Nosso aplicativo pode conter links para sites de terceiros. Não
         nos responsabilizamos pelas práticas de privacidade desses sites.
       </Text>
 
-      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2">
+      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2" style={{ color: colors.text }}>
         Compromisso do usuário
       </Text>
-      <Text className="text-base text-gray-700 mb-3 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-3 text-justify leading-7" style={{ color: colors.text }}>
         Ao usar o Doamar APP, você concorda em utilizar o aplicativo de maneira
         ética e legal, não praticando atividades que possam prejudicar o serviço,
         seus usuários ou terceiros.
       </Text>
 
-      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2">
+      <Text className="text-xl font-bold text-gray-800 mt-4 mb-2" style={{ color: colors.text }}>
         Contato
       </Text>
-      <Text className="text-base text-gray-700 mb-3 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-3 text-justify leading-7" style={{ color: colors.text }}>
         Se tiver dúvidas sobre nossa política de privacidade, entre em contato
         conosco pelo email:{" "}
-        <Text className="text-blue-500 underline">
+        <Text className="text-blue-500 underline" style={{ color: colors.text }}>
           doamarapp@gmail.com
         </Text>
       </Text>
 
-      <Text className="text-base text-gray-700 mb-10 text-justify leading-7">
+      <Text className="text-base text-gray-700 mb-10 text-justify leading-7" style={{ color: colors.text }}>
         Esta política é efetiva a partir de 07 de Setembro de 2025.
       </Text>
     </ScrollView>

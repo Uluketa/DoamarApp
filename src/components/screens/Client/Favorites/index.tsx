@@ -131,8 +131,9 @@ export default function Favorites() {
 
     return (
         <View className='flex-1 py-6' style={{ backgroundColor: colors.background }}>
-            <View className="flex-row justify-between items-center mx-6 mb-4">
-                <Text className="text-2xl font-bold" style={{ color: colors.text }}>
+            <View className="flex-row items-center mx-6 mb-4">
+                <Ionicons name="heart-half" size={28} color={colors.palette[1]} />
+                <Text className="text-2xl font-bold ml-3" style={{ color: colors.text }}>
                     Favoritos {favoritesData.length > 0 && `(${favoritesData.length})`}
                 </Text>
             </View>

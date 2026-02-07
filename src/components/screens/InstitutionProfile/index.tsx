@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import { Institution } from '~/types/entities/Institution';
 import { Order } from '~/types/entities/Order';
 import { RootState } from '~/store';
 
-import { getOrdersByInstitution, URL } from '~/api';
+import { getOrdersByInstitution, URL, getClientFavorites, addFavorite, removeFavorite } from '~/api';
 import { formatCNPJ, PATH_INSTITUTION_COVER } from '~/core/helpers';
 import { OrderCard } from './components/OrderCard';
 import { CartHeader } from '~/components/CartHeader';
@@ -44,7 +44,7 @@ export function InstitutionProfile({ route, navigation }: Props) {
   const { theme } = useTheme();
 
   const dispatch = useDispatch();
-  const { token } = useSelector((state: RootState) => state.user);
+  const { token, userData } = useSelector((state: RootState) => state.user);
   const { items, institution: cartInstitution } = useSelector(
     (state: RootState) => state.cart
   );
@@ -55,6 +55,8 @@ export function InstitutionProfile({ route, navigation }: Props) {
   });
 
   const [liked, setLiked] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(false);
+  const clientId = userData.client?.id || 0;
   const getQuantityForOrder = (orderId: number) =>
     items.find(i => i.id === orderId)?.quantity ?? 0;
 
@@ -100,6 +102,62 @@ export function InstitutionProfile({ route, navigation }: Props) {
     if (response.data) setOrdersData(response.data);
   };
 
+  // Buscar lista de favoritos do cliente
+  const fetchFavorites = useCallback(async () => {
+    if (!token || !clientId) return;
+
+    try {
+      const response = await getClientFavorites(clientId, token);
+      if (response.ok === 'S' && response.data) {
+        // Verificar se a instituição atual está na lista de favoritos
+        const isFavorite = response.data.some(
+          (fav: any) => fav.institution_id === institutionData.id
+        );
+        setLiked(isFavorite);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar favoritos:', error);
+    }
+  }, [token, clientId, institutionData.id]);
+
+  // Lidar com favoritar/desfavoritar
+  const handleToggleFavorite = useCallback(async () => {
+    if (!token || !clientId) {
+      Alert.alert('Erro', 'Você precisa estar logado para favoritar');
+      return;
+    }
+
+    setLikeLoading(true);
+    try {
+      if (liked) {
+        // Remover favorito
+        const response = await removeFavorite(clientId, institutionData.id, token);
+        if (response.ok === 'S') {
+          setLiked(false);
+        } else {
+          Alert.alert('Erro', response.msg || 'Erro ao remover favorito');
+        }
+      } else {
+        // Adicionar favorito
+        const response = await addFavorite(clientId, institutionData.id, token);
+        if (response.ok === 'S') {
+          setLiked(true);
+        } else {
+          Alert.alert('Erro', response.msg || 'Erro ao adicionar favorito');
+        }
+      }
+    } catch (error: any) {
+      Alert.alert('Erro', 'Erro ao processar favorito');
+      console.error('Erro ao processar favorito:', error);
+    } finally {
+      setLikeLoading(false);
+    }
+  }, [liked, token, clientId, institutionData.id]);
+
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: '',
@@ -138,7 +196,8 @@ export function InstitutionProfile({ route, navigation }: Props) {
           />
 
           <TouchableOpacity
-            onPress={() => setLiked(prev => !prev)}
+            onPress={handleToggleFavorite}
+            disabled={likeLoading}
             activeOpacity={0.8}
             style={{
               position: 'absolute',
@@ -148,6 +207,7 @@ export function InstitutionProfile({ route, navigation }: Props) {
               padding: 10,
               borderRadius: 999,
               zIndex: 10,
+              opacity: likeLoading ? 0.5 : 1,
             }}
           >
             <Ionicons
