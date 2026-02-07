@@ -25,12 +25,12 @@ export const ForgotPassword = () => {
                         <LabeledTextInput label="" onChangeText={setEmail} value={email} placeholder='example@email.com' required={false} />
 
                         <View className='mt-5'>
-                            <BtnText bgColor={colors.palette[3]} onPress={handleContinue} title='Continuar' />
+                            <BtnText bgColor={colors.palette[1]} onPress={handleContinue} title='Continuar' />
                         </View>
                     </View>
                 ) : (
                     <View className='p-4 items-center justify-center'>
-                        <AntDesign name="checkcircle" size={75} color={colors.palette[3]} className='mb-8' />
+                        <AntDesign name="check-circle" size={75} color={colors.palette[3]} className='mb-8' />
                         <Text className='font-semibold text-xl'>Mensagem de confirmação </Text>
 
                         <Text className='text-center mt-2'>Um e-mail de redefinição de senha foi enviado para {email}.</Text>

@@ -147,96 +147,105 @@ export default function Home() {
     return (
         <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
             {/* Perfil */}
-            <View
-                className='flex-col items-center rounded-xl justify-between'
-            >
+
+            <View className="items-center pb-4">
                 <Image
                     source={require("src/assets/global/cover.png")}
-                    className='w-full h-[70] absolute'
+                    className="w-full h-28 absolute"
                 />
 
                 <Image
                     source={{ uri: `http://${URL}${userData.client?.pathProfileImage ? userData.client.pathProfileImage : PATH_CLIENT_PHOTO}` }}
-                    className='rounded-full mt-[30]'
                     style={{
-                        borderColor: (userData?.classification?.rating === 10) ? userColorRating : colors.palette[1],
-                        borderWidth: (userData?.classification?.rating === 10) ? 3 : 2,
                         width: 100,
-                        height: 100
+                        height: 100,
+                        borderRadius: 50,
+                        borderWidth: 2,
+                        borderColor: userColorRating,
+                        marginTop: 40,
+                        backgroundColor: '#fff',
                     }}
                 />
 
-                <View>
-                    <Text className='text-3xl font-semibold mt-2' style={userData?.classification?.rating === 10 ? { color: userColorRating } : {}}>{userData.client?.name}</Text>
-                    {renderRating()}
-                </View>
+                <Text className="text-2xl font-semibold mt-2">
+                    {userData.client?.name}
+                </Text>
+
+                {renderRating()}
             </View>
+
 
             {/* Instituições */}
-            <View className='pl-4 pb-6'>
-                <View className='flex flex-row justify-between items-center mr-4'>
-                    <Text className='text-2xl font-bold mb-2'>Instituições</Text>
-                    <Pressable onPress={handleListInstitutions} className='p-2'>
-                        <Text className='font-bold underline' style={{ color: colors.palette[1] }}>Ver mais</Text>
+            <View className="pb-6">
+                <View className="flex-row justify-between items-center px-4">
+                    <Text className="text-2xl font-bold mb-2">Instituições</Text>
+                    <Pressable onPress={handleListInstitutions}>
+                        <Text className="font-bold underline" style={{ color: colors.palette[1] }}>
+                            Ver mais
+                        </Text>
                     </Pressable>
                 </View>
-                {isLoading ? (
-                    <View className='flex-row justify-center items-center h-[150] my-2'>
-                        <ActivityIndicator size="large" color={colors.palette[1]} />
-                    </View>
-                ) : (
-                    <FlatList
-                        horizontal
-                        data={institutionsData}
-                        renderItem={({ item }) => (
+
+                <FlatList
+                    horizontal
+                    data={institutionsData}
+                    renderItem={({ item }) => (
+                        <View
+                            className="rounded-2xl overflow-hidden"
+                            style={{
+                                shadowColor: '#000',
+                                shadowOpacity: 0.15,
+                                shadowRadius: 6,
+                                elevation: 4,
+                            }}
+                        >
+                            <Pressable
+                                onPress={() => handleInstitutionProfile(item)}
+                                className="z-10 absolute top-2 right-2 w-10 h-10 bg-white/60 rounded-lg flex items-center justify-center">
+                                <Ionicons name="arrow-forward" size={20} color="white" />
+                            </Pressable>
+
+                            <Image
+                                source={{ uri: `http://${URL}${item.pathBackgroundImage ? item.pathBackgroundImage : PATH_INSTITUTION_COVER}` }}
+                                style={{ width: 140, height: 150 }}
+                            />
+
+                            {/* Gradiente */}
+                            <LinearGradient
+                                colors={['transparent', colors.palette[0]]}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: 100,
+                                }}
+                            />
+
+                            {/* Texto Centralizado */}
                             <View
-                                className="rounded-xl mr-2 overflow-hidden relative"
-                                style={{ overflow: 'hidden' }}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 10,
+                                    left: 0,
+                                    right: 0,
+                                    height: 100,
+                                    justifyContent: 'flex-end',
+                                    alignItems: 'center',
+                                }}
                             >
-                                <Pressable
-                                    onPress={() => handleInstitutionProfile(item)}
-                                    className="z-10 absolute top-2 right-2 w-10 h-10 bg-white/60 rounded-lg flex items-center justify-center">
-                                    <Ionicons name="arrow-forward" size={20} color="white" />
-                                </Pressable>
-
-                                <Image
-                                    source={{ uri: `http://${URL}${item.pathBackgroundImage ? item.pathBackgroundImage : PATH_INSTITUTION_COVER}` }}
-                                    style={{ width: 140, height: 150 }}
-                                />
-
-                                {/* Gradiente */}
-                                <LinearGradient
-                                    colors={['transparent', colors.palette[0]]}
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
-                                        height: 100,
-                                    }}
-                                />
-
-                                {/* Texto Centralizado */}
-                                <View
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: 10,
-                                        left: 0,
-                                        right: 0,
-                                        height: 100,
-                                        justifyContent: 'flex-end',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <Text className="text-center text-md text-white">{item.name}</Text>
-                                </View>
+                                <Text className="text-center text-md text-white">{item.name}</Text>
                             </View>
-                        )}
-                        className='space-x-3 h-[150] my-2'
-                        showsHorizontalScrollIndicator={false}
-                    />
-                )}
+                        </View>
+                    )}
+                    contentContainerStyle={{
+                        paddingHorizontal: 16,
+                        gap: 8,
+                    }}
+                    showsHorizontalScrollIndicator={false}
+                />
             </View>
+
 
             {/* Imagem de Propaganda */}
             <View className="relative overflow-hidden">
@@ -257,8 +266,8 @@ export default function Home() {
             </View>
 
             {/* Questões Sociais */}
-            <View className='pl-4 py-6'>
-                <Text className='text-2xl font-bold mb-2'>Questões Sociais</Text>
+            <View className='py-6'>
+                <Text className='text-2xl font-bold mb-2 px-4'>Questões Sociais</Text>
 
                 {isLoading ? (
                     <View className='flex-row justify-center items-center h-[70] my-2'>
@@ -271,7 +280,7 @@ export default function Home() {
                         keyExtractor={(item) => item.title}
                         renderItem={({ item }) => (
                             <Pressable
-                                className="flex flex-row items-center mr-2 justify-center rounded-xl"
+                                className="flex flex-row items-center justify-center rounded-xl"
                                 style={{
                                     backgroundColor: colors.palette[0]
                                 }}
@@ -283,15 +292,18 @@ export default function Home() {
                                 <Text className="text-center text-md pr-5" style={{ color: colors.palette[4] }}>{item.title}</Text>
                             </Pressable>
                         )}
-                        className='h-[70] my-2'
+                        contentContainerStyle={{
+                            paddingHorizontal: 16,
+                            gap: 8,
+                        }}
                         showsHorizontalScrollIndicator={false}
                     />
                 )}
             </View>
 
             {/* Doações Realizadas */}
-            <View className='pl-4 pb-6'>
-                <Text className='text-2xl font-bold mb-2'>Doações Realizadas</Text>
+            <View className='pb-6'>
+                <Text className='text-2xl font-bold mb-2 px-4'>Doações Realizadas</Text>
 
                 {isLoading ? (
                     <View className='flex-row justify-center items-center h-[100] my-2'>
@@ -304,8 +316,8 @@ export default function Home() {
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => (
                             <View
-                                className="rounded-xl mr-2 overflow-hidden bg-white shadow-md"
-                                style={{ width: 200, padding: 10 }}
+                                className="rounded-xl overflow-hidden bg-white shadow-md p-4 justify-between"
+                                style={{ width: 200 }}
                             >
                                 <Text className="text-lg font-semibold mb-1">{item.order?.name || 'Pedido'}</Text>
                                 <Text className="text-sm text-gray-500 mb-2">
@@ -316,8 +328,11 @@ export default function Home() {
                                 </Text>
                             </View>
                         )}
-                        className='my-2 p-2'
                         showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{
+                            paddingHorizontal: 16,
+                            gap: 8,
+                        }}
                     />
                 )}
             </View>

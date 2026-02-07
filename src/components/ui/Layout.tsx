@@ -15,8 +15,8 @@ import ClientFavorites from '~/components/screens/Client/Favorites';
 import ClientSettings from '~/components/screens/Client/Settings';
 
 import InstitutionDashboard from '~/components/screens/Institution/Dashboard';
-import InstitutionStock from '~/components/screens/Institution/Stock';
-import InstitutionOrders from '~/components/screens/Institution/Orders';
+import DonationItemsStock from '~/components/screens/Institution/DonationItemsStock';
+import ReceivedDonations from '~/components/screens/Institution/ReceivedDonations';
 import InstitutionReports from '~/components/screens/Institution/Reports';
 
 export const Layout = () => {
@@ -47,9 +47,9 @@ export const Layout = () => {
                 case 'Dashboard':
                     return <InstitutionDashboard />;
                 case 'Stock':
-                    return <InstitutionStock />;
+                    return <DonationItemsStock />;
                 case 'Orders':
-                    return <InstitutionOrders />;
+                    return <ReceivedDonations />;
                 case 'Reports':
                     return <InstitutionReports />;
                 default:
@@ -60,7 +60,7 @@ export const Layout = () => {
 
     return (
         <View className='flex-1'>
-            <Header />
+            <Header userType={userData.type} />
 
             <View className='flex-1'>
                 {renderScreen()}

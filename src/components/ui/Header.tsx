@@ -7,8 +7,13 @@ import {
 import { colors } from '~/styles/colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { CartHeader } from '../CartHeader';
+import { LogOutHeader } from '../LogOutHeader';
 
-export const Header = () => {
+type headerProps = {
+    userType: 'client' | 'institution'; 
+}
+
+export const Header = ({ userType }: headerProps) => {
     return (
         <View style={{ backgroundColor: colors.palette[1] }} className="flex-row items-center justify-between px-3 py-4">
             <Image
@@ -25,7 +30,8 @@ export const Header = () => {
                     placeholderTextColor="#777"
                 />
             </View>
-            <CartHeader classlist='mr-2' />
+
+            {userType == "client" ?  <CartHeader classlist='mr-2' /> : <LogOutHeader />}
         </View>
     );
 };
