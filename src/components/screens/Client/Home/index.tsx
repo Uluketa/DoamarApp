@@ -306,7 +306,12 @@ export default function Home({ searchText = '' }: { searchText?: string }) {
 
             {/* Seção de Temas Sociais */}
             <View className="px-6 py-8 border-t" style={{ borderColor: colors.border }}>
-                <Text className="text-2xl font-bold mb-4" style={{ color: colors.text }}>Causas Sociais</Text>
+                <View className="flex-row justify-between items-center mb-4">
+                    <Text className="text-2xl font-bold" style={{ color: colors.text }}>Causas Sociais</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('ListSocialIssues')}>
+                        <Text className="font-bold text-blue-500">Ver todas</Text>
+                    </TouchableOpacity>
+                </View>
 
                 {isLoading && socialIssuesData.length === 0 ? (
                     <View className="h-24 justify-center items-center">
@@ -320,7 +325,8 @@ export default function Home({ searchText = '' }: { searchText?: string }) {
                         data={socialIssuesData}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => (
-                            <View
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('ListInstitutions', { socialIssueId: item.id })}
                                 className="rounded-xl items-center justify-center p-4 mr-3 border"
                                 style={{
                                     minWidth: 140,
@@ -335,7 +341,7 @@ export default function Home({ searchText = '' }: { searchText?: string }) {
                                 <Text className="mt-2 text-xs font-semibold text-center" style={{ color: colors.palette[1] }}>
                                     {item.title}
                                 </Text>
-                            </View>
+                            </TouchableOpacity>
                         )}
                         showsHorizontalScrollIndicator={false}
                     />

@@ -23,6 +23,7 @@ import { InstitutionProfile } from '~/components/screens/InstitutionProfile';
 import { Layout } from '~/components/ui/Layout';
 import { PrivacyPolicy } from '~/components/screens/PrivacyPolicy';
 import ListInstitutions from '~/components/screens/ListInstitutions';
+import ListSocialIssuesScreen from '~/components/screens/ListSocialIssues';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -144,6 +145,17 @@ export default function Routes() {
           />
 
           {/* Institution Screens */}
+          <Stack.Screen
+            name="ListSocialIssues"
+            component={ListSocialIssuesScreen}
+            options={{ 
+              gestureEnabled: false, 
+              title: "Causas Sociais", 
+              headerRight: () => <Logo />, 
+              headerStatusBarHeight: 0 
+            }}
+          />
+
           <Stack.Screen
             name="ListInstitutions"
             component={ListInstitutions}

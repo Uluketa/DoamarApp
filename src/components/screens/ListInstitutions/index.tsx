@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -33,8 +33,11 @@ export default function ListInstitutions() {
     const [refreshing, setRefreshing] = useState(false);
 
     const { userData, token } = useSelector((state: RootState) => state.user);
+    const route = useRoute();
+    const params = route.params as { socialIssueId?: number } | undefined;
+    const socialIssueFilterId = params?.socialIssueId;
 
-    type NavigationProps = StackNavigationProp<RootStackParamList, 'InstitutionProfile'>;
+    type NavigationProps = StackNavigationProp<RootStackParamList, 'ListInstitutions'>;
     const navigation = useNavigation<NavigationProps>();
 
     const handleInstitutionProfile = (institution: Institution) => {
@@ -57,6 +60,16 @@ export default function ListInstitutions() {
         fetchClientFavorites();
     }, [userData.id]);
 
+    useEffect(() => {
+        // Atualizar título quando há filtro de causa social
+        if (socialIssueFilterId && institutionsData.length > 0) {
+            const causaName = institutionsData.find(i => i.social_issue?.id === socialIssueFilterId)?.social_issue?.title || 'Causa Social';
+            navigation.setOptions({
+                title: causaName
+            });
+        }
+    }, [socialIssueFilterId, institutionsData]);
+
     const onRefresh = () => {
         setRefreshing(true);
         fetchClientFavorites();
@@ -67,7 +80,8 @@ export default function ListInstitutions() {
         let list = institutionsData.filter((it) => {
             const matchQuery = q ? it.name.toLowerCase().includes(q) : true;
             const matchLogo = hasLogoOnly ? Boolean(it.pathLogoImage) : true;
-            return matchQuery && matchLogo;
+            const matchSocialIssue = socialIssueFilterId ? it.social_issue?.id === socialIssueFilterId : true;
+            return matchQuery && matchLogo && matchSocialIssue;
         });
 
         list = list.sort((a, b) => {
@@ -78,7 +92,7 @@ export default function ListInstitutions() {
         });
 
         return list;
-    }, [institutionsData, query, hasLogoOnly, sortAZ]);
+    }, [institutionsData, query, hasLogoOnly, sortAZ, socialIssueFilterId]);
 
     const renderItem = ({ item }: { item: Institution }) => (
         <TouchableOpacity

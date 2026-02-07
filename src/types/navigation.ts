@@ -1,4 +1,5 @@
 import { Institution } from "./entities/Institution";
+import { SocialIssue } from "./entities/SocialIssue";
 
 export type RootStackParamList = {
   // Auth Screens
@@ -23,7 +24,8 @@ export type RootStackParamList = {
   About: undefined;
   Help: undefined;
   InstitutionProfile: { institution: Institution };
-  ListInstitutions: undefined;
+  ListInstitutions: { socialIssueId?: number } | undefined;
+  ListSocialIssues: undefined;
 
   // Legacy (kept for compatibility)
   Overview: undefined;
