@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { NavBar } from '~/components/ui/Navbar';
@@ -25,16 +25,23 @@ export const Layout = () => {
     const dispatch = useDispatch();
     const { screen } = useSelector((state: RootState) => state.navigation);
     const { userData } = useSelector((state: RootState) => state.user);
+    const [searchText, setSearchText] = useState('');
 
     const handleChangeScreen = (screen: ClientScreenType | InstitutionScreenType) => {
         dispatch(setNavigationScreen({ screen }));
+        // Limpar busca quando muda de tela
+        setSearchText('');
+    };
+
+    const handleSearchChange = (text: string) => {
+        setSearchText(text);
     };
 
     const renderScreen = () => {
         if (userData.type === 'client') {
             switch (screen) {
                 case 'Home':
-                    return <ClientHome />;
+                    return <ClientHome searchText={searchText} />;
                 case 'Donation':
                     return <ClientDonation />;
                 case 'Favorites':
@@ -42,7 +49,7 @@ export const Layout = () => {
                 case 'Settings':
                     return <ClientSettings />;
                 default:
-                    return <ClientHome />;
+                    return <ClientHome searchText={searchText} />;
             }
         } else {
             switch (screen) {
@@ -62,7 +69,11 @@ export const Layout = () => {
 
     return (
         <View className='flex-1'>
-            <Header userType={userData.type} />
+            <Header 
+                userType={userData.type} 
+                searchValue={searchText}
+                onSearchChange={handleSearchChange}
+            />
 
             <View className='flex-1'>
                 {renderScreen()}

@@ -10,10 +10,12 @@ import { CartHeader } from '../CartHeader';
 import { LogOutHeader } from '../LogOutHeader';
 
 type headerProps = {
-    userType: 'client' | 'institution'; 
+    userType: 'client' | 'institution';
+    searchValue?: string;
+    onSearchChange?: (text: string) => void;
 }
 
-export const Header = ({ userType }: headerProps) => {
+export const Header = ({ userType, searchValue = '', onSearchChange }: headerProps) => {
     return (
         <View style={{ backgroundColor: colors.primary }} className="flex-row items-center justify-between px-3 py-4">
             <Image
@@ -28,6 +30,8 @@ export const Header = ({ userType }: headerProps) => {
                     className="flex-1 h-12 text-gray-600 ml-2 text-bold"
                     placeholder="Pesquisar..."
                     placeholderTextColor="#777"
+                    value={searchValue}
+                    onChangeText={onSearchChange}
                     style={{ fontFamily: 'Poppins-Regular', backgroundColor: 'transparent' }}
                 />
             </View>

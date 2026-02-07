@@ -15,7 +15,7 @@ import { RootStackParamList } from '~/types/Navigation';
 import { Institution } from '~/types/entities/Institution';
 import { SocialIssue } from '~/types/entities/SocialIssue';
 
-export default function Home() {
+export default function Home({ searchText = '' }: { searchText?: string }) {
     const dispatch = useDispatch();
     const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
@@ -23,6 +23,17 @@ export default function Home() {
     const { token, userData } = useSelector((state: RootState) => state.user);
     const { institutions: institutionsData, socialIssues: socialIssuesData, isLoading } = useSelector((state: RootState) => state.home);
     const [userColorRating, setUserColorRating] = useState<string>('#2196F3');
+
+    // Filtrar instituições baseado no texto de busca
+    const institutionsFiltered = institutionsData.filter((institution) => {
+        const searchLower = searchText.toLowerCase().trim();
+        if (!searchLower) return true;
+        
+        const matchesName = institution.name.toLowerCase().includes(searchLower);
+        const matchesSocialIssue = institution.social_issue?.title.toLowerCase().includes(searchLower);
+        
+        return matchesName || matchesSocialIssue;
+    });
 
     type NavigationProps = StackNavigationProp<RootStackParamList, 'InstitutionProfile'>;
     const navigation = useNavigation<NavigationProps>();
@@ -226,14 +237,18 @@ export default function Home() {
                             <Text className="text-gray-400 text-sm mt-1">Aguarde um momento</Text>
                         </View>
                     </View>
-                ) : institutionsData.length === 0 ? (
+                ) : institutionsFiltered.length === 0 ? (
                     <View className="h-40 justify-center items-center border border-gray-200 rounded-lg">
-                        <Text className="text-gray-500">Nenhuma instituição disponível</Text>
+                        <Text className="text-gray-500">
+                            {searchText.trim() 
+                                ? `Nenhuma instituição encontrada para "${searchText}"` 
+                                : 'Nenhuma instituição disponível'}
+                        </Text>
                     </View>
                 ) : (
                     <FlatList
                         horizontal
-                        data={institutionsData}
+                        data={institutionsFiltered}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => (
                             <TouchableOpacity

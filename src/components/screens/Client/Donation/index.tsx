@@ -62,8 +62,8 @@ export default function DonationHistory() {
 
     if (isLoading) {
         return (
-            <View className='flex-1 justify-center items-center'>
-                <ActivityIndicator size="large" color={colors.palette[1]} />
+            <View className='flex-1 justify-center items-center' style={{ backgroundColor: colors.background }}>
+                <ActivityIndicator size="large" color={colors.text} />
             </View>
         );
     }
