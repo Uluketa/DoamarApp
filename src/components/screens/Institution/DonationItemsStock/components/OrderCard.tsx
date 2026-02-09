@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
+import colors from '~/styles/colors';
 import { Order } from '~/types/entities/Order';
 
 type Props = {
@@ -26,70 +27,60 @@ export default function OrderCard({
     };
 
     return (
-        <View className="bg-white rounded-2xl mb-4 overflow-hidden shadow-sm">
-            {order.image_url && (
-                <Image
-                    source={{ uri: order.image_url }}
-                    className="w-full h-32"
-                    resizeMode="cover"
-                />
-            )}
+        <View
+            className="flex-1 rounded-2xl mb-4 overflow-hidden shadow-sm"
+        >
+            <View className='border rounded-t-2xl' style={{ borderColor: colors.card }}>
+                {order.image_url ? (
+                    <Image
+                        source={{ uri: order.image_url }}
+                        className="w-full h-24 p-2"
+                        resizeMode="contain"
+                    />
+                ) : (
+                    <View className='w-full h-24 p-2 items-center justify-center'>
+                        <Ionicons name="image-outline" size={32} color="#9ca3af" />
+                    </View>
+                )}
+            </View>
 
-            <View className="p-4">
+            <View className="p-4 justify-between flex-1" style={{ backgroundColor: colors.card }}>
                 <View className="flex-row justify-between items-center mb-2">
-                    <Text className="text-lg font-bold">
+                    <Text className="text-lg font-bold" style={{ color: colors.text }}>
                         {order.name}
                     </Text>
 
                     <View className="flex-row items-center gap-2">
                         <Ionicons
                             name="ellipse"
-                            size={12}
+                            size={14}
                             color={statusColor[order.status]}
                         />
-                        <Text
-                            className="text-sm font-semibold"
-                            style={{ color: statusColor[order.status] }}
-                        >
-                            {statusLabel[order.status]}
-                        </Text>
                     </View>
                 </View>
 
-                {!!order.description && (
-                    <Text className="text-gray-600 mb-3">
+                {typeof order.description === 'string' && order.description.trim() !== '' && (
+                    <Text className="mb-3 text-sm" style={{ color: colors.text + '66' }}>
                         {order.description}
                     </Text>
                 )}
 
-                {order.has_limit && (
+                {typeof order.limit === 'number' && order.limit > 0 && (
                     <Text className="text-sm text-gray-500 mb-3">
-                        Limite solicitado: {order.limit}
+                        Limite solicitado: {order.limit.toString()}
                     </Text>
                 )}
 
-                <View className="flex-row justify-end gap-5 mt-4">
+                <View className="flex-row justify-between">
                     <TouchableOpacity
                         className="flex-row items-center gap-1"
                         onPress={onEdit}
                     >
-                        <Ionicons name="create-outline" size={18} color="#2563eb" />
-                        <Text className="text-blue-600 font-semibold">
+                        <Ionicons name="create-outline" size={16} color="#2563eb" />
+                        <Text className="text-blue-600 text-xs font-semibold">
                             Editar
                         </Text>
                     </TouchableOpacity>
-
-                    {order.status === 'available' && (
-                        <TouchableOpacity
-                            className="flex-row items-center gap-1"
-                            onPress={() => onChangeStatus('completed')}
-                        >
-                            <Ionicons name="checkmark-circle-outline" size={18} color="#16a34a" />
-                            <Text className="text-green-600 font-semibold">
-                                Concluir
-                            </Text>
-                        </TouchableOpacity>
-                    )}
                 </View>
             </View>
         </View>

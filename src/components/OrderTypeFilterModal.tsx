@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useRef } from 'react';
 import { ORDER_TYPES } from '~/constants/orderTypes';
+import colors from '~/styles/colors';
 
 type Props = {
   visible: boolean;
@@ -70,13 +71,13 @@ export function OrderTypeFilterModal({
         {/* SHEET */}
         <Animated.View
           {...panResponder.panHandlers}
-          style={{ transform: [{ translateY }] }}
-          className="bg-white rounded-t-3xl px-6 pt-3 pb-14"
+          style={{ transform: [{ translateY }], backgroundColor: colors.card }}
+          className="rounded-t-3xl px-6 pt-3 pb-14"
         >
           {/* Handle */}
-          <View className="w-12 h-1.5 bg-gray-300 rounded-full self-center mb-4" />
+          <View className="w-12 h-1.5 rounded-full self-center mb-4" style={{ backgroundColor: colors.secondary }} />
 
-          <Text className="text-lg font-bold text-center mb-4">
+          <Text className="text-lg font-bold text-center mb-4" style={{ color: colors.text }}>
             Tipo de pedido
           </Text>
 
@@ -88,11 +89,8 @@ export function OrderTypeFilterModal({
             className="py-3"
           >
             <Text
-              className={`text-base ${
-                selectedType === null
-                  ? 'font-bold text-green-600'
-                  : 'text-gray-700'
-              }`}
+              className="text-base"
+              style={{ color: selectedType === null ? '#16A34A' : colors.secondary, fontWeight: selectedType === null ? 'bold' : 'normal' }}
             >
               Todos
             </Text>
@@ -108,11 +106,8 @@ export function OrderTypeFilterModal({
               className="py-3"
             >
               <Text
-                className={`text-base ${
-                  selectedType === type.id
-                    ? 'font-bold text-green-600'
-                    : 'text-gray-700'
-                }`}
+                className='text-base'
+                style={{ color: selectedType === type.id ? '#16A34A' : colors.secondary, fontWeight: selectedType === type.id ? 'bold' : 'normal' }}
               >
                 {type.name}
               </Text>

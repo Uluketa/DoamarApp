@@ -57,6 +57,9 @@ export default function EditProfile() {
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [imageModal, setImageModal] = useState(false);
 
+    const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null); // servidor
+    const [profileImageFile, setProfileImageFile] = useState<{uri: string, type?: string, fileName?: string} | null>(null);
+
     const [formData, setFormData] = useState<EditFormData>({
         name: userData.client?.name || '',
         email: userData.client?.email || '',
@@ -72,13 +75,13 @@ export default function EditProfile() {
         addressReference: userData.client?.addressReference || '',
     });
 
-    // Carregar imagem de perfil salva no servidor (URL completa)
     useEffect(() => {
         if (userData.client?.pathProfileImage) {
             const path = userData.client.pathProfileImage.startsWith('/')
                 ? userData.client.pathProfileImage
                 : `/${userData.client.pathProfileImage}`;
-            setProfileImage(`${IMAGE_BASE_URL}${path}`);
+
+            setProfileImageUrl(`${IMAGE_BASE_URL}${path}`);
         }
     }, [userData.client?.pathProfileImage]);
 
@@ -135,8 +138,17 @@ export default function EditProfile() {
                 });
             }
 
-            if (!result.canceled && result.assets[0]) {
-                setProfileImage(result.assets[0].uri);
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                const asset = result.assets[0];
+
+                setProfileImageUrl(asset.uri);
+
+                setProfileImageFile({
+                    uri: asset.uri,
+                    fileName: `profile-${userData.client?.id ?? 'temp'}.jpg`,
+                    type: asset.mimeType ?? 'image/jpeg',
+                });
+
                 setImageModal(false);
             }
         } catch (error) {
@@ -185,24 +197,6 @@ export default function EditProfile() {
 
         setIsSaving(true);
         try {
-            // Preparar imagem se houver (aceita file://, content://, data: ou qualquer URI não-http)
-            let imageData = null;
-            if (profileImage && !profileImage.startsWith('http://') && !profileImage.startsWith('https://')) {
-                // Se for data URI, tente extrair o tipo
-                let mimeType = 'image/jpeg';
-                if (profileImage.startsWith('data:')) {
-                    const match = profileImage.match(/^data:(image\/[a-zA-Z]+);base64,/);
-                    if (match && match[1]) mimeType = match[1];
-                }
-
-                imageData = {
-                    uri: profileImage,
-                    type: mimeType,
-                    name: `profile-${userData.client?.id}.jpg`
-                };
-            }
-
-            // Atualizar perfil com ou sem imagem
             const updateResponse = await updateClientProfile(
                 userData.client?.id || 0,
                 {
@@ -219,7 +213,7 @@ export default function EditProfile() {
                     addressComplement: formData.addressComplement,
                     addressReference: formData.addressReference,
                 },
-                imageData,
+                profileImageFile,
                 token
             );
 
@@ -227,13 +221,11 @@ export default function EditProfile() {
                 Toast.show({
                     type: 'error',
                     text1: 'Erro',
-                    text2: updateResponse.msg || 'Erro ao atualizar perfil.'
+                    text2: updateResponse.msg || 'Erro ao atualizar perfil.',
                 });
-                setIsSaving(false);
                 return;
             }
 
-            // Atualizar Redux com dados novos (aceita data.client ou data)
             const updatedClient = updateResponse.data?.client || updateResponse.data;
             if (updatedClient) {
                 dispatch(updateClientData(updatedClient));
@@ -241,19 +233,15 @@ export default function EditProfile() {
 
             Toast.show({
                 type: 'success',
-                text1: 'Sucesso!',
-                text2: 'Perfil atualizado com sucesso.'
+                text1: 'Perfil atualizado',
             });
 
-            // Voltar
             navigation.goBack();
-
-        } catch (error) {
-            console.error('Erro ao salvar perfil:', error);
+        } catch (e) {
             Toast.show({
                 type: 'error',
                 text1: 'Erro',
-                text2: 'Erro ao salvar alterações.'
+                text2: 'Erro ao salvar alterações.',
             });
         } finally {
             setIsSaving(false);
@@ -273,11 +261,11 @@ export default function EditProfile() {
                         className="w-36 h-36 items-center justify-center rounded-full"
                         style={{ backgroundColor: colors.border }}
                     >
-                        {profileImage ? (
+                        {profileImageUrl ? (
                             <Image
-                                source={{ uri: profileImage }}
+                                source={{ uri: profileImageUrl || undefined }}
                                 resizeMode="cover"
-                                className='z-10 rounded-full overflow-hidden w-32 h-32'
+                                className="rounded-full w-32 h-32"
                             />
                         ) : (
                             <Ionicons name="person" size={64} color="#999" />

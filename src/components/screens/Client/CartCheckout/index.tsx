@@ -214,10 +214,10 @@ export const CartCheckout = () => {
       {/* Modal */}
       <Modal visible={confirmModal} transparent animationType="fade">
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white rounded-2xl w-[85%] overflow-hidden">
+          <View className="rounded-2xl w-[85%] overflow-hidden" style={{ backgroundColor: colors.background }}>
             <View className="p-6 items-center" style={{ backgroundColor: colors.palette[1] + '15' }}>
               <Ionicons name="alert-circle" size={48} color={colors.palette[1]} />
-              <Text className="text-lg font-bold mt-4 text-center">
+              <Text className="text-lg font-bold mt-4 text-center" style={{ color: colors.text }}>
                 Confirmar doação?
               </Text>
             </View>
@@ -227,7 +227,7 @@ export const CartCheckout = () => {
                 Deseja confirmar a doação para:
               </Text>
 
-              <Text className="font-bold text-center text-lg mb-6">
+              <Text className="font-bold text-center text-lg mb-6" style={{ color: colors.text }}>
                 {institution?.name}
               </Text>
 

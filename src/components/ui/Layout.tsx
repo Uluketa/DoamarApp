@@ -16,10 +16,10 @@ import ClientFavorites from '~/components/screens/Client/Favorites';
 import ClientSettings from '~/components/screens/Client/Settings';
 
 // Institution Screens
-import InstitutionDashboard from '~/components/screens/Institution/Dashboard';
 import DonationItemsStock from '~/components/screens/Institution/DonationItemsStock';
 import ReceivedDonations from '~/components/screens/Institution/ReceivedDonations';
 import InstitutionReports from '~/components/screens/Institution/Reports';
+import InstitutionHome from '../screens/Institution/Home';
 
 export const Layout = () => {
     const dispatch = useDispatch();
@@ -54,7 +54,7 @@ export const Layout = () => {
         } else {
             switch (screen) {
                 case 'Dashboard':
-                    return <InstitutionDashboard />;
+                    return <InstitutionHome />;
                 case 'Stock':
                     return <DonationItemsStock />;
                 case 'Orders':
@@ -62,7 +62,7 @@ export const Layout = () => {
                 case 'Reports':
                     return <InstitutionReports />;
                 default:
-                    return <InstitutionDashboard />;
+                    return <InstitutionHome />;
             }
         }
     };

@@ -1,7 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '~/types/Navigation';
-import Toast from 'react-native-toast-message';
 import React from 'react';
 
 // Auth Screens
@@ -32,8 +31,6 @@ import { colors } from '~/styles/colors';
 import { Logo } from '~/components/Logo';
 import { CartHeader } from '~/components/CartHeader';
 
-import toastConfig from '~/styles/toast';
-
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function Routes() {
@@ -59,10 +56,10 @@ export default function Routes() {
         >
           {!userData.id ? (
             <>
-              <Stack.Screen 
-                name="SignIn" 
-                component={SignIn} 
-                options={{ headerShown: false }} 
+              <Stack.Screen
+                name="SignIn"
+                component={SignIn}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="SignUp"
@@ -85,10 +82,10 @@ export default function Routes() {
             <Stack.Screen
               name="Layout"
               component={Layout}
-              options={{ 
-                headerShown: false, 
-                gestureEnabled: false, 
-                title: "Voltar" 
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+                title: "Voltar"
               }}
             />
           )}
@@ -97,20 +94,20 @@ export default function Routes() {
           <Stack.Screen
             name="PrivacyPolicy"
             component={PrivacyPolicy}
-            options={{ 
-              gestureEnabled: false, 
-              title: "Política de Privacidade", 
-              headerRight: () => <Logo /> 
+            options={{
+              gestureEnabled: false,
+              title: "Política de Privacidade",
+              headerRight: () => <Logo />
             }}
           />
 
           <Stack.Screen
             name="About"
             component={About}
-            options={{ 
-              gestureEnabled: false, 
-              title: "Sobre", 
-              headerRight: () => <Logo /> 
+            options={{
+              gestureEnabled: false,
+              title: "Sobre",
+              headerRight: () => <Logo />
             }}
           />
 
@@ -118,29 +115,29 @@ export default function Routes() {
           <Stack.Screen
             name="EditProfile"
             component={EditProfile}
-            options={{ 
-              title: "Editar Perfil", 
-              headerRight: () => <Logo /> 
+            options={{
+              title: "Editar Perfil",
+              headerRight: () => <Logo />
             }}
           />
 
           <Stack.Screen
             name="ClientCart"
             component={ClientCart}
-            options={{ 
-              gestureEnabled: false, 
-              title: "Carrinho", 
-              headerRight: () => <Logo /> 
+            options={{
+              gestureEnabled: false,
+              title: "Carrinho",
+              headerRight: () => <Logo />
             }}
           />
 
           <Stack.Screen
             name="CartCheckout"
             component={CartCheckout}
-            options={{ 
-              title: "Confirmar Doações", 
+            options={{
+              title: "Confirmar Doações",
               headerRight: () => <Logo />,
-              gestureEnabled: false 
+              gestureEnabled: false
             }}
           />
 
@@ -148,37 +145,35 @@ export default function Routes() {
           <Stack.Screen
             name="ListSocialIssues"
             component={ListSocialIssuesScreen}
-            options={{ 
-              gestureEnabled: false, 
-              title: "Causas Sociais", 
-              headerRight: () => <Logo />, 
-              headerStatusBarHeight: 0 
+            options={{
+              gestureEnabled: false,
+              title: "Causas Sociais",
+              headerRight: () => <Logo />,
+              headerStatusBarHeight: 0
             }}
           />
 
           <Stack.Screen
             name="ListInstitutions"
             component={ListInstitutions}
-            options={{ 
-              gestureEnabled: false, 
-              title: "Instituições", 
-              headerRight: () => <Logo />, 
-              headerStatusBarHeight: 0 
+            options={{
+              gestureEnabled: false,
+              title: "Instituições",
+              headerRight: () => <Logo />,
+              headerStatusBarHeight: 0
             }}
           />
 
           <Stack.Screen
             name="InstitutionProfile"
             component={InstitutionProfile}
-            options={{ 
-              gestureEnabled: false, 
-              headerRight: () => <CartHeader classlist='mr-5' /> 
+            options={{
+              gestureEnabled: false,
+              headerRight: () => <CartHeader classlist='mr-5' />
             }}
           />
         </Stack.Navigator>
       </NavigationContainer>
-
-      <Toast config={toastConfig} topOffset={70} />
     </>
   );
 }

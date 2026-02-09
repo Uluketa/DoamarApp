@@ -27,7 +27,7 @@ export function OrderCard({
       className="mr-4 rounded-2xl overflow-hidden"
       style={{
         width: 150,
-        backgroundColor: colors.background,
+        backgroundColor: colors.card,
         borderWidth: 1,
         borderColor: colors.border,
         elevation: 4,

@@ -11,7 +11,7 @@ type Theme = {
     black: string;
     pink: string;
     primary: string;
-    borderSecondary: string;
+    secondary: string;
 };
 
 const light: Theme = {
@@ -30,7 +30,7 @@ const light: Theme = {
     black: '#000000',
     pink: '#ec4899',
     primary: '#39503B',
-    borderSecondary: '#999999',
+    secondary: '#999999',
     card: '#FFFFFF'
 };
 
@@ -50,7 +50,7 @@ const dark: Theme = {
     black: '#FFFFFF',
     pink: '#ec4899',
     primary: '#39503B',
-    borderSecondary: '#7c7c7c',
+    secondary: '#7c7c7c',
     card: '#1f1f1f'
 };
 

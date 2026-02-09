@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { InitialUserState } from '~/store/modules/user/reducer';
 import * as prop from './types/props';
 import * as res from './types/response';
+import { getImageData, normalizeUri } from '~/core/helpers';
 
 export const URL = (__DEV__) ? "192.168.18.8:8000" : "NOT DEFINED";
 /** Base URL para imagens (precisa do protocolo para Image.uri) */
@@ -102,7 +103,7 @@ export async function authMe(token: string) {
 export async function saveSignUpData(props: prop.SignUpProps) {
   try {
     const endpoint = props.userType === 'I' ? '/institutions' : '/clients';
-    
+
     if (!endpoint || !props.userType) {
       return { ok: 'N', msg: 'Tipo de usuário inválido.' };
     }
@@ -123,7 +124,7 @@ export async function fetchCepData(cep: string) {
   try {
     const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
     const data = response.data;
-    
+
     if (data.erro) {
       return {
         ok: "N",
@@ -136,7 +137,7 @@ export async function fetchCepData(cep: string) {
         complemento: ""
       };
     }
-    
+
     return {
       ok: "S",
       msg: "CEP encontrado.",
@@ -186,34 +187,33 @@ export async function clientHome(userId: number, token: string) {
 export async function updateClientProfile(
   clientId: number,
   profileData: prop.UpdateClientProfileProps,
-  profileImage?: any,
+  profileImage?: { uri: string, type?: string, fileName?: string } | null,
   token?: string
 ) {
   try {
     // Se houver imagem, usar FormData para multipart
     if (profileImage) {
       const formData = new FormData();
-      
-      // Adicionar todos os campos do perfil
-      Object.keys(profileData).forEach(key => {
-        formData.append(key, profileData[key as keyof typeof profileData]);
-      });
 
-      // Adicionar imagem
-      formData.append('profileImage', {
-        uri: profileImage.uri,
-        type: profileImage.type || 'image/jpeg',
-        name: profileImage.name || `profile-${clientId}.jpg`
-      } as any);
-
-      // Do not set explicit Content-Type for multipart FormData here;
-      // axios (and the native environment) will add the proper boundary
-      // when FormData is provided.
-      const { data } = await API.patch(`/clients/${clientId}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      Object.entries(profileData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
         }
       });
+
+      formData.append('profileImage', {
+        uri: profileImage.uri,
+        type: profileImage.type ?? 'image/jpeg',
+        name: profileImage.fileName ?? `profile-${clientId}.jpg`,
+      } as any);
+
+      const { data } = await API.post(`/clients/${clientId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        },
+      });
+
       return data;
     } else {
       // Sem imagem, usar JSON
@@ -225,6 +225,7 @@ export async function updateClientProfile(
       return data;
     }
   } catch (error: any) {
+    console.log(error)
     const msg = handleApiError(error, "Erro ao atualizar perfil.");
     return {
       ok: "N",
@@ -348,7 +349,7 @@ export async function createDonation(userId: number, orderId: number, quantity: 
   }
 }
 
-export async function createBulkDonations(donations: Array<{user_id: number, order_id: number, quantity: number}>, token: string) {
+export async function createBulkDonations(donations: Array<{ user_id: number, order_id: number, quantity: number }>, token: string) {
   try {
     const { data } = await API.post('/donations', {
       donations
@@ -535,5 +536,42 @@ export async function removeFavorite(clientId: number, institutionId: number, to
       msg,
       data: null
     };
+  }
+}
+
+export async function fetchInstitutionSummary(institutionId: number, token?: string) {
+  try {
+    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+    const { data } = await API.get(`/institutions/${institutionId}/summary`, config);
+    return data;
+  } catch (error: any) {
+    const msg = handleApiError(error, 'Erro ao buscar resumo da instituição.');
+    return { ok: 'N', msg, data: null };
+  }
+}
+
+export async function fetchInstitutionDonations(institutionId: number, date: string, token?: string) {
+  try {
+    const config = token ? { headers: { Authorization: `Bearer ${token}` }, params: { date } } : { params: { date } };
+    const { data } = await API.get(`/institutions/${institutionId}/donations`, config);
+    return data;
+  } catch (error: any) {
+    const msg = handleApiError(error, 'Erro ao buscar doações da instituição.');
+    return { ok: 'N', msg, data: [] };
+  }
+}
+
+export async function fetchLatestInstitutionDonations(institutionId: number, limit = 6, token?: string) {
+  try {
+    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+    const { data } = await API.get(`/donations/institution/${institutionId}`, config);
+    if (data?.ok === 'S') {
+      // return only latest `limit` items
+      return { ok: 'S', data: (data.data || []).slice(0, limit) };
+    }
+    return { ok: 'N', msg: data?.msg || 'Erro', data: [] };
+  } catch (error: any) {
+    const msg = handleApiError(error, 'Erro ao buscar últimas doações.');
+    return { ok: 'N', msg, data: [] };
   }
 }

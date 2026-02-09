@@ -11,6 +11,8 @@ import { DonationDetailsModal } from './components/DonationDetailsModal';
 import { Donation } from '~/types/entities/Donation';
 import { ORDER_TYPE_ID } from '~/constants/orderTypes';
 import { OrderTypeFilterModal } from '~/components/OrderTypeFilterModal';
+import colors from '~/styles/colors';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ReceivedDonations() {
     const { userData, token } = useSelector((state: RootState) => state.user);
@@ -51,7 +53,7 @@ export default function ReceivedDonations() {
         limitDate.setDate(limitDate.getDate() - selectedPeriod);
 
         const matchesPeriod = donationDate >= limitDate;
-        const orderTypeId = donation.order?.order_type?.id ?? donation.order?.orderType?.id;
+        const orderTypeId = donation.order?.order_type?.id ?? donation.order?.order_type;
         const matchesType = selectedOrderType
             ? orderTypeId === selectedOrderType
             : true;
@@ -60,14 +62,13 @@ export default function ReceivedDonations() {
     });
 
     return (
-        <View className="flex-1 bg-gray-50 px-6 pt-8">
-            <Text className="text-2xl font-bold mb-1">
-                Recebidos
-            </Text>
-
-            <Text className="text-gray-500 mb-6">
-                {filteredDonations.length} doações no período
-            </Text>
+        <View className="flex-1 py-6 px-6" style={{ backgroundColor: colors.background }}>
+            <View className="flex-row items-center mb-4">
+                <Ionicons name="receipt" size={28} color={colors.palette[1]} />
+                <Text className="text-2xl font-bold ml-3" style={{ color: colors.text }}>
+                    Recebidos {filteredDonations.length > 0 && `(${filteredDonations.length})`}
+                </Text>
+            </View>
 
             <FiltersBar
                 selectedPeriod={selectedPeriod}
@@ -79,7 +80,7 @@ export default function ReceivedDonations() {
             <ReceivedChart total={filteredDonations.length} />
 
             {loading ? (
-                <ActivityIndicator size="large" className="flex-1 mt-8" />
+                <ActivityIndicator size="large" className="flex-1" />
             ) : (
                 <FlatList
                     data={filteredDonations}

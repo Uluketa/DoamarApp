@@ -22,6 +22,8 @@ import { ThemeProviderApp, useTheme } from './src/contexts/ThemeContext';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Asset } from 'expo-asset';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
+import getToastConfig from './src/styles/toast';
 
 
 // ======================
@@ -74,6 +76,7 @@ export default function App() {
 function RootLayoutNav() {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     // update global colors module
@@ -85,25 +88,32 @@ function RootLayoutNav() {
     }
   }, [theme]);
   return (
-    <Provider store={store}>
-      <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: colors.primary,
-            paddingTop: insets.top,
-            paddingBottom: 0
-          }}
-        >
-          <StatusBar
-            barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
-            translucent={Platform.OS === 'android'}
-            backgroundColor="transparent"
-          />
+    <>
+      <Provider store={store}>
+        <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: colors.primary,
+              paddingTop: insets.top,
+              paddingBottom: 0
+            }}
+          >
+            <StatusBar
+              barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
+              translucent={Platform.OS === 'android'}
+              backgroundColor="transparent"
+            />
 
-          <RootStack key={theme} />
-        </View>
-      </ThemeProvider>
-    </Provider>
+            <RootStack key={theme} />
+          </View>
+        </ThemeProvider>
+      </Provider>
+
+      <Toast 
+        config={getToastConfig(isDark)} 
+        topOffset={120}
+      />
+    </>
   );
 }

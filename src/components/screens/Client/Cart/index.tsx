@@ -105,7 +105,6 @@ export const ClientCart = () => {
                                 <Image
                                     source={{ uri: institution.pathLogoImage ? `${IMAGE_BASE_URL}${institution.pathLogoImage}` : undefined }}
                                     style={{ width: 80, height: 40, resizeMode: 'contain' }}
-                                    
                                 />
                             )}
                         </View>
@@ -197,12 +196,14 @@ export const ClientCart = () => {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    onPress={handleClearCart}
-                    className='py-3 px-6 border-2 border-red-300 rounded-lg'
-                >
-                    <Text className='text-center text-red-600 font-bold'>Limpar Carrinho</Text>
-                </TouchableOpacity>
+                <View className='flex w-full items-center'>
+                    <TouchableOpacity
+                        onPress={handleClearCart}
+                        className='py-3 px-6 rounded-lg'
+                    >
+                        <Text className='text-center text-red-600 font-bold'>Limpar Carrinho</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );

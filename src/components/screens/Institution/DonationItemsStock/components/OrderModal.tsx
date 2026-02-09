@@ -11,13 +11,16 @@ import {
   PanResponder,
   ActivityIndicator,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRef, useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 
 import { LabeledTextInput } from '~/components/LabeledTextInput';
 import { ORDER_TYPES, ORDER_TYPE_ID } from '~/constants/orderTypes';
+import { Order } from '~/types/entities/Order';
+import colors from '~/styles/colors';
 
 export type OrderModalSavePayload = {
   name: string;
@@ -26,6 +29,7 @@ export type OrderModalSavePayload = {
   limit?: number | null;
   image_url?: string | null;
   order_type_id: number;
+  status: Order['status'];
 };
 
 type Props = {
@@ -33,6 +37,7 @@ type Props = {
   onClose: () => void;
   onSave: (payload: OrderModalSavePayload) => void | Promise<unknown>;
   institutionId?: number;
+  order?: Order | null;
 };
 
 const ORDER_TYPE_ENTRIES = [
@@ -43,27 +48,47 @@ const ORDER_TYPE_ENTRIES = [
   { id: ORDER_TYPE_ID.MATERIAL_ESCOLAR, name: ORDER_TYPES[ORDER_TYPE_ID.MATERIAL_ESCOLAR].name },
 ];
 
-export default function OrderModal({ visible, onClose, onSave, institutionId }: Props) {
+export default function OrderModal({
+  visible,
+  onClose,
+  onSave,
+  institutionId,
+  order,
+}: Props) {
   const translateY = useRef(new Animated.Value(0)).current;
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [hasLimit, setHasLimit] = useState(false);
   const [limit, setLimit] = useState('');
-  const [image, setImage] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState('');
   const [orderTypeId, setOrderTypeId] = useState(ORDER_TYPE_ID.ALIMENTOS);
   const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<Order['status']>('available');
 
   useEffect(() => {
-    if (visible) {
+    if (!visible) return;
+
+    if (order) {
+      console.log(order)
+      setName(order.name);
+      setDescription(order.description ?? '');
+      setHasLimit(order.has_limit ? true : false);
+      setLimit(order.limit ? String(order.limit) : '');
+      setImageUrl(order.image_url ?? '');
+      setOrderTypeId(order.order_type.id);
+      setStatus(order.status);
+    } else {
       setName('');
       setDescription('');
       setHasLimit(false);
       setLimit('');
-      setImage(null);
+      setImageUrl('');
       setOrderTypeId(ORDER_TYPE_ID.ALIMENTOS);
+      setStatus('available');
     }
-  }, [visible]);
+  }, [visible, order]);
+
 
   const closeSheet = () => {
     Animated.timing(translateY, {
@@ -108,8 +133,9 @@ export default function OrderModal({ visible, onClose, onSave, institutionId }: 
       description: description.trim() || undefined,
       has_limit: hasLimit,
       limit: hasLimit ? Number(limit) || null : null,
-      image_url: image?.startsWith('http') ? image : null,
+      image_url: imageUrl.trim() || null,
       order_type_id: orderTypeId,
+      status: status,
     };
     if (institutionId != null) {
       setSaving(true);
@@ -128,40 +154,9 @@ export default function OrderModal({ visible, onClose, onSave, institutionId }: 
     }
   };
 
-  const pickImage = async () => {
-    const permission = await ImagePicker.getMediaLibraryPermissionsAsync();
-
-    if (!permission.granted) {
-      const request = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (!request.granted) {
-        Alert.alert(
-          'Permissão necessária',
-          'Para adicionar uma imagem, permita o acesso às suas fotos.',
-          [
-            { text: 'Cancelar', style: 'cancel' },
-            { text: 'Abrir configurações', onPress: () => Linking.openSettings() },
-          ]
-        );
-        return;
-      }
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
   return (
-    <Modal transparent visible={visible} animationType="fade">
-      <View className="flex-1 justify-end">
+    <Modal transparent visible={visible} animationType="none">
+      <View className="flex-1">
         {/* Backdrop */}
         <TouchableOpacity
           activeOpacity={1}
@@ -169,136 +164,161 @@ export default function OrderModal({ visible, onClose, onSave, institutionId }: 
           className="absolute inset-0 bg-black/50"
         />
 
-        {/* Sheet */}
-        <Animated.View
-          {...panResponder.panHandlers}
-          style={{ transform: [{ translateY }] }}
-          className="bg-white rounded-t-3xl px-6 pt-3 pb-12"
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1 justify-end"
         >
-          {/* Handle */}
-          <View className="w-12 h-1.5 bg-gray-300 rounded-full self-center mb-4" />
 
-          {/* Header */}
-          <View className="flex-row justify-between items-center mb-6">
-            <Text className="text-xl font-bold">
-              Novo pedido
-            </Text>
+          {/* Sheet */}
+          <View
+            className="rounded-t-3xl px-6 pt-3"
+            style={{ maxHeight: '75%', backgroundColor: colors.card }}
+          >
+            {/* Handle */}
+            <View className="w-12 h-1.5 rounded-full self-center mb-4" style={{ backgroundColor: colors.secondary }} />
 
-            <TouchableOpacity onPress={closeSheet}>
-              <Ionicons name="close" size={26} color="#6b7280" />
-            </TouchableOpacity>
-          </View>
+            {/* Header */}
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-xl font-bold" style={{ color: colors.text }}>
+                {order ? 'Editar pedido' : 'Novo pedido'}
+              </Text>
 
-          <LabeledTextInput
-            label="Produto"
-            value={name}
-            onChangeText={setName}
-            placeholder="Ex: Arroz, Feijão, Cesta básica"
-            placeholderTextColor="#888"
-          />
-
-          <LabeledTextInput
-            label="Descrição"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            placeholder="Descreva o produto e suas condições"
-            placeholderTextColor="#888"
-          />
-
-          <View className="my-4">
-            <Text className="mb-2 font-bold text-lg">Tipo do pedido</Text>
-            <View className="flex-row flex-wrap gap-2">
-              {ORDER_TYPE_ENTRIES.map(({ id, name: typeName }) => (
-                <TouchableOpacity
-                  key={id}
-                  onPress={() => setOrderTypeId(id)}
-                  className={`px-4 py-2 rounded-full ${
-                    orderTypeId === id ? 'bg-green-600' : 'bg-gray-200'
-                  }`}
-                >
-                  <Text
-                    className={`font-semibold ${
-                      orderTypeId === id ? 'text-white' : 'text-gray-700'
-                    }`}
-                  >
-                    {typeName}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              <TouchableOpacity onPress={closeSheet}>
+                <Ionicons name="close" size={26} color={colors.secondary} />
+              </TouchableOpacity>
             </View>
-          </View>
 
-          <View className="flex-row justify-between items-center my-4">
-            <Text className="font-bold text-lg">
-              Tem limite?
-            </Text>
-
-            <Switch value={hasLimit} onValueChange={setHasLimit} />
-          </View>
-
-          {hasLimit && (
-            <LabeledTextInput
-              label="Limite"
-              value={limit}
-              onChangeText={setLimit}
-              keyboardType="numeric"
-              placeholder="Ex: 100 unidades"
-              placeholderTextColor="#888"
-            />
-          )}
-
-          {/* Imagem */}
-          <View className="my-4">
-            <Text className="mb-2 font-bold text-lg">
-              Imagem do produto
-            </Text>
-
-            <TouchableOpacity
-              onPress={pickImage}
-              activeOpacity={0.8}
-              className={`flex-row items-center gap-4 border-2 rounded-xl p-3 ${
-                image ? 'border-green-600' : 'border-gray-300'
-              }`}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 32 }}
             >
-              {image ? (
-                <Image
-                  source={{ uri: image }}
-                  className="w-20 h-20 rounded-lg"
-                />
-              ) : (
-                <View className="w-20 h-20 rounded-lg bg-gray-100 items-center justify-center">
-                  <Ionicons name="image-outline" size={26} color="#6b7280" />
-                </View>
-              )}
+              <LabeledTextInput
+                label="Produto"
+                value={name}
+                onChangeText={setName}
+                placeholder="Ex: Arroz, Feijão, Cesta básica"
+                placeholderTextColor={colors.secondary}
+              />
 
-              <View className="flex-1">
-                <Text className="font-semibold">
-                  {image ? 'Imagem selecionada' : 'Adicionar imagem'}
-                </Text>
-                <Text className="text-gray-500 text-sm">
-                  Toque para escolher da galeria
-                </Text>
+              <LabeledTextInput
+                label="Descrição"
+                value={description}
+                onChangeText={setDescription}
+                multiline
+                placeholder="Descreva o produto e suas condições"
+                placeholderTextColor={colors.secondary}
+              />
+
+              <View className="my-4 border-t pt-4" style={{ borderColor: colors.border }}>
+                <Text className="mb-2 font-bold text-lg" style={{ color: colors.text }}>Tipo do pedido</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {ORDER_TYPE_ENTRIES.map(({ id, name: typeName }) => (
+                    <TouchableOpacity
+                      key={id}
+                      onPress={() => setOrderTypeId(id)}
+                      className="px-4 py-2 rounded-full"
+                      style={{ backgroundColor: orderTypeId === id ? colors.primary : colors.background }}
+                    >
+                      <Text
+                        className="font-semibold"
+                        style={{ color: orderTypeId === id ? '#f0f0f0' : colors.secondary }}
+                      >
+                        {typeName}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
 
-              <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-            </TouchableOpacity>
-          </View>
+              <View className="border-t pt-4" style={{ borderColor: colors.border }}>
+                <View className="flex-row justify-between items-center my-4">
+                  <Text className="font-bold text-lg" style={{ color: colors.text }}>
+                    Tem limite?
+                  </Text>
 
-          <TouchableOpacity
-            className="bg-green-600 py-4 rounded-xl items-center mt-4"
-            onPress={handleSave}
-            disabled={saving}
-          >
-            {saving ? (
-              <ActivityIndicator color="white" size="small" />
-            ) : (
-              <Text className="text-white font-bold text-lg">
-                Salvar pedido
-              </Text>
-            )}
-          </TouchableOpacity>
-        </Animated.View>
+                  <Switch
+                    value={hasLimit}
+                    onValueChange={setHasLimit}
+                    thumbColor={hasLimit ? colors.primary : colors.secondary}
+                    trackColor={{ false: colors.background, true: colors.background }}
+                    ios_backgroundColor={colors.background}
+                  />
+                </View>
+
+                {hasLimit && (
+                  <LabeledTextInput
+                    label="Limite"
+                    value={limit}
+                    onChangeText={setLimit}
+                    keyboardType="numeric"
+                    placeholder="Ex: 100 unidades"
+                    placeholderTextColor={colors.secondary}
+                  />
+                )}
+              </View>
+
+              <View className="my-4">
+                <Text className="pt-4 mb-2 font-bold text-lg border-t" style={{ color: colors.text, borderTopColor: colors.border }}>
+                  URL da imagem
+                </Text>
+
+                <LabeledTextInput
+                  label="Imagem"
+                  value={imageUrl}
+                  onChangeText={setImageUrl}
+                  placeholder="https://exemplo.com/imagem.png"
+                  autoCapitalize="none"
+                  placeholderTextColor={colors.secondary}
+                />
+
+                {imageUrl.startsWith('http') && (
+                  <View className="mt-3 items-center">
+                    <Image
+                      source={{ uri: imageUrl }}
+                      className="w-full h-40 rounded-xl p-4 elevation-2"
+                      resizeMode="contain"
+                    />
+                  </View>
+                )}
+              </View>
+
+              <View className="my-4 border-t pt-4" style={{ borderColor: colors.border }}>
+                <Text className="mb-2 font-bold text-lg" style={{ color: colors.text }}>
+                  Status do pedido
+                </Text>
+
+                <View className="flex-row gap-3">
+                  {(['available', 'completed', 'canceled'] as const).map(s => (
+                    <TouchableOpacity
+                      key={s}
+                      onPress={() => setStatus(s)}
+                      className="px-4 py-2 rounded-full"
+                      style={{ backgroundColor: status === s ? colors.primary : colors.background }}
+                    >
+                      <Text className='font-bold' style={{ color: status === s ? '#f0f0f0' : colors.secondary }}>
+                        {s === 'available' ? 'Disponível' : s === 'completed' ? 'Concluído' : 'Cancelado'}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <TouchableOpacity
+                className="bg-green-600 py-4 rounded-xl items-center mt-4"
+                onPress={handleSave}
+                disabled={saving}
+              >
+                {saving ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <Text className="text-white font-bold text-lg">
+                    {order ? 'Salvar alterações' : 'Salvar pedido'}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );
