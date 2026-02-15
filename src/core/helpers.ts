@@ -5,9 +5,9 @@ export const TOKEN = '1g0273nbj1h4398dsn329uis2113x4';
 export const EMAIL = 'doamarapp@gmail.com';
 export const URL = '127.0.0.1:8000';
 
-export const PATH_INSTITUTION_PHOTO = '/storage/profile/institution.png';
-export const PATH_INSTITUTION_COVER = '/storage/profile/institution_background.png'
-export const PATH_CLIENT_PHOTO = '/storage/profile/client.png';
+export const PATH_INSTITUTION_PHOTO = 'https://fmyvowbxdibhlpoftvpd.supabase.co/storage/v1/object/public/doamar-files/institution-profile/institution.png';
+export const PATH_INSTITUTION_COVER = 'https://fmyvowbxdibhlpoftvpd.supabase.co/storage/v1/object/public/doamar-files/institution-profile/institution_background.png'
+export const PATH_CLIENT_PHOTO = 'https://fmyvowbxdibhlpoftvpd.supabase.co/storage/v1/object/public/doamar-files/client-profile/client.png';
 
 export const conectado = async () => {
   const response = await NetInfo.fetch();

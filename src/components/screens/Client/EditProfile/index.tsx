@@ -18,7 +18,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { RootStackParamList } from '~/types/Navigation';
 import { RootState } from '~/store';
-import { updateClientProfile, fetchCepData, IMAGE_BASE_URL } from '~/api';
+import { updateClientProfile, fetchCepData, resolveImageUrl } from '~/api';
 import { PATH_CLIENT_PHOTO } from '~/core/helpers';
 import { updateClientData } from '~/store/modules/user/actions';
 
@@ -77,11 +77,7 @@ export default function EditProfile() {
 
     useEffect(() => {
         if (userData.client?.pathProfileImage) {
-            const path = userData.client.pathProfileImage.startsWith('/')
-                ? userData.client.pathProfileImage
-                : `/${userData.client.pathProfileImage}`;
-
-            setProfileImageUrl(`${IMAGE_BASE_URL}${path}`);
+            setProfileImageUrl(resolveImageUrl(userData.client.pathProfileImage) ?? null);
         }
     }, [userData.client?.pathProfileImage]);
 

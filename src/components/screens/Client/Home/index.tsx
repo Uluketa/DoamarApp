@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, FlatList, Image, Pressable, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { clientHome, listSocialIssues, IMAGE_BASE_URL } from '~/api';
+import { clientHome, listSocialIssues, resolveImageUrl } from '~/api';
 import { useTheme } from '~/contexts/ThemeContext';
 import { PATH_CLIENT_PHOTO, PATH_INSTITUTION_COVER } from '~/core/helpers';
 import { RootState } from '~/store';
@@ -196,9 +196,10 @@ export default function Home({ searchText = '' }: { searchText?: string }) {
                     <View className="mt-8">
                         <Image
                             source={{
-                                uri: userData.client?.pathProfileImage
-                                    ? `${IMAGE_BASE_URL}${userData.client.pathProfileImage}`
-                                    : `${IMAGE_BASE_URL}${PATH_CLIENT_PHOTO}`
+                                uri: resolveImageUrl(
+                                    userData.client?.pathProfileImage,
+                                    PATH_CLIENT_PHOTO
+                                )
                             }}
                             style={{
                                 width: 100,
@@ -266,9 +267,10 @@ export default function Home({ searchText = '' }: { searchText?: string }) {
                                 {/* Imagem de fundo */}
                                 <Image
                                     source={{
-                                        uri: item.pathBackgroundImage
-                                            ? `${IMAGE_BASE_URL}${item.pathBackgroundImage}`
-                                            : `${IMAGE_BASE_URL}${PATH_INSTITUTION_COVER}`
+                                        uri: resolveImageUrl(
+                                            item.pathBackgroundImage,
+                                            PATH_INSTITUTION_COVER
+                                        )
                                     }}
                                     className="w-full h-full"
                                 />

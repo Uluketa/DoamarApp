@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { RootState } from '~/store';
 import { RootStackParamList } from '~/types/Navigation';
-import { IMAGE_BASE_URL } from '~/api';
+import { resolveImageUrl } from '~/api';
 import { clearCart } from '~/store/modules/cart/actions';
 
 import Toast from 'react-native-toast-message';
@@ -141,7 +141,7 @@ export const CartCheckout = () => {
 
               {institution.pathLogoImage && (
                 <Image
-                  source={{ uri: `${IMAGE_BASE_URL}${institution.pathLogoImage}` }}
+                  source={{ uri: resolveImageUrl(institution.pathLogoImage) }}
                   style={{ width: 80, height: 40, resizeMode: 'contain' }}
                 />
               )}

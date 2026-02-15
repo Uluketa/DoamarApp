@@ -20,7 +20,7 @@ import { Institution } from '~/types/entities/Institution';
 import { Order } from '~/types/entities/Order';
 import { RootState } from '~/store';
 
-import { getOrdersByInstitution, URL, getClientFavorites, addFavorite, removeFavorite } from '~/api';
+import { getOrdersByInstitution, resolveImageUrl, getClientFavorites, addFavorite, removeFavorite } from '~/api';
 import { formatCNPJ, PATH_INSTITUTION_COVER } from '~/core/helpers';
 import { OrderCard } from './components/OrderCard';
 import { CartHeader } from '~/components/CartHeader';
@@ -175,7 +175,10 @@ export function InstitutionProfile({ route, navigation }: Props) {
         <View className="relative">
           <Image
             source={{
-              uri: `http://${URL}${institutionData.pathBackgroundImage ?? PATH_INSTITUTION_COVER}`,
+              uri: resolveImageUrl(
+                institutionData.pathBackgroundImage,
+                PATH_INSTITUTION_COVER
+              ),
             }}
             className="w-full h-[220]"
           />
@@ -239,7 +242,7 @@ export function InstitutionProfile({ route, navigation }: Props) {
               }}
             >
               <Image
-                source={{ uri: `http://${URL}${institutionData.pathLogoImage}` }}
+                source={{ uri: resolveImageUrl(institutionData.pathLogoImage) }}
                 style={{ width: 80, height: 40, resizeMode: 'contain' }}
               />
             </View>
@@ -282,7 +285,10 @@ export function InstitutionProfile({ route, navigation }: Props) {
           <View className="mt-4 rounded-2xl overflow-hidden">
             <Image
               source={{
-                uri: `http://${URL}${institutionData.social_issue?.pathImage ?? PATH_INSTITUTION_COVER}`,
+                uri: resolveImageUrl(
+                  institutionData.social_issue?.pathImage,
+                  PATH_INSTITUTION_COVER
+                ),
               }}
               style={{ height: 200 }}
             />

@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import colors from '~/styles/colors';
 import { Order } from '~/types/entities/Order';
+import { resolveImageUrl } from '~/api';
 
 type Props = {
     order: Order;
@@ -33,7 +34,7 @@ export default function OrderCard({
             <View className='border rounded-t-2xl' style={{ borderColor: colors.card }}>
                 {order.image_url ? (
                     <Image
-                        source={{ uri: order.image_url }}
+                        source={{ uri: resolveImageUrl(order.image_url) }}
                         className="w-full h-24 p-2"
                         resizeMode="contain"
                     />

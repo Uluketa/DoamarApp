@@ -4,7 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View, RefreshControl, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { getClientFavorites, addFavorite, removeFavorite, IMAGE_BASE_URL } from '~/api';
+import { getClientFavorites, addFavorite, removeFavorite, resolveImageUrl } from '~/api';
 import { PATH_INSTITUTION_COVER } from '~/core/helpers';
 import { RootState } from '~/store';
 import { Institution } from '~/types/entities/Institution';
@@ -158,9 +158,10 @@ export default function Favorites() {
                                 {/* Imagem da Instituição */}
                                 <Image
                                     source={{
-                                        uri: item.institution.pathBackgroundImage
-                                            ? `${IMAGE_BASE_URL}${item.institution.pathBackgroundImage}`
-                                            : `${IMAGE_BASE_URL}${PATH_INSTITUTION_COVER}`
+                                        uri: resolveImageUrl(
+                                            item.institution.pathBackgroundImage,
+                                            PATH_INSTITUTION_COVER
+                                        )
                                     }}
                                     style={{ width: 120, height: 100 }}
                                     className='rounded-l-xl'

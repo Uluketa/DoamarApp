@@ -8,6 +8,28 @@ export const URL = (__DEV__) ? "192.168.18.8:8000" : "NOT DEFINED";
 /** Base URL para imagens (precisa do protocolo para Image.uri) */
 export const IMAGE_BASE_URL = `http://${URL}`;
 
+export const resolveImageUrl = (
+  path?: string | null,
+  fallbackPath?: string | null
+) => {
+  const value = path ?? fallbackPath ?? '';
+  if (!value) return undefined;
+
+  const lower = value.toLowerCase();
+  if (
+    lower.startsWith('http://') ||
+    lower.startsWith('https://') ||
+    lower.startsWith('file://') ||
+    lower.startsWith('content://') ||
+    lower.startsWith('data:')
+  ) {
+    return value;
+  }
+
+  const normalized = value.startsWith('/') ? value : `/${value}`;
+  return `${IMAGE_BASE_URL}${normalized}`;
+};
+
 // ============================================================
 // API Instance Configuration
 // ============================================================
@@ -173,6 +195,7 @@ export async function clientHome(userId: number, token: string) {
         Authorization: `Bearer ${token}`
       }
     });
+    console.log("Home data:", data.data.institutions);
     return data;
   } catch (error: any) {
     const msg = handleApiError(error, "Erro ao buscar dados da home.");

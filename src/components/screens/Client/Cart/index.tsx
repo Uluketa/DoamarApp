@@ -11,7 +11,7 @@ import { updateCartItemQuantity, removeCartItem, clearCart } from '~/store/modul
 
 import Toast from 'react-native-toast-message';
 import { colors } from '~/styles/colors';
-import { IMAGE_BASE_URL } from '~/api';
+import { resolveImageUrl } from '~/api';
 
 export const ClientCart = () => {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -103,7 +103,7 @@ export const ClientCart = () => {
                             </View>
                             {institution.pathLogoImage && (
                                 <Image
-                                    source={{ uri: institution.pathLogoImage ? `${IMAGE_BASE_URL}${institution.pathLogoImage}` : undefined }}
+                                    source={{ uri: resolveImageUrl(institution.pathLogoImage) }}
                                     style={{ width: 80, height: 40, resizeMode: 'contain' }}
                                 />
                             )}

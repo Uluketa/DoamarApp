@@ -14,7 +14,7 @@ import {
     Switch
 } from 'react-native';
 import { useSelector } from 'react-redux';
-import { indexInstitutions, URL } from '~/api';
+import { indexInstitutions, resolveImageUrl } from '~/api';
 import { RootState } from '~/store';
 import { Institution } from '~/types/entities/Institution';
 import { RootStackParamList } from '~/types/Navigation';
@@ -107,7 +107,7 @@ export default function ListInstitutions() {
         >
             <Image
                 source={{
-                    uri: `http://${URL}${item.pathBackgroundImage || PATH_INSTITUTION_COVER}`,
+                    uri: resolveImageUrl(item.pathBackgroundImage, PATH_INSTITUTION_COVER),
                 }}
                 className="w-[110px] h-[90px]"
                 resizeMode="cover"
@@ -125,7 +125,7 @@ export default function ListInstitutions() {
                 <View className="flex-row items-center justify-end mt-2">
                     {item.pathLogoImage ? (
                         <Image
-                            source={{ uri: `http://${URL}${item.pathLogoImage}` }}
+                            source={{ uri: resolveImageUrl(item.pathLogoImage) }}
                             className="w-16 h-12 rounded-lg"
                             resizeMode="contain"
                         />

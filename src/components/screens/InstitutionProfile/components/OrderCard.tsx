@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "~/styles/colors";
 import { Order } from "~/types/entities/Order";
+import { resolveImageUrl } from "~/api";
 
 type OrderCardProps = {
   item: Order;
@@ -39,7 +40,7 @@ export function OrderCard({
         style={{ backgroundColor: colors.background }}
       >
         <Image
-          source={{ uri: item.image_url }}
+          source={{ uri: resolveImageUrl(item.image_url) }}
           style={{
             width: 80,
             height: 90,
