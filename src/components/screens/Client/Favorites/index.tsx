@@ -1,81 +1,51 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View, RefreshControl, Alert } from 'react-native';
+import { useCallback, useState, useEffect } from 'react';
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View, RefreshControl } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { getClientFavorites, addFavorite, removeFavorite, resolveImageUrl } from '~/api';
 import { PATH_INSTITUTION_COVER } from '~/core/helpers';
 import { RootState } from '~/store';
+import { setFavoritesLoading, setFavorites, removeFavoriteItem } from '~/store/modules/favorites/actions';
 import { Institution } from '~/types/entities/Institution';
 import { RootStackParamList } from '~/types/Navigation';
-import { ClientFavorite } from '~/types/entities/ClientFavorite';
 import { colors } from '~/styles/colors';
 import Toast from 'react-native-toast-message';
 
 export default function Favorites() {
-    const [favoritesData, setFavoritesData] = useState<Array<ClientFavorite>>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const dispatch = useDispatch();
+    const { items: favoritesData, isLoading } = useSelector((state: RootState) => state.favorites);
+    const { userData, token } = useSelector((state: RootState) => state.user);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [removingIds, setRemovingIds] = useState<number[]>([]);
-
-    const { userData, token } = useSelector((state: RootState) => state.user);
 
     type NavigationProps = StackNavigationProp<RootStackParamList, 'InstitutionProfile'>;
     const navigation = useNavigation<NavigationProps>();
 
-    // Buscar favoritos
+    // Buscar favoritos apenas na primeira montagem
+    useEffect(() => {
+        if (favoritesData.length === 0 && !isLoading) {
+            fetchClientFavorites();
+        }
+    }, []);
+
     const fetchClientFavorites = async () => {
         try {
+            dispatch(setFavoritesLoading(true));
             const response = await getClientFavorites(userData.client?.id || 0, token);
 
             if (response.ok === 'S' && response.data) {
-                setFavoritesData(response.data);
+                dispatch(setFavorites(response.data));
             } else {
-                setFavoritesData([]);
+                dispatch(setFavorites([]));
             }
         } catch (error: any) {
             console.error('Erro ao buscar favoritos:', error);
-            setFavoritesData([]);
+            dispatch(setFavorites([]));
         } finally {
-            setIsLoading(false);
+            dispatch(setFavoritesLoading(false));
             setIsRefreshing(false);
-        }
-    };
-
-    useFocusEffect(
-        useCallback(() => {
-            setIsLoading(true);
-            fetchClientFavorites();
-        }, [userData.id, token])
-    );
-
-    // Adicionar favorito
-    const handleAddFavorite = async (institutionId: number) => {
-        try {
-            const response = await addFavorite(userData.client?.id || 0, institutionId, token);
-
-            if (response.ok === 'S') {
-                // Refrescar lista
-                await fetchClientFavorites();
-                Toast.show({
-                    type: 'success',
-                    text1: 'Adicionado aos favoritos!',
-                });
-            } else {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Erro',
-                    text2: response.msg || 'Não foi possível adicionar aos favoritos.'
-                });
-            }
-        } catch (error) {
-            console.error('Erro ao adicionar favorito:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Erro',
-                text2: 'Erro ao adicionar aos favoritos.'
-            });
         }
     };
 
@@ -87,8 +57,7 @@ export default function Favorites() {
             const response = await removeFavorite(clientId, institutionId, token);
 
             if (response.ok === 'S') {
-                // Remover da lista localmente
-                setFavoritesData(prev => prev.filter(fav => fav.institution.id !== institutionId));
+                dispatch(removeFavoriteItem(institutionId));
                 Toast.show({
                     type: 'success',
                     text1: 'Removido dos favoritos!'

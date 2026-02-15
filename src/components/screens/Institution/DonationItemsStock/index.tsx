@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import { FlatList, Text, TouchableOpacity, View, ActivityIndicator, RefreshControl } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 
 import { getOrdersByInstitution, createOrder } from '~/api';
 import { RootState } from '~/store';
+import { setOrdersLoading, setOrders, addOrder as addOrderToStore } from '~/store/modules/institutionData/actions';
 import OrderCard from './components/OrderCard';
 import OrderModal from './components/OrderModal';
 import EmptyState from './components/EmptyState';
@@ -14,28 +15,32 @@ import { Order } from '~/types/entities/Order';
 import { colors } from '~/styles/colors';
 
 export default function DonationItemsStock() {
+    const dispatch = useDispatch();
     const { userData, token } = useSelector((state: RootState) => state.user);
+    const { orders, isLoadingOrders } = useSelector((state: RootState) => state.institutionData);
     const institutionId = userData.institution?.id ?? 0;
 
     const [modalVisible, setModalVisible] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-
-    const [orders, setOrders] = useState<Order[]>([]);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+    // Buscar pedidos apenas na primeira montagem
+    useEffect(() => {
+        if (orders.length === 0 && !isLoadingOrders) {
+            fetchOrders();
+        }
+    }, []);
 
     const fetchOrders = useCallback(async () => {
         if (!institutionId || !token) return;
-        setIsLoading(true);
+        dispatch(setOrdersLoading(true));
         const res = await getOrdersByInstitution(institutionId, token);
         if (res.ok === 'S' && res.data) {
-            setOrders(Array.isArray(res.data) ? res.data : []);
+            dispatch(setOrders(Array.isArray(res.data) ? res.data : []));
         }
-        setIsLoading(false);
-    }, [institutionId, token]);
-
-    useEffect(() => {
-        fetchOrders();
-    }, [fetchOrders]);
+        dispatch(setOrdersLoading(false));
+        setIsRefreshing(false);
+    }, [institutionId, token, dispatch]);
 
     const handleSaveOrder = useCallback(async (payload: {
         name: string;
@@ -51,16 +56,21 @@ export default function DonationItemsStock() {
             institution_id: institutionId,
         }, token);
         if (res.ok === 'S' && res.data) {
-            setOrders(prev => [...prev, res.data as Order]);
+            dispatch(addOrderToStore(res.data as Order));
             setModalVisible(false);
             Toast.show({ type: 'success', text1: 'Pedido criado com sucesso!' });
         } else {
             Toast.show({ type: 'error', text1: res.msg ?? 'Erro ao criar pedido' });
         }
         return res;
-    }, [institutionId, token]);
+    }, [institutionId, token, dispatch]);
 
-    if (isLoading) {
+    const handleRefresh = () => {
+        setIsRefreshing(true);
+        fetchOrders();
+    };
+
+    if (isLoadingOrders) {
         return (
             <View className='flex-1 justify-center items-center' style={{ backgroundColor: colors.background }}>
                 <ActivityIndicator size="large" color={colors.text} />
@@ -105,7 +115,7 @@ export default function DonationItemsStock() {
                         columnWrapperStyle={{ gap: 12 }}
                         contentContainerStyle={{ paddingBottom: 16 }}
                         refreshControl={
-                            <RefreshControl refreshing={isLoading} onRefresh={fetchOrders} />
+                            <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
                         }
                         renderItem={({ item }) => (
                             <OrderCard

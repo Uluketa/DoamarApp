@@ -1,9 +1,10 @@
 import { View, Text, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { getDonationsByInstitution } from '~/api';
 import { RootState } from '~/store';
+import { setDonationsLoading, setDonations } from '~/store/modules/institutionData/actions';
 import { FiltersBar } from './components/FiltersBar';
 import { DonationCard } from './components/DonationCard';
 import { ReceivedChart } from './components/ReceivedChart';
@@ -15,30 +16,35 @@ import colors from '~/styles/colors';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ReceivedDonations() {
+    const dispatch = useDispatch();
     const { userData, token } = useSelector((state: RootState) => state.user);
+    const { donations, isLoadingDonations } = useSelector((state: RootState) => state.institutionData);
     const institutionId = userData.institution?.id ?? 0;
 
-    const [donations, setDonations] = useState<Donation[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState(30);
     const [selectedOrderType, setSelectedOrderType] =
         useState<ORDER_TYPE_ID | null>(null);
     const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
     const [typeModalVisible, setTypeModalVisible] = useState(false);
 
+    // Buscar doações apenas na primeira montagem
+    useEffect(() => {
+        if (donations.length === 0 && !isLoadingDonations) {
+            fetchDonations();
+        }
+    }, []);
+
     const fetchDonations = useCallback(async () => {
         if (!institutionId || !token) return;
-        setLoading(true);
+        dispatch(setDonationsLoading(true));
         const res = await getDonationsByInstitution(institutionId, token);
         if (res.ok === 'S' && res.data) {
-            setDonations(Array.isArray(res.data) ? res.data : []);
+            dispatch(setDonations(Array.isArray(res.data) ? res.data : []));
         }
-        setLoading(false);
-    }, [institutionId, token]);
-
-    useEffect(() => {
-        fetchDonations();
-    }, [fetchDonations]);
+        dispatch(setDonationsLoading(false));
+        setIsRefreshing(false);
+    }, [institutionId, token, dispatch]);
 
     const handleCloseModal = useCallback(() => {
         setSelectedDonation(null);
@@ -61,6 +67,11 @@ export default function ReceivedDonations() {
         return matchesPeriod && matchesType;
     });
 
+    const handleRefresh = () => {
+        setIsRefreshing(true);
+        fetchDonations();
+    };
+
     return (
         <View className="flex-1 py-6 px-6" style={{ backgroundColor: colors.background }}>
             <View className="flex-row items-center mb-4">
@@ -79,7 +90,7 @@ export default function ReceivedDonations() {
 
             <ReceivedChart total={filteredDonations.length} />
 
-            {loading ? (
+            {isLoadingDonations ? (
                 <ActivityIndicator size="large" className="flex-1" />
             ) : (
                 <FlatList
@@ -88,7 +99,7 @@ export default function ReceivedDonations() {
                     contentContainerStyle={{ paddingBottom: 120 }}
                     showsVerticalScrollIndicator={false}
                     refreshControl={
-                        <RefreshControl refreshing={loading} onRefresh={fetchDonations} />
+                        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
                     }
                     renderItem={({ item }) => (
                         <DonationCard

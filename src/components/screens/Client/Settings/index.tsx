@@ -14,6 +14,8 @@ import { clearUser } from '~/store/modules/user/actions';
 import { clearCart } from '~/store/modules/cart/actions';
 import { resetNavigation } from '~/store/modules/navigation/actions';
 import { clearHome } from '~/store/modules/home/actions';
+import { clearFavorites } from '~/store/modules/favorites/actions';
+import { clearInstitutionData } from '~/store/modules/institutionData/actions';
 import { authLogout } from '~/api';
 import colors from '~/styles/colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -65,6 +67,8 @@ export default function Settings() {
             dispatch(clearCart());
             dispatch(resetNavigation());
             dispatch(clearHome());
+            dispatch(clearFavorites());
+            dispatch(clearInstitutionData());
 
             // Limpar AsyncStorage e Redux Persist
             await persistor.purge();
@@ -83,6 +87,8 @@ export default function Settings() {
             dispatch(clearCart());
             dispatch(resetNavigation());
             dispatch(clearHome());
+            dispatch(clearFavorites());
+            dispatch(clearInstitutionData());
             await AsyncStorage.clear();
             navigation.reset({
                 index: 0,
