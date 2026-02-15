@@ -13,6 +13,7 @@ import { updateDonationStatus } from "~/api";
 import { useSelector } from "react-redux";
 import { RootState } from "~/store";
 import Toast from "react-native-toast-message";
+import { colors } from "~/styles/colors";
 
 type Props = {
   donation: Donation | null;
@@ -87,17 +88,17 @@ export function DonationDetailsModal({ donation, onClose, onStatusUpdated }: Pro
       <View className="flex-1 justify-end bg-black/40">
         <Animated.View
           {...panResponder.panHandlers}
-          style={{ transform: [{ translateY }] }}
-          className="bg-white rounded-t-3xl px-6 pt-3 pb-12"
+          style={{ transform: [{ translateY }], backgroundColor: colors.card }}
+          className="rounded-t-3xl px-6 pt-3 pb-12"
         >
           {/* Barrinha */}
-          <View className="w-12 h-1.5 bg-slate-300 rounded-full self-center mb-4" />
+          <View className="w-12 h-1.5 rounded-full self-center mb-4" style={{ backgroundColor: colors.border }} />
 
-          <Text className="text-xl font-semibold text-slate-900 mb-6 text-center">
+          <Text className="text-xl font-semibold mb-6 text-center" style={{ color: colors.text }}>
             Detalhes da Doação
           </Text>
 
-          <View className="bg-slate-50 rounded-2xl p-4 mb-4">
+          <View className="rounded-2xl p-4 mb-4" style={{ backgroundColor: colors.background }}>
             <Detail
               label="Nome"
               value={donation.user?.client?.name || "Doação anônima"}
@@ -150,9 +151,10 @@ export function DonationDetailsModal({ donation, onClose, onStatusUpdated }: Pro
 
           <TouchableOpacity
             onPress={onClose}
-            className="bg-slate-900 py-3.5 rounded-2xl"
+            className="py-3.5 rounded-2xl"
+            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border }}
           >
-            <Text className="text-white text-center font-semibold text-base">
+            <Text className="text-center font-semibold text-base" style={{ color: colors.text }}>
               Fechar
             </Text>
           </TouchableOpacity>
@@ -165,10 +167,10 @@ export function DonationDetailsModal({ donation, onClose, onStatusUpdated }: Pro
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <View className="mb-4">
-      <Text className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+      <Text className="text-xs mb-1 uppercase tracking-wide" style={{ color: colors.text + 'AA' }}>
         {label}
       </Text>
-      <Text className="text-base text-slate-800 font-medium">
+      <Text className="text-base font-medium" style={{ color: colors.text }}>
         {value}
       </Text>
     </View>

@@ -4,7 +4,7 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '~/types/Navigation';
 import { version } from '../../../../../package.json';
 
-import SettingsButton from './components/SettingsButton';
+import SettingsButton from '~/components/SettingsButton';
 import { useTheme } from '~/contexts/ThemeContext';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';

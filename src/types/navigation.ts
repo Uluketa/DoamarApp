@@ -17,6 +17,8 @@ export type RootStackParamList = {
 
   // Institution Screens
   ReceiveDonationQuest: undefined;
+  InstitutionSettings: undefined;
+  EditInstitutionProfile: undefined;
 
   // Common Screens
   Privacy: undefined;

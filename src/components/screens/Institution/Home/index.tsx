@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import colors from '~/styles/colors';
 import { RootState } from '~/store';
 import { fetchInstitutionSummary, fetchInstitutionDonations, fetchLatestInstitutionDonations } from '~/api';
@@ -47,6 +48,8 @@ export default function InstitutionHome() {
     const totalItems = summary?.totalItems ?? 0;
     const totalDonations = summary?.totalDonations ?? 0;
     const lastDonation = summary?.lastDonation ?? null;
+    const weekTotal = useMemo(() => weeklyDonations.reduce((acc: number, item: any) => acc + (item.value || 0), 0), [weeklyDonations]);
+    const weekAverage = useMemo(() => weeklyDonations.length ? (weekTotal / weeklyDonations.length) : 0, [weekTotal, weeklyDonations.length]);
 
     const maxDonation = useMemo(() => {
         if (!weeklyDonations || weeklyDonations.length === 0) return 1;
@@ -94,6 +97,14 @@ export default function InstitutionHome() {
         if (!loading) loadLatestDonations();
     }, [loading]);
 
+    const recentStatusCounts = useMemo(() => {
+        return latestDonations.reduce((acc, donation) => {
+            const status = donation.status || 'pendente';
+            acc[status] = (acc[status] ?? 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+    }, [latestDonations]);
+
 
     if (loading) {
         return (
@@ -126,21 +137,62 @@ export default function InstitutionHome() {
 
             {/* Doações na semana */}
             <View className="mb-8">
-                <Text className="text-lg font-bold mb-4" style={{ color: colors.text }}>Doações na semana</Text>
+                <View className="flex-row items-center justify-between mb-4">
+                    <Text className="text-lg font-bold" style={{ color: colors.text }}>Doações na semana</Text>
+                    <View className="px-3 py-1 rounded-full" style={{ backgroundColor: colors.background }}>
+                        <Text className="text-xs font-semibold" style={{ color: colors.text }}>
+                            {weekTotal} doações
+                        </Text>
+                    </View>
+                </View>
 
                 <View className="rounded-2xl p-6" style={{ backgroundColor: colors.card }}>
-                    {weeklyDonations.map((item: any) => (
-                        <TouchableOpacity key={item.date} className="mb-4" activeOpacity={0.8} onPress={() => openDayModal(item.date)}>
-                            <View className="flex-row justify-between mb-2">
-                                <Text style={{ color: colors.secondary }}>{item.day}</Text>
-                                <Text style={{ color: colors.secondary }}>{item.value}</Text>
-                            </View>
+                    <View className="flex-row items-end justify-between" style={{ height: 150 }}>
+                        {weeklyDonations.map((item: any) => {
+                            const barHeight = Math.max(12, (item.value / maxDonation) * 110);
+                            return (
+                                <TouchableOpacity
+                                    key={item.date}
+                                    activeOpacity={0.85}
+                                    onPress={() => openDayModal(item.date)}
+                                    className="items-center"
+                                    style={{ width: 38 }}
+                                >
+                                    <Text className="text-[10px] mb-2" style={{ color: colors.secondary }}>
+                                        {item.value}
+                                    </Text>
 
-                            <View className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: colors.secondary }}>
-                                <View className="h-2 bg-green-500 rounded-full" style={{ width: `${(item.value / maxDonation) * 100}%` }} />
-                            </View>
-                        </TouchableOpacity>
-                    ))}
+                                    <View
+                                        className="w-6 rounded-full overflow-hidden"
+                                        style={{ backgroundColor: colors.border, height: 120 }}
+                                    >
+                                        <LinearGradient
+                                            colors={[colors.palette[3], colors.palette[1]]}
+                                            start={{ x: 0, y: 1 }}
+                                            end={{ x: 0, y: 0 }}
+                                            style={{ height: barHeight, marginTop: 120 - barHeight }}
+                                        />
+                                    </View>
+
+                                    <Text className="text-[10px] mt-2" style={{ color: colors.secondary }}>
+                                        {item.day}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                </View>
+            </View>
+
+            {/* Resumo da semana */}
+            <View className="flex-row gap-3 mb-6">
+                <View className="flex-1 rounded-2xl p-4" style={{ backgroundColor: colors.card }}>
+                    <Text className="text-xs" style={{ color: colors.secondary }}>Total na semana</Text>
+                    <Text className="text-xl font-bold mt-2" style={{ color: colors.text }}>{weekTotal}</Text>
+                </View>
+                <View className="flex-1 rounded-2xl p-4" style={{ backgroundColor: colors.card }}>
+                    <Text className="text-xs" style={{ color: colors.secondary }}>Média diária (semana)</Text>
+                    <Text className="text-xl font-bold mt-2" style={{ color: colors.text }}>{weekAverage.toFixed(1)}</Text>
                 </View>
             </View>
 
@@ -162,6 +214,28 @@ export default function InstitutionHome() {
                     <Text style={{ color: colors.secondary }}>Última doação recebida</Text>
                     <Text style={{ color: colors.secondary }}>{lastDonation ? `${lastDonation.order?.name ?? ''}` : '—'}</Text>
                 </View>
+            </View>
+
+            {/* Status recente */}
+            <View className="rounded-2xl p-5 mb-6" style={{ backgroundColor: colors.card }}>
+                <Text className="text-lg font-bold mb-3" style={{ color: colors.text }}>Status recente</Text>
+                <View className="flex-row justify-between">
+                    <View className="items-center">
+                        <Text className="text-xs" style={{ color: colors.secondary }}>Aprovadas</Text>
+                        <Text className="text-lg font-bold" style={{ color: colors.text }}>{recentStatusCounts.approved ?? 0}</Text>
+                    </View>
+                    <View className="items-center">
+                        <Text className="text-xs" style={{ color: colors.secondary }}>Pendentes</Text>
+                        <Text className="text-lg font-bold" style={{ color: colors.text }}>{recentStatusCounts.pending ?? 0}</Text>
+                    </View>
+                    <View className="items-center">
+                        <Text className="text-xs" style={{ color: colors.secondary }}>Rejeitadas</Text>
+                        <Text className="text-lg font-bold" style={{ color: colors.text }}>{recentStatusCounts.rejected ?? 0}</Text>
+                    </View>
+                </View>
+                <Text className="text-[11px] mt-3" style={{ color: colors.secondary }}>
+                    Baseado nas últimas doações listadas
+                </Text>
             </View>
 
             {/* Últimas doações */}

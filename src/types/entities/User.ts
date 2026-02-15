@@ -8,7 +8,7 @@ import { UserClassification } from "./UserClassification";
 export type User = {
     id: number;
     username: string;
-    password: string;
+    password?: string;
     type: 'client' | 'institution';
     hash: string;
     client?: Client;

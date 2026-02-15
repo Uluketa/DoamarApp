@@ -3,6 +3,9 @@ import { InitialUserState } from '~/store/modules/user/reducer';
 import * as prop from './types/props';
 import * as res from './types/response';
 import { getImageData, normalizeUri } from '~/core/helpers';
+import store from '~/store';
+import { setUser, setToken, clearUser, setRefreshToken } from '~/store/modules/user/actions';
+import { resetNavigation } from '~/store/modules/navigation/actions';
 
 export const URL = (__DEV__) ? "192.168.18.8:8000" : "NOT DEFINED";
 /** Base URL para imagens (precisa do protocolo para Image.uri) */
@@ -40,6 +43,105 @@ const API = axios.create({
     'Accept': 'application/json'
   }
 });
+
+let isRefreshing = false;
+let refreshQueue: Array<(token?: string) => void> = [];
+
+const resolveQueued = (token?: string) => {
+  refreshQueue.forEach((cb) => cb(token));
+  refreshQueue = [];
+};
+
+const refreshAccessToken = async () => {
+  const state = store.getState();
+  const refreshToken = state.user.refreshToken;
+  const userId = state.user.userData?.id;
+
+  if (!refreshToken || !userId) {
+    return null;
+  }
+
+  const response = await axios.post(`http://${URL}/api/auth/refresh`, {
+    user_id: userId,
+    refresh_token: refreshToken,
+  });
+
+  if (response.data?.ok !== 'S') {
+    return null;
+  }
+
+  return response.data?.data ?? null;
+};
+
+API.interceptors.request.use((config) => {
+  const state = store.getState();
+  const token = state.user.token;
+  if (token && !config.headers?.Authorization) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+API.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status !== 401 || originalRequest?._retry) {
+      return Promise.reject(error);
+    }
+
+    if (originalRequest?.url?.includes('/auth/login') || originalRequest?.url?.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        refreshQueue.push((token?: string) => {
+          if (!token) {
+            reject(error);
+            return;
+          }
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          resolve(API(originalRequest));
+        });
+      });
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const refreshData = await refreshAccessToken();
+
+      if (!refreshData?.token) {
+        store.dispatch(clearUser());
+        store.dispatch(resetNavigation());
+        resolveQueued(undefined);
+        return Promise.reject(error);
+      }
+
+      store.dispatch(setUser(refreshData));
+      store.dispatch(setToken(refreshData.token));
+      store.dispatch(setRefreshToken({
+        refreshToken: refreshData.refreshToken,
+        refreshTokenExpiresAt: refreshData.refreshTokenExpiresAt ?? null,
+      }));
+
+      resolveQueued(refreshData.token);
+      originalRequest.headers.Authorization = `Bearer ${refreshData.token}`;
+      return API(originalRequest);
+    } catch (refreshError) {
+      store.dispatch(clearUser());
+      store.dispatch(resetNavigation());
+      resolveQueued(undefined);
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
+  }
+);
 
 // ============================================================
 // Helper: Error Handler
@@ -122,6 +224,23 @@ export async function authMe(token: string) {
   }
 }
 
+export async function authRefresh(userId: number, refreshToken: string) {
+  try {
+    const { data } = await API.post('/auth/refresh', {
+      user_id: userId,
+      refresh_token: refreshToken
+    });
+    return data;
+  } catch (error: any) {
+    const msg = handleApiError(error, "Erro ao atualizar sessão.");
+    return {
+      ok: "N",
+      msg,
+      data: null
+    };
+  }
+}
+
 export async function saveSignUpData(props: prop.SignUpProps) {
   try {
     const endpoint = props.userType === 'I' ? '/institutions' : '/clients';
@@ -195,7 +314,6 @@ export async function clientHome(userId: number, token: string) {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log("Home data:", data.data.institutions);
     return data;
   } catch (error: any) {
     const msg = handleApiError(error, "Erro ao buscar dados da home.");
@@ -237,18 +355,22 @@ export async function updateClientProfile(
         },
       });
 
+      console.log("Client update response:", data);
+
       return data;
     } else {
       // Sem imagem, usar JSON
-      const { data } = await API.patch(`/clients/${clientId}`, profileData, {
+      const { data } = await API.put(`/clients/${clientId}`, profileData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
+      console.log("Client update responsse:", data);
       return data;
     }
   } catch (error: any) {
     console.log(error)
+    console.log("Error response:", error.response);
     const msg = handleApiError(error, "Erro ao atualizar perfil.");
     return {
       ok: "N",
@@ -304,9 +426,48 @@ export async function getInstitution(id: number, token?: string) {
 export async function updateInstitutionProfile(
   institutionId: number,
   profileData: prop.UpdateInstitutionProfileProps,
-  token: string
+  logoImage?: { uri: string; type?: string; fileName?: string } | null,
+  backgroundImage?: { uri: string; type?: string; fileName?: string } | null,
+  token?: string
 ) {
   try {
+    const hasImages = Boolean(logoImage || backgroundImage);
+
+    if (hasImages) {
+      const formData = new FormData();
+
+      Object.entries(profileData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
+        }
+      });
+
+      if (logoImage) {
+        formData.append('logoImage', {
+          uri: logoImage.uri,
+          type: logoImage.type ?? 'image/jpeg',
+          name: logoImage.fileName ?? `logo-${institutionId}.jpg`,
+        } as any);
+      }
+
+      if (backgroundImage) {
+        formData.append('backgroundImage', {
+          uri: backgroundImage.uri,
+          type: backgroundImage.type ?? 'image/jpeg',
+          name: backgroundImage.fileName ?? `background-${institutionId}.jpg`,
+        } as any);
+      }
+
+      const { data } = await API.patch(`/institutions/${institutionId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      return data;
+    }
+
     const { data } = await API.patch(`/institutions/${institutionId}`, profileData, {
       headers: {
         Authorization: `Bearer ${token}`

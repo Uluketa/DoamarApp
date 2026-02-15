@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useDispatch } from 'react-redux';
 import { setUser } from '~/store/modules/user/actions';
+import { setNavigationScreen } from '~/store/modules/navigation/actions';
 
 import { RootStackParamList } from '~/types/Navigation';
 
@@ -86,6 +87,10 @@ export const SignIn = ({ navigation }: SignInProps) => {
                 });
 
                 dispatch(setUser(responseUser.data));
+                
+                // Reset navegação de acordo com tipo de usuário
+                const initialScreen = responseUser.data.type === 'institution' ? 'Dashboard' : 'Home';
+                dispatch(setNavigationScreen({ screen: initialScreen }));
             }
 
         } catch (error: any) {

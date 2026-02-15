@@ -25,14 +25,14 @@ export const Header = ({ userType, searchValue = '', onSearchChange }: headerPro
             />
 
             <View className="flex-row flex-1 items-center bg-gray-200 rounded-lg px-4 mx-2 h-10" style={{ backgroundColor: colors.border }}>
-                <Ionicons name="search" size={20} color='#777' />
+                <Ionicons name="search" size={20} color={colors.secondary} />
                 <TextInput
-                    className="flex-1 h-12 text-gray-600 ml-2 text-bold"
+                    className="flex-1 h-12 ml-2 text-bold"
                     placeholder="Pesquisar..."
                     placeholderTextColor="#777"
                     value={searchValue}
                     onChangeText={onSearchChange}
-                    style={{ fontFamily: 'Poppins-Regular', backgroundColor: 'transparent' }}
+                    style={{ fontFamily: 'Poppins-Regular', backgroundColor: 'transparent', color: colors.secondary }}
                 />
             </View>
 

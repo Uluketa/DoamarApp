@@ -12,7 +12,6 @@ import EmptyState from './components/EmptyState';
 
 import { Order } from '~/types/entities/Order';
 import { colors } from '~/styles/colors';
-import { useTheme } from '~/contexts/ThemeContext';
 
 export default function DonationItemsStock() {
     const { userData, token } = useSelector((state: RootState) => state.user);
@@ -23,8 +22,6 @@ export default function DonationItemsStock() {
 
     const [orders, setOrders] = useState<Order[]>([]);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-
-    const {toggleTheme} = useTheme();
 
     const fetchOrders = useCallback(async () => {
         if (!institutionId || !token) return;
@@ -135,13 +132,6 @@ export default function DonationItemsStock() {
                 institutionId={institutionId}
                 order={selectedOrder}
             />
-
-            <TouchableOpacity
-                className="absolute bottom-6 right-6 w-24 h-24 rounded-full bg-green-600 items-center justify-center shadow-lg"
-                onPress={() => toggleTheme()}
-            >
-                <Ionicons name="add" size={28} color="#fff" />
-            </TouchableOpacity>
         </View>
     );
 }

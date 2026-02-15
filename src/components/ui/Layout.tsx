@@ -27,6 +27,15 @@ export const Layout = () => {
     const { userData } = useSelector((state: RootState) => state.user);
     const [searchText, setSearchText] = useState('');
 
+    // Sincroniza estado de navegação com tipo de usuário quando app carrega
+    useEffect(() => {
+        if (userData.type === 'institution' && screen !== 'Dashboard' && screen !== 'Stock' && screen !== 'Orders' && screen !== 'Reports') {
+            dispatch(setNavigationScreen({ screen: 'Dashboard' }));
+        } else if (userData.type === 'client' && screen !== 'Home' && screen !== 'Donation' && screen !== 'Favorites' && screen !== 'Settings') {
+            dispatch(setNavigationScreen({ screen: 'Home' }));
+        }
+    }, [userData.type, dispatch]);
+
     const handleChangeScreen = (screen: ClientScreenType | InstitutionScreenType) => {
         dispatch(setNavigationScreen({ screen }));
         // Limpar busca quando muda de tela

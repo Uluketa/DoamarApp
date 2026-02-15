@@ -15,6 +15,8 @@ import EditProfile from '~/components/screens/Client/EditProfile';
 
 // Institution Screens
 import { ReceiveDonationQuest } from '~/components/screens/Institution/ReceiveDonationQuest';
+import InstitutionSettings from '~/components/screens/Institution/Settings';
+import EditInstitutionProfile from '~/components/screens/Institution/EditProfile';
 
 // Common Screens
 import { About } from '~/components/screens/About';
@@ -117,6 +119,24 @@ export default function Routes() {
             component={EditProfile}
             options={{
               title: "Editar Perfil",
+              headerRight: () => <Logo />
+            }}
+          />
+
+          <Stack.Screen
+            name="InstitutionSettings"
+            component={InstitutionSettings}
+            options={{
+              title: "Configurações",
+              headerRight: () => <Logo />
+            }}
+          />
+
+          <Stack.Screen
+            name="EditInstitutionProfile"
+            component={EditInstitutionProfile}
+            options={{
+              title: "Editar Instituição",
               headerRight: () => <Logo />
             }}
           />

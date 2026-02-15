@@ -107,41 +107,48 @@ export default function Home({ searchText = '' }: { searchText?: string }) {
         navigation.navigate('ListInstitutions');
     };
 
+    //  Calcular classificação baseado no número de doações
+    const calculateRatingByDonations = (): { stars: number; levelText: string; starColor: string } => {
+        const donationCount = userData?.donations?.length || 0;
+
+        if (donationCount === 0) {
+            return {
+                stars: 1,
+                levelText: 'Comece a Doar',
+                starColor: '#6b7280'
+            };
+        } else if (donationCount >= 1 && donationCount <= 3) {
+            return {
+                stars: 2,
+                levelText: 'Vizinho',
+                starColor: '#3b82f6' // Azul
+            };
+        } else if (donationCount >= 4 && donationCount <= 6) {
+            return {
+                stars: 3,
+                levelText: 'Amigo',
+                starColor: '#f59e0b' // Âmbar
+            };
+        } else if (donationCount >= 7 && donationCount <= 15) {
+            return {
+                stars: 4,
+                levelText: 'Herói',
+                starColor: '#10b981' // Verde
+            };
+        } else {
+            // 16 ou mais
+            return {
+                stars: 5,
+                levelText: 'Doamar',
+                starColor: '#ec4899' // Rosa
+            };
+        }
+    };
+
     //  Renderizar classificação do usuário
     const renderRating = () => {
-        const rating = userData?.classification?.rating;
-
-        if (rating === undefined || rating === null || rating === 0) {
-            return (
-                <Text className="text-sm text-gray-500">Comece a doar para ganhar pontos</Text>
-            );
-        }
-
-        let levelText = 'Iniciante';
-        let starColor = '#3b82f6';
-        let stars = 1;
-
-        if (rating >= 1 && rating <= 2) {
-            levelText = 'Nível Iniciante';
-            stars = 1;
-            starColor = '#3b82f6';
-        } else if (rating >= 3 && rating <= 4) {
-            levelText = 'Nível Vizinho';
-            stars = 2;
-            starColor = '#f59e0b';
-        } else if (rating >= 5 && rating <= 7) {
-            levelText = 'Nível Amigo';
-            stars = 3;
-            starColor = '#10b981';
-        } else if (rating >= 8 && rating <= 9) {
-            levelText = 'Nível Herói';
-            stars = 4;
-            starColor = '#8b5cf6';
-        } else if (rating >= 10) {
-            levelText = 'Nível Doamar';
-            stars = 5;
-            starColor = '#ec4899';
-        }
+        const { stars, levelText, starColor } = calculateRatingByDonations();
+        const donationCount = userData?.donations?.length || 0;
 
         const starIcons = Array(5).fill(0).map((_, i) => (
             <Ionicons
@@ -163,6 +170,9 @@ export default function Home({ searchText = '' }: { searchText?: string }) {
                 </View>
                 <Text className='font-bold text-sm' style={{ color: starColor }}>
                     {levelText}
+                </Text>
+                <Text className='text-xs text-gray-500'>
+                    {donationCount} {donationCount === 1 ? 'doação' : 'doações'}
                 </Text>
             </View>
         );

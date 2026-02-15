@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState, useEffect, useCallback } from 'react';
+import { useLayoutEffect, useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
+import * as Location from 'expo-location';
 
 import { RootStackParamList } from '~/types/Navigation';
 import { colors } from '~/styles/colors';
@@ -49,10 +50,47 @@ export function InstitutionProfile({ route, navigation }: Props) {
     (state: RootState) => state.cart
   );
 
-  const [location] = useState({
+  const [location, setLocation] = useState({
     latitude: -23.55052,
     longitude: -46.633308,
   });
+
+  const [mapRegion, setMapRegion] = useState({
+    latitude: -23.55052,
+    longitude: -46.633308,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  });
+
+  const institutionAddress = useMemo(() => {
+    const parts = [
+      institutionData.addressLine,
+      institutionData.addressNumber,
+      institutionData.addressNeighborhood,
+      institutionData.addressCity,
+      institutionData.addressState,
+      institutionData.addressCep,
+    ].filter(Boolean);
+
+    if (parts.length > 0) {
+      return `${parts.join(', ')}, Brasil`;
+    }
+
+    return '';
+  }, [
+    institutionData.addressLine,
+    institutionData.addressNumber,
+    institutionData.addressNeighborhood,
+    institutionData.addressCity,
+    institutionData.addressState,
+    institutionData.addressCep,
+  ]);
+
+  const fallbackCepQuery = useMemo(() => {
+    if (!institutionData.addressCep) return '';
+    const cep = String(institutionData.addressCep).replace(/\D/g, '');
+    return cep ? `${cep}, Brasil` : '';
+  }, [institutionData.addressCep]);
 
   const [liked, setLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
@@ -157,6 +195,44 @@ export function InstitutionProfile({ route, navigation }: Props) {
   useEffect(() => {
     fetchFavorites();
   }, [fetchFavorites]);
+
+  useEffect(() => {
+    if (!institutionAddress && !fallbackCepQuery) return;
+
+    let cancelled = false;
+    const geocode = async () => {
+      try {
+        let results = institutionAddress
+          ? await Location.geocodeAsync(institutionAddress)
+          : [];
+
+        if ((!results || results.length === 0) && fallbackCepQuery) {
+          results = await Location.geocodeAsync(fallbackCepQuery);
+        }
+
+        if (!cancelled && results.length > 0) {
+          const nextLocation = {
+            latitude: results[0].latitude,
+            longitude: results[0].longitude,
+          };
+          setLocation(nextLocation);
+          setMapRegion({
+            ...nextLocation,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }
+      } catch (error) {
+        console.warn('Falha ao geocodificar endereco:', error);
+      }
+    };
+
+    geocode();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [institutionAddress, fallbackCepQuery]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -263,12 +339,7 @@ export function InstitutionProfile({ route, navigation }: Props) {
             <MapView
               provider={PROVIDER_GOOGLE}
               style={{ width: '100%', height: 160 }}
-              region={{
-                latitude: location.latitude,
-                longitude: location.longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
+              region={mapRegion}
               customMapStyle={theme === 'dark' ? MAP_DARK_STYLE : []}
             >
               <Marker coordinate={location} title={institutionData.name} />
