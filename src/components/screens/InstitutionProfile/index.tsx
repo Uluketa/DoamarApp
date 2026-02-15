@@ -39,7 +39,8 @@ const MAP_DARK_STYLE = [
 type Props = StackScreenProps<RootStackParamList, 'InstitutionProfile'>;
 
 export function InstitutionProfile({ route, navigation }: Props) {
-  const { institution } = route.params;
+  const { institution, hideActions } = route.params;
+  const isReadOnly = Boolean(hideActions);
   const [institutionData] = useState<Institution>(institution);
   const [ordersData, setOrdersData] = useState<Order[]>([]);
   const { theme } = useTheme();
@@ -99,6 +100,9 @@ export function InstitutionProfile({ route, navigation }: Props) {
     items.find(i => i.id === orderId)?.quantity ?? 0;
 
   const handleQuantityChange = (order: Order, qty: number) => {
+    if (isReadOnly) {
+      return;
+    }
     const differentInstitution =
       cartInstitution && cartInstitution.id !== institutionData.id;
 
@@ -193,8 +197,10 @@ export function InstitutionProfile({ route, navigation }: Props) {
   }, [liked, token, clientId, institutionData.id]);
 
   useEffect(() => {
-    fetchFavorites();
-  }, [fetchFavorites]);
+    if (!isReadOnly) {
+      fetchFavorites();
+    }
+  }, [fetchFavorites, isReadOnly]);
 
   useEffect(() => {
     if (!institutionAddress && !fallbackCepQuery) return;
@@ -237,11 +243,11 @@ export function InstitutionProfile({ route, navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: '',
-      headerRight: () => <CartHeader classlist="mr-5" />,
+      headerRight: () => (isReadOnly ? null : <CartHeader classlist="mr-5" />),
     });
 
     fetchOrders();
-  }, []);
+  }, [isReadOnly]);
 
   return (
     <View className="flex-1" style={{ backgroundColor: colors.background }}>
@@ -274,27 +280,29 @@ export function InstitutionProfile({ route, navigation }: Props) {
             }}
           />
 
-          <TouchableOpacity
-            onPress={handleToggleFavorite}
-            disabled={likeLoading}
-            activeOpacity={0.8}
-            style={{
-              position: 'absolute',
-              top: 20,
-              right: 20,
-              backgroundColor: 'rgba(0,0,0,0.45)',
-              padding: 10,
-              borderRadius: 999,
-              zIndex: 10,
-              opacity: likeLoading ? 0.5 : 1,
-            }}
-          >
-            <Ionicons
-              name={liked ? 'heart' : 'heart-outline'}
-              size={25}
-              color={liked ? '#ff4d6d' : '#fff'}
-            />
-          </TouchableOpacity>
+          {!isReadOnly && (
+            <TouchableOpacity
+              onPress={handleToggleFavorite}
+              disabled={likeLoading}
+              activeOpacity={0.8}
+              style={{
+                position: 'absolute',
+                top: 20,
+                right: 20,
+                backgroundColor: 'rgba(0,0,0,0.45)',
+                padding: 10,
+                borderRadius: 999,
+                zIndex: 10,
+                opacity: likeLoading ? 0.5 : 1,
+              }}
+            >
+              <Ionicons
+                name={liked ? 'heart' : 'heart-outline'}
+                size={25}
+                color={liked ? '#ff4d6d' : '#fff'}
+              />
+            </TouchableOpacity>
+          )}
 
           <View className="absolute bottom-6 left-4 right-4">
             <Text className="text-2xl font-bold text-white">
@@ -392,9 +400,11 @@ export function InstitutionProfile({ route, navigation }: Props) {
             <Text className="text-xl font-bold" style={{ color: colors.text }}>
               Pedidos de doação
             </Text>
-            <Text className="text-sm mt-1" style={{ color: colors.text + 'CC' }}>
-              Escolha como ajudar esta instituição
-            </Text>
+            {!isReadOnly && (
+              <Text className="text-sm mt-1" style={{ color: colors.text + 'CC' }}>
+                Escolha como ajudar esta instituição
+              </Text>
+            )}
           </View>
 
           <FlatList
@@ -421,6 +431,7 @@ export function InstitutionProfile({ route, navigation }: Props) {
                 item={item}
                 onQuantityChange={handleQuantityChange}
                 initialQuantity={getQuantityForOrder(item.id)}
+                showActions={!isReadOnly}
               />
             )}
           />

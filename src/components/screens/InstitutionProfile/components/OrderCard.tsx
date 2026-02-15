@@ -9,12 +9,14 @@ type OrderCardProps = {
   item: Order;
   initialQuantity: number;
   onQuantityChange: (item: Order, quantity: number) => void;
+  showActions?: boolean;
 };
 
 export function OrderCard({
   item,
   initialQuantity,
   onQuantityChange,
+  showActions = true,
 }: OrderCardProps) {
   const [quantity, setQuantity] = useState(initialQuantity);
 
@@ -59,41 +61,42 @@ export function OrderCard({
           {item.name}
         </Text>
 
-        {/* STEPPER */}
-        <View
-          className="flex-row items-center justify-between mt-4 rounded-full px-3 py-2"
-          style={{
-            backgroundColor: colors.background,
-            borderWidth: 1,
-            borderColor: colors.border,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => updateQuantity(Math.max(0, quantity - 1))}
-            disabled={quantity === 0}
+        {showActions && (
+          <View
+            className="flex-row items-center justify-between mt-4 rounded-full px-3 py-2"
+            style={{
+              backgroundColor: colors.background,
+              borderWidth: 1,
+              borderColor: colors.border,
+            }}
           >
-            <Ionicons
-              name="remove"
-              size={18}
-              color={quantity === 0 ? colors.border : colors.palette[1]}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => updateQuantity(Math.max(0, quantity - 1))}
+              disabled={quantity === 0}
+            >
+              <Ionicons
+                name="remove"
+                size={18}
+                color={quantity === 0 ? colors.border : colors.palette[1]}
+              />
+            </TouchableOpacity>
 
-          <Text
-            className="text-base font-bold"
-            style={{ color: colors.text }}
-          >
-            {quantity}
-          </Text>
+            <Text
+              className="text-base font-bold"
+              style={{ color: colors.text }}
+            >
+              {quantity}
+            </Text>
 
-          <TouchableOpacity onPress={() => updateQuantity(quantity + 1)}>
-            <Ionicons
-              name="add"
-              size={18}
-              color={colors.palette[1]}
-            />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity onPress={() => updateQuantity(quantity + 1)}>
+              <Ionicons
+                name="add"
+                size={18}
+                color={colors.palette[1]}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );

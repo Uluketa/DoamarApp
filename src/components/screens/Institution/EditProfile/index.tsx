@@ -17,7 +17,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { RootStackParamList } from '~/types/Navigation';
 import { RootState } from '~/store';
-import { updateInstitutionProfile, resolveImageUrl } from '~/api';
+import { listSocialIssues, updateInstitutionProfile, resolveImageUrl } from '~/api';
 import { updateInstitutionData } from '~/store/modules/user/actions';
 
 import { LabeledTextInput } from '~/components/LabeledTextInput';
@@ -25,12 +25,14 @@ import { BtnText as ButtonSalvar } from '~/components/Button';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { colors } from '~/styles/colors';
+import { SocialIssue } from '~/types/entities/SocialIssue';
 
 interface EditFormData {
     name: string;
     email: string;
     cellphone: string;
     cnpj: string;
+    socialIssueId: number | null;
     addressLine: string;
     addressNumber: string;
     addressCep: string;
@@ -58,6 +60,9 @@ export default function EditInstitutionProfile() {
     const [isSaving, setIsSaving] = useState(false);
     const [imageModal, setImageModal] = useState(false);
     const [imageTarget, setImageTarget] = useState<ImageTarget | null>(null);
+    const [socialIssueModal, setSocialIssueModal] = useState(false);
+    const [socialIssues, setSocialIssues] = useState<SocialIssue[]>([]);
+    const [isSocialIssueLoading, setIsSocialIssueLoading] = useState(false);
 
     const [logoUrl, setLogoUrl] = useState<string | null>(null);
     const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
@@ -69,6 +74,7 @@ export default function EditInstitutionProfile() {
         email: institution?.email || '',
         cellphone: institution?.cellphone?.toString() || '',
         cnpj: institution?.cnpj || '',
+        socialIssueId: institution?.social_issue?.id ?? institution?.social_issue_id ?? null,
         addressLine: institution?.addressLine || '',
         addressNumber: institution?.addressNumber || '',
         addressCep: institution?.addressCep || '',
@@ -87,6 +93,26 @@ export default function EditInstitutionProfile() {
             setBackgroundUrl(resolveImageUrl(institution.pathBackgroundImage) ?? null);
         }
     }, [institution?.pathLogoImage, institution?.pathBackgroundImage]);
+
+    useEffect(() => {
+        const fetchSocialIssues = async () => {
+            if (isSocialIssueLoading || socialIssues.length > 0) {
+                return;
+            }
+
+            setIsSocialIssueLoading(true);
+            try {
+                const response = await listSocialIssues();
+                if (response.ok === 'S' && response.data) {
+                    setSocialIssues(response.data);
+                }
+            } finally {
+                setIsSocialIssueLoading(false);
+            }
+        };
+
+        fetchSocialIssues();
+    }, []);
 
     const openImageModal = (target: ImageTarget) => {
         setImageTarget(target);
@@ -176,6 +202,10 @@ export default function EditInstitutionProfile() {
             Toast.show({ type: 'error', text1: 'Erro', text2: 'CNPJ e obrigatorio.' });
             return false;
         }
+        if (!formData.socialIssueId) {
+            Toast.show({ type: 'error', text1: 'Erro', text2: 'Causa social e obrigatoria.' });
+            return false;
+        }
         return true;
     };
 
@@ -192,6 +222,7 @@ export default function EditInstitutionProfile() {
                     email: formData.email,
                     cellphone: formData.cellphone,
                     cnpj: formData.cnpj,
+                    social_issue_id: formData.socialIssueId ?? undefined,
                     addressLine: formData.addressLine,
                     addressNumber: formData.addressNumber,
                     addressCep: formData.addressCep,
@@ -317,6 +348,23 @@ export default function EditInstitutionProfile() {
                         onChangeText={(text) => setFormData(prev => ({ ...prev, cnpj: text }))}
                     />
 
+                    <View className="w-full text-center mb-6 mt-4 flex-row items-center justify-center border-t pt-4" style={{ borderColor: colors.border }}>
+                        <Ionicons name="heart-outline" size={16} color={colors.text} />
+                        <Text className="ml-2 text-lg font-bold" style={{ color: colors.text }}>
+                            Causa social
+                        </Text>
+                    </View>
+
+                    <TouchableOpacity
+                        className="px-3 py-3 rounded-xl border"
+                        style={{ borderColor: colors.border, backgroundColor: colors.background }}
+                        onPress={() => setSocialIssueModal(true)}
+                    >
+                        <Text style={{ color: colors.text }}>
+                            {socialIssues.find((issue) => issue.id === formData.socialIssueId)?.title || 'Selecione uma causa social'}
+                        </Text>
+                    </TouchableOpacity>
+
                     {/* Endereço */}
                     <View className="w-full text-center mb-6 mt-4 flex-row items-center justify-center border-t pt-4" style={{ borderColor: colors.border }}>
                         <Ionicons name="location-outline" size={16} color={colors.text} />
@@ -426,6 +474,52 @@ export default function EditInstitutionProfile() {
                             className="py-3 rounded-xl border"
                             style={{ borderColor: colors.border }}
                             onPress={() => setImageModal(false)}
+                        >
+                            <Text className="text-center font-semibold" style={{ color: colors.text }}>
+                                Cancelar
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal visible={socialIssueModal} transparent animationType="fade" onRequestClose={() => setSocialIssueModal(false)}>
+                <View className="flex-1 items-center justify-center bg-black/60 px-8">
+                    <View className="w-full rounded-2xl p-6" style={{ backgroundColor: colors.card }}>
+                        <Text className="text-lg font-bold mb-4" style={{ color: colors.text }}>
+                            Selecione a causa social
+                        </Text>
+
+                        {isSocialIssueLoading ? (
+                            <View className="py-8 items-center">
+                                <ActivityIndicator color={colors.primary} />
+                            </View>
+                        ) : (
+                            <ScrollView className="max-h-80">
+                                {socialIssues.map((issue) => (
+                                    <TouchableOpacity
+                                        key={issue.id}
+                                        onPress={() => {
+                                            setFormData(prev => ({ ...prev, socialIssueId: issue.id }));
+                                            setSocialIssueModal(false);
+                                        }}
+                                        className="py-3 border-b"
+                                        style={{ borderColor: colors.border }}
+                                    >
+                                        <Text style={{ color: colors.text }}>{issue.title}</Text>
+                                        <Text className="text-xs mt-1" style={{ color: colors.text + 'AA' }}>{issue.description}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                                {socialIssues.length === 0 && (
+                                    <Text style={{ color: colors.text }}>Nenhuma causa encontrada.</Text>
+                                )}
+                            </ScrollView>
+                        )}
+
+                        <TouchableOpacity
+                            className="py-3 rounded-xl border mt-4"
+                            style={{ borderColor: colors.border }}
+                            onPress={() => setSocialIssueModal(false)}
                         >
                             <Text className="text-center font-semibold" style={{ color: colors.text }}>
                                 Cancelar

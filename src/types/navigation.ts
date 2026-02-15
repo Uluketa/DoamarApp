@@ -25,7 +25,7 @@ export type RootStackParamList = {
   PrivacyPolicy: undefined;
   About: undefined;
   Help: undefined;
-  InstitutionProfile: { institution: Institution };
+  InstitutionProfile: { institution: Institution; hideActions?: boolean };
   ListInstitutions: { socialIssueId?: number } | undefined;
   ListSocialIssues: undefined;
 

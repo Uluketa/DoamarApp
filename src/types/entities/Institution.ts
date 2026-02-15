@@ -12,7 +12,8 @@ export type Institution = {
     pathLogoImage?: string,
     pathBackgroundImage?: string,
     accountType: 'R' | 'D' | 'B',
-    social_issue: SocialIssue
+    social_issue_id?: number,
+    social_issue?: SocialIssue | null
 }
     & AddressType
     & TimestampsType

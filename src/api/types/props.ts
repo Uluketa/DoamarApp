@@ -20,6 +20,7 @@ export type SignUpProps = {
     accountType: "D" | "R";
     cpf?: string;
     cnpj?: string;
+    social_issue_id?: number;
     userType: "C" | "I";
 }
 

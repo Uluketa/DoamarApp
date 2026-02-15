@@ -2,15 +2,18 @@ import React from 'react';
 import { View, Text, Linking, Alert } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { version } from '../../../../../package.json';
+import { useSelector } from 'react-redux';
 
 import SettingsButton from '~/components/SettingsButton';
 import { RootStackParamList } from '~/types/Navigation';
+import { RootState } from '~/store';
 import { useTheme } from '~/contexts/ThemeContext';
 import colors from '~/styles/colors';
 
 export default function InstitutionSettings() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const { theme, toggleTheme } = useTheme();
+    const institution = useSelector((state: RootState) => state.user.userData.institution);
 
     const email = 'doamarapp@gmail.com';
     const title = 'Ajuda - Doamar App';
@@ -53,6 +56,22 @@ export default function InstitutionSettings() {
                     title="Editar informações da instituição"
                     color={colors.text}
                     onPress={() => navigation.navigate('EditInstitutionProfile')}
+                />
+
+                <SettingsButton
+                    iconName="eye-outline"
+                    title="Visualizar perfil"
+                    color={colors.text}
+                    onPress={() => {
+                        if (!institution) {
+                            Alert.alert('Erro', 'Dados da instituição não encontrados.');
+                            return;
+                        }
+                        navigation.navigate('InstitutionProfile', {
+                            institution,
+                            hideActions: true,
+                        });
+                    }}
                 />
 
                 <SettingsButton

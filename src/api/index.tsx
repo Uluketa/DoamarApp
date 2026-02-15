@@ -156,6 +156,9 @@ const handleApiError = (error: any, defaultMessage: string = "Erro ao processar 
   if (error.response?.status === 404) {
     return "Recurso não encontrado.";
   }
+  if (error.response?.status === 405) {
+    return "Método não permitido.";
+  }
   if (error.response?.status === 422) {
     return error.response.data?.msg || "Dados inválidos.";
   }
@@ -250,8 +253,11 @@ export async function saveSignUpData(props: prop.SignUpProps) {
     }
 
     const { data } = await API.post(endpoint, props);
+    console.log("Sign-up response:", data);
     return data;
   } catch (error: any) {
+    console.log("Sign-up error:", error);
+
     const msg = handleApiError(error, "Erro ao salvar cadastro.");
     return { ok: 'N', msg };
   }
@@ -431,15 +437,18 @@ export async function updateInstitutionProfile(
   token?: string
 ) {
   try {
+    const filteredProfileData = Object.fromEntries(
+      Object.entries(profileData).filter(([, value]) => value !== undefined && value !== null && value !== '')
+    );
     const hasImages = Boolean(logoImage || backgroundImage);
 
     if (hasImages) {
       const formData = new FormData();
 
-      Object.entries(profileData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
+      formData.append('_method', 'PATCH');
+
+      Object.entries(filteredProfileData).forEach(([key, value]) => {
+        formData.append(key, String(value));
       });
 
       if (logoImage) {
@@ -458,7 +467,7 @@ export async function updateInstitutionProfile(
         } as any);
       }
 
-      const { data } = await API.patch(`/institutions/${institutionId}`, formData, {
+      const { data } = await API.post(`/institutions/${institutionId}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -468,7 +477,7 @@ export async function updateInstitutionProfile(
       return data;
     }
 
-    const { data } = await API.patch(`/institutions/${institutionId}`, profileData, {
+    const { data } = await API.patch(`/institutions/${institutionId}`, filteredProfileData, {
       headers: {
         Authorization: `Bearer ${token}`
       }

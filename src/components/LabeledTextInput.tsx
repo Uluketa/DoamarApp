@@ -22,7 +22,7 @@ export const LabeledTextInput = ({ label, required, ...rest }: LabeledTextInputP
         className="border-2 rounded-lg p-3"
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        placeholderTextColor={colors.border}
+        placeholderTextColor={colors.secondary}
         editable={rest.editable}
         style={[
           {

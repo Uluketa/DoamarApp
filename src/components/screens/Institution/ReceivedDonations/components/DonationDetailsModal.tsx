@@ -7,7 +7,7 @@ import {
   PanResponder,
   ActivityIndicator,
 } from "react-native";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Donation } from "~/types/entities/Donation";
 import { updateDonationStatus } from "~/api";
 import { useSelector } from "react-redux";
@@ -26,6 +26,12 @@ export function DonationDetailsModal({ donation, onClose, onStatusUpdated }: Pro
   const [updating, setUpdating] = useState(false);
 
   const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (donation) {
+      translateY.setValue(0);
+    }
+  }, [donation, translateY]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -84,7 +90,12 @@ export function DonationDetailsModal({ donation, onClose, onStatusUpdated }: Pro
   const canApproveReject = status === "pending";
 
   return (
-    <Modal transparent animationType="fade">
+    <Modal
+      transparent
+      animationType="fade"
+      visible={Boolean(donation)}
+      onRequestClose={onClose}
+    >
       <View className="flex-1 justify-end bg-black/40">
         <Animated.View
           {...panResponder.panHandlers}

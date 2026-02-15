@@ -53,7 +53,9 @@ export default function Routes() {
               backgroundColor: colors.primary,
             },
             headerStatusBarHeight: 0,
-            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+            headerBackTitle: 'Voltar',
+            headerBackTitleVisible: true
           }}
         >
           {!userData.id ? (
