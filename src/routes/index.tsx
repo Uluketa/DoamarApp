@@ -46,8 +46,13 @@ export default function Routes() {
           screenOptions={{
             animationEnabled: true,
             headerTintColor: '#f0f0f0',
+            headerTitleAlign: 'center',
             headerTitleStyle: {
               color: '#f0f0f0',
+              fontSize: 12,
+            },
+            headerTitleContainerStyle: {
+              alignItems: 'center',
             },
             headerStyle: {
               backgroundColor: colors.primary,

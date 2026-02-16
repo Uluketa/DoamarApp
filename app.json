@@ -32,6 +32,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/global/doamarIcon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.uluketa.DoamarApp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "389601e2-1ae9-422b-be86-60cb56b2cdff"
       }
     }
   }

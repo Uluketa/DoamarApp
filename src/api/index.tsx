@@ -7,9 +7,9 @@ import store from '~/store';
 import { setUser, setToken, clearUser, setRefreshToken } from '~/store/modules/user/actions';
 import { resetNavigation } from '~/store/modules/navigation/actions';
 
-export const URL = (__DEV__) ? "192.168.18.8:8000" : "NOT DEFINED";
+export const URL = (__DEV__) ? "doamarapi.onrender.com" : "doamarapi.onrender.com";
 /** Base URL para imagens (precisa do protocolo para Image.uri) */
-export const IMAGE_BASE_URL = `http://${URL}`;
+export const IMAGE_BASE_URL = `https://${URL}`;
 
 export const resolveImageUrl = (
   path?: string | null,
@@ -37,7 +37,7 @@ export const resolveImageUrl = (
 // API Instance Configuration
 // ============================================================
 const API = axios.create({
-  baseURL: `http://${URL}/api`,
+  baseURL: `https://${URL}/api`,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -61,7 +61,7 @@ const refreshAccessToken = async () => {
     return null;
   }
 
-  const response = await axios.post(`http://${URL}/api/auth/refresh`, {
+  const response = await axios.post(`https://${URL}/api/auth/refresh`, {
     user_id: userId,
     refresh_token: refreshToken,
   });

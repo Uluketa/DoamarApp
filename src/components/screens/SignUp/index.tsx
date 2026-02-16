@@ -168,6 +168,16 @@ export const SignUp = ({ navigation }: SignUpProps) => {
                 return;
             }
 
+            if (password.trim().length <= 4) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Ocorreu um erro!',
+                    text2: 'A senha precisa ter mais de 4 digitos.'
+                });
+                setIsLoading(false);
+                return;
+            }
+
             const cleanCpfCnpj = stripNonDigits(cpfCnpj);
             const cleanCellphone = stripNonDigits(cellphone);
 
