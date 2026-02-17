@@ -32,8 +32,7 @@ export function OrderCard({
         width: 150,
         backgroundColor: colors.card,
         borderWidth: 1,
-        borderColor: colors.border,
-        elevation: 4,
+        borderColor: colors.border
       }}
     >
       {/* IMAGE */}

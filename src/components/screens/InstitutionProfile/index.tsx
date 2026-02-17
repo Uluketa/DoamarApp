@@ -7,6 +7,7 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -14,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Location from 'expo-location';
+import Constants from 'expo-constants';
 
 import { RootStackParamList } from '~/types/Navigation';
 import { colors } from '~/styles/colors';
@@ -44,6 +46,10 @@ export function InstitutionProfile({ route, navigation }: Props) {
   const [institutionData] = useState<Institution>(institution);
   const [ordersData, setOrdersData] = useState<Order[]>([]);
   const { theme } = useTheme();
+  const hasGoogleMapsKey = Boolean(
+    Constants.expoConfig?.android?.config?.googleMaps?.apiKey
+  );
+  const canRenderMap = Platform.OS === 'ios' || hasGoogleMapsKey;
 
   const dispatch = useDispatch();
   const { token, userData } = useSelector((state: RootState) => state.user);
@@ -208,6 +214,15 @@ export function InstitutionProfile({ route, navigation }: Props) {
     let cancelled = false;
     const geocode = async () => {
       try {
+        // Solicitar permissão de localização no Android
+        if (Platform.OS === 'android') {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            console.warn('Permissão de localização negada');
+            return;
+          }
+        }
+
         let results = institutionAddress
           ? await Location.geocodeAsync(institutionAddress)
           : [];
@@ -321,8 +336,7 @@ export function InstitutionProfile({ route, navigation }: Props) {
                 bottom: -24,
                 backgroundColor: colors.background,
                 padding: 14,
-                borderRadius: 16,
-                elevation: 6,
+                borderRadius: 16
               }}
             >
               <Image
@@ -344,14 +358,37 @@ export function InstitutionProfile({ route, navigation }: Props) {
               backgroundColor: colors.background,
             }}
           >
-            <MapView
-              provider={PROVIDER_GOOGLE}
-              style={{ width: '100%', height: 160 }}
-              region={mapRegion}
-              customMapStyle={theme === 'dark' ? MAP_DARK_STYLE : []}
-            >
-              <Marker coordinate={location} title={institutionData.name} />
-            </MapView>
+            {canRenderMap ? (
+              <MapView
+                provider={PROVIDER_GOOGLE}
+                style={{ width: '100%', height: 160 }}
+                region={mapRegion}
+                customMapStyle={theme === 'dark' ? MAP_DARK_STYLE : []}
+              >
+                <Marker coordinate={location} title={institutionData.name} />
+              </MapView>
+            ) : (
+              <View
+                style={{
+                  height: 160,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 16,
+                }}
+              >
+                <Text className="text-sm text-center" style={{ color: colors.text }}>
+                  Mapa indisponivel no Android sem chave do Google Maps.
+                </Text>
+                {(institutionAddress || fallbackCepQuery) && (
+                  <Text
+                    className="text-xs text-center mt-2"
+                    style={{ color: colors.text + 'CC' }}
+                  >
+                    {institutionAddress || fallbackCepQuery}
+                  </Text>
+                )}
+              </View>
+            )}
           </View>
         </View>
 

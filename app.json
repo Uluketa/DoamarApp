@@ -11,7 +11,13 @@
     },
     "plugins": [
       "expo-font",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Permitir que o $(PRODUCT_NAME) use sua localização para encontrar instituições próximas."
+        }
+      ]
     ],
     "newArchEnabled": true,
     "orientation": "portrait",

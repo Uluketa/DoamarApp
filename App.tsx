@@ -83,7 +83,7 @@ function RootLayoutNav() {
     setAppTheme(theme === 'dark' ? 'dark' : 'light');
 
     if (Platform.OS === 'android') {
-      NavigationBar.setBackgroundColorAsync(colors.background);
+      // Apenas setButtonStyleAsync é suportado com edge-to-edge mode
       NavigationBar.setButtonStyleAsync(theme === 'dark' ? 'light' : 'dark');
     }
   }, [theme]);
@@ -96,7 +96,7 @@ function RootLayoutNav() {
               flex: 1,
               backgroundColor: colors.primary,
               paddingTop: insets.top,
-              paddingBottom: 0
+              paddingBottom: insets.bottom
             }}
           >
             <StatusBar

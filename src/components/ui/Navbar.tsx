@@ -1,5 +1,6 @@
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Platform } from 'react-native';
 import { ClientScreenType } from '~/types/Navigation';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -33,6 +34,8 @@ const NavButton = ({ icon, onPress, isActive }: NavButtonProps) => (
 );
 
 export const NavBar = ({ activeScreen, setActiveScreen, userType }: NavBarProps) => {
+  const insets = useSafeAreaInsets();
+  
   const clientScreens = [
     {
       title: 'Home',
@@ -82,7 +85,14 @@ export const NavBar = ({ activeScreen, setActiveScreen, userType }: NavBarProps)
   const screens = userType === 'institution' ? institutionScreens : clientScreens;
 
   return (
-    <View className='flex-row pb-12 pt-6 border-t' style={{ backgroundColor: colors.background, borderColor: colors.border }}>
+    <View 
+      className='flex-row pt-6 border-t' 
+      style={{ 
+        backgroundColor: colors.background, 
+        borderColor: colors.border,
+        paddingBottom: Platform.OS === 'android' ? Math.max(insets.bottom, 12) : 12
+      }}
+    >
       {screens.map((button, index) => (
         <NavButton
           key={index}
