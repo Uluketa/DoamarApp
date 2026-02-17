@@ -29,6 +29,7 @@ import { OrderCard } from './components/OrderCard';
 import { CartHeader } from '~/components/CartHeader';
 import { setCartItems, clearCart } from '~/store/modules/cart/actions';
 import { useTheme } from '~/contexts/ThemeContext';
+import { Loading } from '~/components/ui/Loading';
 
 const MAP_DARK_STYLE = [
   { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
@@ -45,6 +46,7 @@ export function InstitutionProfile({ route, navigation }: Props) {
   const isReadOnly = Boolean(hideActions);
   const [institutionData] = useState<Institution>(institution);
   const [ordersData, setOrdersData] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
   const { theme } = useTheme();
   const hasGoogleMapsKey = Boolean(
     Constants.expoConfig?.android?.config?.googleMaps?.apiKey
@@ -146,8 +148,15 @@ export function InstitutionProfile({ route, navigation }: Props) {
   };
 
   const fetchOrders = async () => {
-    const response = await getOrdersByInstitution(institutionData.id, token);
-    if (response.data) setOrdersData(response.data);
+    setLoadingOrders(true);
+    try {
+      const response = await getOrdersByInstitution(institutionData.id, token);
+      if (response.data) setOrdersData(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar pedidos:', error);
+    } finally {
+      setLoadingOrders(false);
+    }
   };
 
   // Buscar lista de favoritos do cliente
@@ -455,12 +464,16 @@ export function InstitutionProfile({ route, navigation }: Props) {
             ]}
             ListEmptyComponent={() => (
               <View className="flex-1 justify-center items-center">
-                <Text
-                  className="text-center"
-                  style={{ color: colors.text + 'CC' }}
-                >
-                  Nenhum pedido disponível
-                </Text>
+                {loadingOrders ? (
+                  <Loading />
+                ) : (
+                  <Text
+                    className="text-center"
+                    style={{ color: colors.text + 'CC' }}
+                  >
+                    Nenhum pedido disponível
+                  </Text>
+                )}
               </View>
             )}
             renderItem={({ item }) => (

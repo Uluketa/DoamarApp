@@ -43,7 +43,6 @@ export default function App() {
   const [assetsLoaded, setAssetsLoaded] = useState(false);
 
   useEffect(() => {
-    // Preload static images (cover) to avoid delay when Home mounts
     (async () => {
       try {
         await Asset.loadAsync(require('src/assets/global/cover.png'));
@@ -59,7 +58,6 @@ export default function App() {
     return <Loading />;
   }
 
-  // 🔥 SafeAreaProvider TEM que estar AQUI
   return (
     <SafeAreaProvider>
       <ThemeProviderApp>
@@ -79,11 +77,9 @@ function RootLayoutNav() {
   const isDark = theme === 'dark';
 
   useEffect(() => {
-    // update global colors module
     setAppTheme(theme === 'dark' ? 'dark' : 'light');
 
     if (Platform.OS === 'android') {
-      // Apenas setButtonStyleAsync é suportado com edge-to-edge mode
       NavigationBar.setButtonStyleAsync(theme === 'dark' ? 'light' : 'dark');
     }
   }, [theme]);
@@ -91,14 +87,14 @@ function RootLayoutNav() {
     <>
       <Provider store={store}>
         <ThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: colors.primary,
-              paddingTop: insets.top,
-              paddingBottom: insets.bottom
-            }}
-          >
+          <View style={{ flex: 1, backgroundColor: colors.background, paddingBottom: insets.bottom }}>
+            <View 
+              style={{ 
+                height: insets.top,
+                backgroundColor: colors.primary
+              }} 
+            />
+            
             <StatusBar
               barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
               translucent={Platform.OS === 'android'}

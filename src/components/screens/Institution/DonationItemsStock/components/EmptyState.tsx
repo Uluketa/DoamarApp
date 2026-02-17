@@ -4,12 +4,12 @@ import { colors } from '~/styles/colors';
 
 export default function EmptyState() {
   return (
-    <View className="flex-1 items-center justify-center" >
+    <View className="flex-1 items-center justify-center py-20" >
       <Ionicons name="cube-outline" size={64} color={colors.secondary} />
       <Text className="text-lg font-bold mt-4 text-center" style={{ color: colors.text }}>
-        Nenhum pedido cadastrado
+        Nenhum item cadastrado
       </Text>
-      <Text className="text-center mt-2" style={{ color: colors.secondary }}>
+      <Text className="text-center mt-2 px-8" style={{ color: colors.secondary }}>
         Crie pedidos de itens para que os doadores saibam exatamente o que sua instituição precisa.
       </Text>
     </View>

@@ -239,7 +239,7 @@ export default function InstitutionHome() {
             </View>
 
             {/* Últimas doações */}
-            <View className="rounded-2xl p-5 mb-6" style={{ backgroundColor: colors.card }}>
+            <View className="rounded-2xl p-5 mb-12" style={{ backgroundColor: colors.card }}>
                 <View className="flex-row justify-between items-center mb-3">
                     <Text className="text-lg font-bold" style={{ color: colors.text }}>Últimas doações</Text>
                     <TouchableOpacity onPress={() => dispatch(setNavigationScreen({ screen: 'Orders' }))}>

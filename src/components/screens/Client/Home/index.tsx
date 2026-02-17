@@ -365,10 +365,16 @@ export default function Home({ searchText = '' }: { searchText?: string }) {
                 <Text className="text-2xl font-bold mb-4" style={{ color: colors.text }}>Suas Doações</Text>
 
                 {!userData.donations || userData.donations.length === 0 ? (
-                    <View className="bg-blue-50 rounded-lg p-6 items-center">
+                    <View className="rounded-lg p-6 items-center"
+                        style={{
+                            backgroundColor: theme === 'light' ? '#deefff' : '#212130',
+                        }}>
                         <Ionicons name="gift-outline" size={48} color={colors.palette[1]} />
-                        <Text className="mt-4 font-bold text-lg">Comece a Doar</Text>
-                        <Text className="text-sm text-gray-600 text-center mt-2">
+                        <Text className="mt-4 font-bold text-lg" 
+                        style={{
+                            color: theme === 'light' ? '#212130' : '#deefff',
+                        }}>Comece a Doar</Text>
+                        <Text className="text-sm text-center mt-2" style={{ color: colors.secondary}}>
                             Explore instituições e realize sua primeira doação
                         </Text>
                     </View>

@@ -130,7 +130,7 @@ export const SignIn = ({ navigation }: SignInProps) => {
                     <ButtonEntrar title='Entrar' onPress={handleLogin} bgColor={colors.primary} loading={isFetching} />
                 </View>
 
-                <View className='flex flex-row justify-center items-center mb-12'>
+                <View className='flex flex-row justify-center items-center '>
                     <Text className="text-base text-center mr-1 py-5" style={{ color: colors.text + '77' }}>Ainda não tem uma conta?</Text>
                     <TouchableOpacity className="items-center py-5"  onPress={() => navigation.navigate("SignUp")}>
                         <Text className='underline ml-1' style={{ color: colors.text }}>Cadastre-se</Text>

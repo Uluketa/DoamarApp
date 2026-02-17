@@ -28,7 +28,7 @@ export interface NavButtonProps {
 const NavButton = ({ icon, onPress, isActive }: NavButtonProps) => (
   <TouchableOpacity className="flex-1 justify-center items-center" onPress={onPress}>
     {isValidElement(icon)
-      ? cloneElement(icon as React.ReactElement<any>, { color: isActive ? colors.palette[1] : 'gray' })
+      ? cloneElement(icon as React.ReactElement<any>, { color: isActive ? colors.text : colors.text + '80' })
       : icon}
   </TouchableOpacity>
 );
@@ -86,11 +86,13 @@ export const NavBar = ({ activeScreen, setActiveScreen, userType }: NavBarProps)
 
   return (
     <View 
-      className='flex-row pt-6 border-t' 
+      className='flex-row border-t' 
       style={{ 
         backgroundColor: colors.background, 
-        borderColor: colors.border,
-        paddingBottom: Platform.OS === 'android' ? Math.max(insets.bottom, 12) : 12
+        borderTopColor: colors.text + '20', // Cor da barrinha superior (text com 12% opacidade)
+        borderTopWidth: 1,
+        paddingBottom: Platform.OS === 'android' ? 20 : 5,
+        paddingTop: 20
       }}
     >
       {screens.map((button, index) => (

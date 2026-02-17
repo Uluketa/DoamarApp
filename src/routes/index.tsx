@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '~/types/Navigation';
 import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 
 // Auth Screens
 import { SignIn } from '~/components/screens/SignIn';
@@ -60,7 +61,19 @@ export default function Routes() {
             headerStatusBarHeight: 0,
             cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
             headerBackTitle: 'Voltar',
-            headerBackTitleVisible: true
+            headerBackTitleVisible: true,
+            headerBackTitleStyle: {
+              color: '#f0f0f0',
+              marginLeft: 5
+            },
+            headerBackImage: () => (
+              <Ionicons 
+                name="arrow-back" 
+                size={24} 
+                color="#f0f0f0" 
+                style={{ marginLeft: 10 }} 
+              />
+            )
           }}
         >
           {!userData.id ? (
@@ -196,7 +209,7 @@ export default function Routes() {
             component={InstitutionProfile}
             options={{
               gestureEnabled: false,
-              headerRight: () => <CartHeader classlist='mr-5' />
+              headerRight: () => <CartHeader />
             }}
           />
         </Stack.Navigator>

@@ -4,7 +4,7 @@ import colors from '~/styles/colors';
 
 export function About() {
     return (
-        <View>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
             <Image
                 className="absolute t-0 w-[100%] h-[200px] opacity-[0.3]"
                 source={require('~/assets/rostos.jpg')}

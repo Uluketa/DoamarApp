@@ -20,7 +20,7 @@ export const Header = ({ userType, searchValue = '', onSearchChange }: headerPro
         <View style={{ backgroundColor: colors.primary }} className="flex-row items-center justify-between px-3 py-4">
             <Image
                 source={require('~/assets/logoLightGreenB.png')}
-                className="w-10 h-10 mx-2"
+                className="w-8 h-8 mx-2"
                 resizeMode="contain"
             />
 
@@ -36,7 +36,7 @@ export const Header = ({ userType, searchValue = '', onSearchChange }: headerPro
                 />
             </View>
 
-            {userType == "client" ?  <CartHeader classlist='mr-2' /> : <LogOutHeader />}
+            {userType == "client" ?  <CartHeader /> : <LogOutHeader />}
         </View>
     );
 };

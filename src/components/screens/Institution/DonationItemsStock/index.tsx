@@ -103,7 +103,7 @@ export default function DonationItemsStock() {
                 </TouchableOpacity>
             </View>
 
-            <View className='px-6 pb-6'>
+            <View className='px-6 pb-6 flex-1'>
                 {/* Listagem */}
                 {orders.length === 0 ? (
                     <EmptyState />
